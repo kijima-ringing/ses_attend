@@ -12,9 +12,17 @@
 */
 
 Route::get('/', function () {
+    return view('auth.login');
+});
+
+Route::get('home', function () {
     return view('welcome');
 });
 
-Auth::routes();
 
-Route::get('/home', 'HomeController@index')->name('home');
+Route::get('login', 'Auth\LoginController@showLoginForm')->name('login');
+Route::post('login', 'Auth\LoginController@login');
+
+Route::middleware('auth')->group(function (){
+    Route::post('logout', 'Auth\LoginController@logout')->name('logout');
+});
