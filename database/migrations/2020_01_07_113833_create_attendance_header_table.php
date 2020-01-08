@@ -20,6 +20,7 @@ class CreateAttendanceHeaderTable extends Migration
             $table->date('year_month');
             $table->unsignedTinyInteger('working_days');
             $table->time('overtime_hours');
+            $table->time('scheduled_working_hours');
             $table->time('working_hours');
             $table->unsignedBigInteger('created_by')->nullable();
             $table->unsignedBigInteger('updated_by')->nullable();
