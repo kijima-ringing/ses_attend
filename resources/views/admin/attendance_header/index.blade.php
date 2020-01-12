@@ -7,10 +7,8 @@
     <div class="container">
         <form method="GET" action="{{ route('admin.attendance_header.index') }}">
             @csrf
-            <input type="text" class="monthPick" name="year_month" value="{{ $date }}">
-            <button type="submit" class="btn btn-primary">
-                {{ __('ログイン') }}
-            </button>
+            <input type="text" class="monthPick" id="year_month" name="year_month" value="{{ $date }}">
+            <input type="submit" class="d-none" id="year_month_submit">
         </form>
         <table class="table table-bordered">
             <thead class="bg-info">
@@ -32,7 +30,7 @@
                     <th class="text-center">{{ $user->overtime_hours }}</th>
                     <th class="text-center">{{ $user->working_hours }}</th>
                     <td class="text-center">
-                        <a href="{{ route('admin.attendance_header.index') }}" class="btn btn-info">詳細</a>
+                        <a href="{{ route('admin.attendance_header.show', ['user_id' => $user->user_id, 'year_month' => $date]) }}" class="btn btn-info">詳細</a>
                     </td>
                 </tr>
             @endforeach

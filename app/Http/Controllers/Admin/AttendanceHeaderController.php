@@ -3,20 +3,17 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\YearMonthRequest;
 use App\Models\User;
+use App\Services\GetDateService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
 
 class AttendanceHeaderController extends Controller
 {
-    public function index(YearMonthRequest $request) {
+    public function index(Request $request) {
 
-        if(!$request->validated() || !isset($request)) {
-            $date = Carbon::now()->startOfMonth();
-        } else {
-            $date = Carbon::create($request->year_month)->startOfMonth();
-        }
+        $getDateService = new GetDateService();
+
+        $date = $getDateService->createYearMonthFormat($request->year_month);
 
         $dateForSearch = $date->format('Y-m-d');
 

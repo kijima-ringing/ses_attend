@@ -9,15 +9,16 @@
 
     <title>{{ config('app.name', 'Laravel') }}</title>
 
-    <!-- Scripts -->
-    <script src="{{ asset('js/app.js') }}" defer></script>
-
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
 
     <!-- Styles -->
+    <link href="{{ asset('css/custom.css') }}" rel="stylesheet">
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+    <link href="{{ asset('vendor/jquery-ui/jquery-ui.css') }}" rel="stylesheet">
+
+    @yield('addCss')
 </head>
 <body>
     <div id="app">
@@ -70,6 +71,13 @@
         <main class="py-4">
             @yield('content')
         </main>
+
+        <!-- Scripts -->
+        <script src="{{ asset('js/app.js') }}"></script>
+        <script src="{{ asset('vendor/jquery-ui/jquery-ui.js') }}"></script>
+        <script src="{{ asset('vendor/jquery-ui/jquery.mtz.monthpicker.js') }}"></script>
+        <script src="{{ asset('js/common.js') }}"></script>
+        @yield('addJs')
     </div>
 </body>
 </html>

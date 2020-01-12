@@ -42,7 +42,16 @@ class User extends Authenticatable
 
     public function scopeLedftJoinAttendanceHeader($query, $date) {
 
-        return $query->leftjoin('attendance_header', function($join) use ($date) {
+        return $query->select(
+            'users.id AS user_id',
+            'users.last_name AS last_name',
+            'users.first_name AS first_name',
+            'attendance_header.working_days AS working_days',
+            'attendance_header.scheduled_working_hours AS scheduled_working_hours',
+            'attendance_header.overtime_hours AS overtime_hours',
+            'attendance_header.working_hours AS working_hours'
+        )
+            ->leftjoin('attendance_header', function($join) use ($date) {
             $join->on('users.id', 'attendance_header.user_id')
                 ->where('attendance_header.year_month', '=', $date);
         })->get();
