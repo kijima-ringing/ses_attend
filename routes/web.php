@@ -25,4 +25,8 @@ Route::post('login', 'Auth\LoginController@login');
 
 Route::middleware('auth')->group(function (){
     Route::post('logout', 'Auth\LoginController@logout')->name('logout');
+    Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin'], function () {
+        Route::resource('attendance_header', 'AttendanceHeaderController', ['except' => ['show', 'edit', 'delete']]);
+        Route::get('attendance_header/{user_id}/{year_month}', 'AttendanceHeaderController@show')->name('attendance_header.show');
+    });
 });
