@@ -34,3 +34,7 @@ $('#year_month').change(function() {
         $('form').submit();
     }
 });
+
+$('.back-index').click(function() {
+    $('#year_month_submit').trigger('click');
+});

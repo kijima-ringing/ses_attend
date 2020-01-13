@@ -5,11 +5,15 @@
 
 @section('content')
     <div class="container">
-        <form method="GET" action="{{ route('admin.attendance_header.index') }}">
-            @csrf
-            <input type="text" class="monthPick" id="year_month" name="year_month" value="{{ $date }}">
-            <input type="submit" class="d-none" id="year_month_submit">
-        </form>
+        <div class="row pb-3">
+            <div class="col-12">
+                <form method="GET" action="{{ route('admin.attendance_header.index') }}">
+                    @csrf
+                    <input type="text" class="monthPick" id="year_month" name="year_month" value="{{ $date }}">
+                    <input type="submit" class="d-none" id="year_month_submit">
+                </form>
+            </div>
+        </div>
         <table class="table table-bordered">
             <thead class="bg-info">
             <tr>

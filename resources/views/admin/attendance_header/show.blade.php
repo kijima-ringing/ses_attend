@@ -6,6 +6,16 @@
 @section('content')
     <div class="container company" data-base_time_from="{{ $company->base_time_from }}" data-base_time_to="{{ $company->base_time_to }}">
         <div class="row pb-3">
+            <form method="GET" action="{{ route('admin.attendance_header.index') }}">
+                @csrf
+                <input type="hidden" name="year_month" value="{{ $date }}">
+                <button type="submit" class="d-none" id="year_month_submit"></button>
+                <div class="col-12">
+                    <div class="back-index click-text">戻る</div>
+                </div>
+            </form>
+        </div>
+        <div class="row pb-3">
             <div class="col-2">
                 <div data-action="{{ route('admin.attendance_header.show', ['user_id' => $attendance->user_id, 'year_month' => 'year_month']) }}" id="year_month_url">
                     <input type="text" class="monthPick" id="year_month" name="year_month" value="{{ $date }}">
@@ -13,7 +23,8 @@
                 </div>
             </div>
 
-            <div class="col-2 text-right h2">
+            <div class="col-1"></div>
+            <div class="h2">
                 {{ $attendance->user->last_name }}{{ $attendance->user->first_name }}
             </div>
 
@@ -31,9 +42,9 @@
             <tbody>
                 <tr class="bg-white">
                     <th class="text-center">{{ $attendance->working_days }}日</th>
-                    <th class="text-center">{{ $attendance->scheduled_working_hours }}</th>
-                    <th class="text-center">{{ $attendance->overtime_hours }}</th>
-                    <th class="text-center">{{ $attendance->working_hours }}</th>
+                    <th class="text-center">{{ AttendanceHelper::timeFormat($attendance->scheduled_working_hours) }}</th>
+                    <th class="text-center">{{ AttendanceHelper::timeFormat($attendance->overtime_hours) }}</th>
+                    <th class="text-center">{{ AttendanceHelper::timeFormat($attendance->working_hours) }}</th>
                 </tr>
             </tbody>
         </table>
@@ -53,27 +64,31 @@
             <tbody>
                 @foreach($daysOfMonth as $day)
                     <tr class="bg-white dateInfo">
-                        <th class="text-right dialog date_info work_date" data-date_info="{{ $date . '-' . $day['day'] . '(' . $day['dayOfWeek'] . ')' }}" data-work_date="{{ $day['work_date'] }}">{{ $day['day'] }}日</th>
+                        <th class="text-right dialog date_info work_date click-text" data-date_info="{{ $date . '-' . $day['day'] . '(' . $day['dayOfWeek'] . ')' }}" data-work_date="{{ $day['work_date'] }}">{{ $day['day'] }}日</th>
                         <th class="text-center">{{ $day['dayOfWeek'] }}</th>
                         @if (count($atendanceDaily) > 0)
                                 @if (isset($atendanceDaily[$day['work_date']]))
-                                    <th class="text-center attendance_class memo" data-attendance_class="{{ $atendanceDaily[$day['work_date']]['attendance_class'] }}" data-memo="{{ $atendanceDaily[$day['work_date']]['memo'] }}">
+                                    <th class="text-center attendance_class memo " data-attendance_class="{{ $atendanceDaily[$day['work_date']]['attendance_class'] }}" data-memo="{{ $atendanceDaily[$day['work_date']]['memo'] }}">
                                         {{ AttendanceHelper::attendanceClass($atendanceDaily[$day['work_date']]['attendance_class']) }}
                                     </th>
                                     <th class="text-center working_time leave_time" data-working_time="{{ $atendanceDaily[$day['work_date']]['working_time'] }}" data-leave_time="{{ $atendanceDaily[$day['work_date']]['leave_time']  }}">
-                                        {{ $atendanceDaily[$day['work_date']]['working_time']  }} ~ {{ $atendanceDaily[$day['work_date']]['leave_time'] }}
+                                        {{ AttendanceHelper::timeFormat($atendanceDaily[$day['work_date']]['working_time'])  }}
+                                        ~
+                                        {{ AttendanceHelper::timeFormat($atendanceDaily[$day['work_date']]['leave_time']) }}
                                     </th>
                                     <th class="text-center break_time_from break_time_from" data-break_time_from="{{ $atendanceDaily[$day['work_date']]['break_time_from']  }}" data-break_time_from="{{ $atendanceDaily[$day['work_date']]['break_time_from']  }}">
-                                        {{ $atendanceDaily[$day['work_date']]['break_time_from']  }} ~ {{ $atendanceDaily[$day['work_date']]['break_time_to']}}
+                                        {{ AttendanceHelper::timeFormat($atendanceDaily[$day['work_date']]['break_time_from'])  }}
+                                        ~
+                                        {{ AttendanceHelper::timeFormat($atendanceDaily[$day['work_date']]['break_time_to']) }}
                                     </th>
                                     <th class="text-right scheduled_working_hours" data-schedule_working_hours="{{ $atendanceDaily[$day['work_date']]['scheduled_working_hours'] }}">
-                                        {{ $atendanceDaily[$day['work_date']]['scheduled_working_hours'] }}
+                                        {{ AttendanceHelper::timeFormat($atendanceDaily[$day['work_date']]['scheduled_working_hours']) }}
                                     </th>
                                     <th class="text-right overtime_hours" dta-overtime_hours="{{ $atendanceDaily[$day['work_date']]['overtime_hours'] }}">
-                                        {{ $atendanceDaily[$day['work_date']]['overtime_hours'] }}
+                                        {{ AttendanceHelper::timeFormat($atendanceDaily[$day['work_date']]['overtime_hours']) }}
                                     </th>
                                     <th class="text-right working_hours" dta-working_hours="{{ $atendanceDaily[$day['work_date']]['working_hours'] }}">
-                                        {{ $atendanceDaily[$day['work_date']]['working_hours'] }}
+                                        {{ AttendanceHelper::timeFormat($atendanceDaily[$day['work_date']]['working_hours']) }}
                                     </th>
                                 @else
                                     <th class="text-center"></th>
@@ -109,7 +124,13 @@
                 <form method="GET" action="{{ route('admin.attendance_header.update') }}">
                     @csrf
                 <div class="modal-body">
-
+                    <div class="row">
+                        <div class="col-md-10 offset-md-1 alert alert-danger d-none" id="modal-error-element">
+                            <span role="alert">
+                                <strong>入力された項目に誤りがあります。内容をご確認ください。</strong>
+                            </span>
+                        </div>
+                    </div>
                     <input type="hidden" name="user_id" value="{{ $attendance->user_id }}">
                     <input type="hidden" name="year_month" value="{{ $date }}">
                     <input type="hidden" name="work_date" value="" id="work_date">
@@ -177,7 +198,7 @@
 
                 </div><!-- /.modal-body -->
                 <div class="modal-footer">
-                    <a data-url="{{ route('admin.attendance_header.delete', ['attendance_id' => $attendance->id, 'work_date' => 'work_date']) }}" class="btn btn-secondary" id="delete-url">未入力に戻す</a>
+                    <a data-url="{{ route('admin.attendance_header.delete', ['user_id' => $attendance->user_id, 'year_month' => $date, 'work_date' => 'work_date']) }}" class="btn btn-secondary" id="delete-url">未入力に戻す</a>
                     <button type="button" class="btn btn-primary" id="attendance_submit">変更を保存</button>
                 </div><!-- /.modal-footer -->
             </div><!-- /.modal-content -->

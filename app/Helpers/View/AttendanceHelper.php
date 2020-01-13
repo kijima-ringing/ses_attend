@@ -2,6 +2,8 @@
 
 namespace App\Helpers\View;
 
+use Illuminate\Support\Carbon;
+
 class AttendanceHelper
 {
     public static function attendanceClass($attendance_class) {
@@ -16,5 +18,9 @@ class AttendanceHelper
                 return '欠勤';
                 break;
         }
+    }
+
+    public static function timeFormat($time) {
+        return substr($time, -8, 5);
     }
 }

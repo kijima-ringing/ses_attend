@@ -11,6 +11,7 @@ use App\Models\User;
 use App\Services\AttendanceService;
 use App\Services\GetDateService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class AttendanceHeaderController extends Controller
 {
@@ -58,19 +59,45 @@ class AttendanceHeaderController extends Controller
     public function update(AttendanceRequest $request) {
 
         $attendanceService = new AttendanceService();
+        $getDateService = new GetDateService();
+        $date = $getDateService->createYearMonthFormat($request->year_month);
+
+        try {
+            DB::transaction(function () use ($request, $attendanceService, $date) {
+                // 抽出①を実行
+                $attendanceHeader = AttendanceHeader::firstOrCreate(['user_id' => $request->user_id, 'year_month' => $date]);
+
+                // 労働時間計算処理(日)
+                $requestParams = $request->validated();
+                $updateDailyParams = $attendanceService->getUpdateDailyParams($requestParams);
+
+                // 更新処理①を実行
+                $attendanceDaily = Attendancedaily::firstOrNew(['attendance_header_id' => $attendanceHeader->id, 'work_date' => $request->work_date]);
+                $attendanceDaily->fill($updateDailyParams)->saveOrfail();
+
+                // 労働時間計算処理(月)
+                $updateMonthParams = $attendanceService->getUpdateMonthParams($attendanceHeader->id);
+
+                // 更新処理②を実行
+                $attendanceHeader->fill($updateMonthParams)->saveOrFail();
+            });
+        } catch (\Exception $e) {
+            session()->flash('flash_message', '更新が失敗しました');
+        }
+
+        return redirect(route('admin.attendance_header.show', ['user_id' => $request->user_id, 'year_month' => $date]));
+    }
+
+    public function destroy($user_id, $year_month, $work_date) {
+        $attendanceService = new AttendanceService();
 
         // 抽出①を実行
         $getDateService = new GetDateService();
-        $date = $getDateService->createYearMonthFormat($request->year_month);
-        $attendanceHeader = AttendanceHeader::firstOrCreate(['user_id' => $request->user_id, 'year_month' => $date]);
+        $date = $getDateService->createYearMonthFormat($year_month);
+        $attendanceHeader = AttendanceHeader::firstOrCreate(['user_id' => $user_id, 'year_month' => $date]);
 
-        // 労働時間計算処理(日)
-        $requestParams = $request->validated();
-        $updateDailyParams = $attendanceService->getUpdateDailyParams($requestParams);
-
-        // 更新処理①を実行
-        $attendanceDaily = Attendancedaily::firstOrNew(['attendance_header_id' => $attendanceHeader->id, 'work_date' => $request->work_date]);
-        $attendanceDaily->fill($updateDailyParams)->saveOrfail();
+        // 更新処理④
+        Attendancedaily::where(['attendance_header_id' => $attendanceHeader->id, 'work_date' => $work_date])->delete();
 
         // 労働時間計算処理(月)
         $updateMonthParams = $attendanceService->getUpdateMonthParams($attendanceHeader->id);
@@ -78,6 +105,6 @@ class AttendanceHeaderController extends Controller
         // 更新処理②を実行
         $attendanceHeader->fill($updateMonthParams)->saveOrFail();
 
-        return redirect(route('admin.attendance_header.show', ['user_id' => $request->user_id, 'year_month' => $date]));
+        return redirect(route('admin.attendance_header.show', ['user_id' => $user_id, 'year_month' => $date]));
     }
 }

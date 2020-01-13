@@ -33,23 +33,20 @@ $(function() {
         $('#delete-url').attr("href", replace) ;
 
         $('.modal-title').text(dateInfo);
+        removeErrorElement();
         $(".modal").modal("show");
     });
 });
 
 $(function() {
     $('#attendance_submit').click(function() {
-        var attendance_class = $('#attendance_class').val();
-        var working_time = $('#working_time').val();
-        var leave_time = $('#leave_time').val();
-        var break_time_from = $('#break_time_from').val();
-        var break_time_to = $('#break_time_to').val();
-        var memo = $('#memo').val();
+        removeErrorElement();
+        let data = getInputdata();
 
-        if (checkAttendanceClass(attendance_class) && comparisonTime(working_time, leave_time) && comparisonTime(break_time_from, break_time_to)) {
+        if (checkAttendanceClass(data['attendance_class']) && comparisonTime(data['working_time'], data['leave_time']) && comparisonTime(data['break_time_from'], data['break_time_to'])) {
             $('form').submit();
         } else {
-            console.log('gg');
+            addErrorElement();
         }
     });
 });
@@ -60,6 +57,24 @@ $(function() {
         console.log('uuuu');
     });
 });
+
+function getInputdata() {
+    let attendance_class = $('#attendance_class').val();
+    let working_time = $('#working_time').val();
+    let leave_time = $('#leave_time').val();
+    let break_time_from = $('#break_time_from').val();
+    let break_time_to = $('#break_time_to').val();
+    let memo = $('#memo').val();
+
+    return {
+        attendance_class: attendance_class,
+        working_time: working_time,
+        leave_time: leave_time,
+        break_time_from: break_time_from,
+        break_time_to: break_time_to,
+        memo: memo
+    }
+}
 
 function checkAttendanceClass(attendanceClass) {
     switch (attendanceClass) {
@@ -85,4 +100,20 @@ function comparisonTime(beforeTime, afterTime) {
     } else {
        return false;
     }
+}
+
+function removeErrorElement() {
+    let errorElement = getModalErrorElement();
+
+    errorElement.addClass('d-none')
+}
+
+function addErrorElement() {
+    let errorElement = getModalErrorElement();
+
+    errorElement.removeClass('d-none')
+}
+
+function getModalErrorElement() {
+    return $('#modal-error-element')
 }

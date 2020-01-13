@@ -5,3 +5,15 @@
 .modal-footer{
     justify-content : center !important;
 }
+
+.click-text{
+    cursor: pointer;
+    border: none;
+    background: none;
+    color: #0033cc;
+}
+
+.click-text:hover{
+    text-decoration: underline;
+    color: #002080;
+}

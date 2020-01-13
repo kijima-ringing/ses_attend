@@ -29,6 +29,6 @@ Route::middleware('auth')->group(function (){
         Route::resource('attendance_header', 'AttendanceHeaderController', ['except' => ['show', 'edit', 'delete', 'update']]);
         Route::get('attendance_header/{user_id}/{year_month}', 'AttendanceHeaderController@show')->name('attendance_header.show');
         Route::get('attendance_header/update', 'AttendanceHeaderController@update')->name('attendance_header.update');
-        Route::delete('attendance_header/delete/{attendance_id}/{work_date}', 'AttendanceHeaderController@delete')->name('attendance_header.delete');
+        Route::get('attendance_header/delete/{user_id}/{year_month}/{work_date}', 'AttendanceHeaderController@destroy')->name('attendance_header.delete');
     });
 });
