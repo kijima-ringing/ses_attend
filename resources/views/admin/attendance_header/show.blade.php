@@ -4,14 +4,13 @@
 @endsection
 
 @section('content')
-    <div class="container">
+    <div class="container company" data-base_time_from="{{ $company->base_time_from }}" data-base_time_to="{{ $company->base_time_to }}">
         <div class="row pb-3">
             <div class="col-2">
-                <form method="GET" action="{{ route('admin.attendance_header.index') }}">
-                    @csrf
+                <div data-action="{{ route('admin.attendance_header.show', ['user_id' => $attendance->user_id, 'year_month' => 'year_month']) }}" id="year_month_url">
                     <input type="text" class="monthPick" id="year_month" name="year_month" value="{{ $date }}">
                     <input type="submit" class="d-none" id="year_month_submit">
-                </form>
+                </div>
             </div>
 
             <div class="col-2 text-right h2">
@@ -53,27 +52,37 @@
             </thead>
             <tbody>
                 @foreach($daysOfMonth as $day)
-                    <tr class="bg-white">
-                        <th class="text-right">{{ $day['day'] }}日</th>
+                    <tr class="bg-white dateInfo">
+                        <th class="text-right dialog date_info work_date" data-date_info="{{ $date . '-' . $day['day'] . '(' . $day['dayOfWeek'] . ')' }}" data-work_date="{{ $day['work_date'] }}">{{ $day['day'] }}日</th>
                         <th class="text-center">{{ $day['dayOfWeek'] }}</th>
                         @if (count($atendanceDaily) > 0)
-                            @foreach($atendanceDaily as $daily)
-                                @if ($daily->work_date == $day['work_date'])
-                                    <th class="text-center">{{ AttendanceHelper::attendanceClass($daily->attendance_class) }}</th>
-                                    <th class="text-center">{{ $daily->working_time  }} ~ {{ $daily->leave_time }}</th>
-                                    <th class="text-center">{{ $daily->break_time_from  }} ~ {{ $daily->break_time_to }}</th>
-                                    <th class="text-right">{{ $daily->scheduled_working_hours }}</th>
-                                    <th class="text-right">{{ $daily->overtime_hours }}</th>
-                                    <th class="text-right">{{ $daily->working_hours }}</th>
+                                @if (isset($atendanceDaily[$day['work_date']]))
+                                    <th class="text-center attendance_class memo" data-attendance_class="{{ $atendanceDaily[$day['work_date']]['attendance_class'] }}" data-memo="{{ $atendanceDaily[$day['work_date']]['memo'] }}">
+                                        {{ AttendanceHelper::attendanceClass($atendanceDaily[$day['work_date']]['attendance_class']) }}
+                                    </th>
+                                    <th class="text-center working_time leave_time" data-working_time="{{ $atendanceDaily[$day['work_date']]['working_time'] }}" data-leave_time="{{ $atendanceDaily[$day['work_date']]['leave_time']  }}">
+                                        {{ $atendanceDaily[$day['work_date']]['working_time']  }} ~ {{ $atendanceDaily[$day['work_date']]['leave_time'] }}
+                                    </th>
+                                    <th class="text-center break_time_from break_time_from" data-break_time_from="{{ $atendanceDaily[$day['work_date']]['break_time_from']  }}" data-break_time_from="{{ $atendanceDaily[$day['work_date']]['break_time_from']  }}">
+                                        {{ $atendanceDaily[$day['work_date']]['break_time_from']  }} ~ {{ $atendanceDaily[$day['work_date']]['break_time_to']}}
+                                    </th>
+                                    <th class="text-right scheduled_working_hours" data-schedule_working_hours="{{ $atendanceDaily[$day['work_date']]['scheduled_working_hours'] }}">
+                                        {{ $atendanceDaily[$day['work_date']]['scheduled_working_hours'] }}
+                                    </th>
+                                    <th class="text-right overtime_hours" dta-overtime_hours="{{ $atendanceDaily[$day['work_date']]['overtime_hours'] }}">
+                                        {{ $atendanceDaily[$day['work_date']]['overtime_hours'] }}
+                                    </th>
+                                    <th class="text-right working_hours" dta-working_hours="{{ $atendanceDaily[$day['work_date']]['working_hours'] }}">
+                                        {{ $atendanceDaily[$day['work_date']]['working_hours'] }}
+                                    </th>
                                 @else
-                                    <th></th>
+                                    <th class="text-center"></th>
                                     <th></th>
                                     <th></th>
                                     <th></th>
                                     <th></th>
                                     <th></th>
                                 @endif
-                            @endforeach
                         @else
                             <th></th>
                             <th></th>
@@ -88,7 +97,95 @@
         </table>
     </div>
 
+    <div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="閉じる">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div><!-- /.modal-header -->
+                <form method="GET" action="{{ route('admin.attendance_header.update') }}">
+                    @csrf
+                <div class="modal-body">
+
+                    <input type="hidden" name="user_id" value="{{ $attendance->user_id }}">
+                    <input type="hidden" name="year_month" value="{{ $date }}">
+                    <input type="hidden" name="work_date" value="" id="work_date">
+                    <div class="form-group row">
+                        <label for="attendance_class" class="col-md-4 col-form-label text-right">
+                            区分
+                        </label>
+                        <div class="col-md-8">
+                            <div class="form-inline">
+                                <select name="attendance_class" class="form-control" id="attendance_class">
+                                    <option value="0">通常勤務</option>
+                                    <option value="1">有給休暇</option>
+                                    <option value="2">欠勤</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label for="working_time" class="col-md-4 col-form-label text-right">
+                            出勤
+                        </label>
+                        <div class="col-md-8">
+                            <div class="form-inline">
+                                <div class="input-group mb-2 mr-sm-2 mb-sm-0">
+                                    <input id="working_time" size="8" type="time" name="working_time" class="form-control" value="{{ $company->base_time_from }}">
+                                </div>
+                                <div class="input-group mb-2 mr-sm-2  ml-sm-2 mb-sm-0">
+                                    〜
+                                </div>
+                                <div class="input-group mb-2 ml-sm-2 mb-sm-0">
+                                    <input id="leave_time" type="time" size="8" name="leave_time" class="form-control" value="{{ $company->base_time_to }}">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label for="break_time_from" class="col-md-4 col-form-label text-right">
+                            休憩
+                        </label>
+                        <div class="col-md-8">
+                            <div class="form-inline">
+                                <div class="input-group mb-2 mr-sm-2 mb-sm-0">
+                                    <input id="break_time_from" size="8" type="time" name="break_time_from" class="form-control" value="12:00">
+                                </div>
+                                <div class="input-group mb-2 mr-sm-2  ml-sm-2 mb-sm-0">
+                                    〜
+                                </div>
+                                <div class="input-group mb-2 ml-sm-2 mb-sm-0">
+                                    <input id="break_time_to" type="time" size="8" name="break_time_to" class="form-control" value="13:00">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label for="memo" class="col-md-4 control-label col-form-label text-right">
+                            メモ
+                        </label>
+                        <div class="col-md-8">
+                            <textarea class="field-textarea" id="memo" class="form-control" name="memo"></textarea>
+                        </div>
+                    </div>
+
+                </div><!-- /.modal-body -->
+                <div class="modal-footer">
+                    <a data-url="{{ route('admin.attendance_header.delete', ['attendance_id' => $attendance->id, 'work_date' => 'work_date']) }}" class="btn btn-secondary" id="delete-url">未入力に戻す</a>
+                    <button type="button" class="btn btn-primary" id="attendance_submit">変更を保存</button>
+                </div><!-- /.modal-footer -->
+            </div><!-- /.modal-content -->
+        </form>
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
 @endsection
 @section('addJs')
-
+    <script src="{{ asset('js/attendanceForm.js') }}"></script>
 @endsection

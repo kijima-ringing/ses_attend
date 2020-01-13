@@ -47,4 +47,16 @@ class GetDateService
 
         return $dayOfWeek[$dayOfWeekNumber];
     }
+
+    public static function diffInHours($time_to, $time_from) {
+        $from = new carbon($time_from);
+        $to = Carbon::parse($time_to);
+
+        return $from->diffInHours($to);
+    }
+
+    public static function getHourInt($time) {
+        $carbon = Carbon::create($time);
+        return $carbon->hour + ($carbon->minute / 60);
+    }
 }
