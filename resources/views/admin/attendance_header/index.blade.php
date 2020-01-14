@@ -30,9 +30,9 @@
                 <tr class="bg-white">
                     <th class="text-center">{{ $user->last_name }}{{ $user->first_name }}</th>
                     <th class="text-center">{{ $user->working_days }}</th>
-                    <th class="text-center">{{ $user->scheduled_working_hours }}</th>
-                    <th class="text-center">{{ $user->overtime_hours }}</th>
-                    <th class="text-center">{{ $user->working_hours }}</th>
+                    <th class="text-center">{{ AttendanceHelper::timeFormat($user->scheduled_working_hours) }}</th>
+                    <th class="text-center">{{ AttendanceHelper::timeFormat($user->overtime_hours) }}</th>
+                    <th class="text-center">{{ AttendanceHelper::timeFormat($user->working_hours) }}</th>
                     <td class="text-center">
                         <a href="{{ route('admin.attendance_header.show', ['user_id' => $user->user_id, 'year_month' => $date]) }}" class="btn btn-info">詳細</a>
                     </td>

@@ -21,6 +21,10 @@ class AttendanceHelper
     }
 
     public static function timeFormat($time) {
-        return substr($time, -8, 5);
+        if (strlen($time) == 8) {
+            return substr($time, -8, 5);
+        } else if (strlen($time) == 9) {
+            return substr($time, -9, 6);
+        }
     }
 }
