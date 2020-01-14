@@ -26,7 +26,9 @@ Route::post('login', 'Auth\LoginController@login');
 Route::middleware('auth')->group(function (){
     Route::post('logout', 'Auth\LoginController@logout')->name('logout');
     Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin'], function () {
-        Route::resource('attendance_header', 'AttendanceHeaderController', ['except' => ['show', 'edit', 'delete']]);
+        Route::resource('attendance_header', 'AttendanceHeaderController', ['except' => ['show', 'edit', 'delete', 'update']]);
         Route::get('attendance_header/{user_id}/{year_month}', 'AttendanceHeaderController@show')->name('attendance_header.show');
+        Route::get('attendance_header/update', 'AttendanceHeaderController@update')->name('attendance_header.update');
+        Route::get('attendance_header/delete/{user_id}/{year_month}/{work_date}', 'AttendanceHeaderController@destroy')->name('attendance_header.delete');
     });
 });
