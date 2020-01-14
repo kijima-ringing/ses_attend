@@ -6,28 +6,12 @@
 @section('content')
     <div class="container company" data-base_time_from="{{ $company->base_time_from }}" data-base_time_to="{{ $company->base_time_to }}">
         <div class="row pb-3">
-            <form method="GET" action="{{ route('admin.attendance_header.index') }}">
-                @csrf
-                <input type="hidden" name="year_month" value="{{ $date }}">
-                <button type="submit" class="d-none" id="year_month_submit"></button>
-                <div class="col-12">
-                    <div class="back-index click-text">戻る</div>
-                </div>
-            </form>
-        </div>
-        <div class="row pb-3">
             <div class="col-2">
-                <div data-action="{{ route('admin.attendance_header.show', ['user_id' => $attendance->user_id, 'year_month' => 'year_month']) }}" id="year_month_url">
+                <div data-action="{{ route('user.attendance_header.show', ['user_id' => $attendance->user_id, 'year_month' => 'year_month']) }}" id="year_month_url">
                     <input type="text" class="monthPick" id="year_month" name="year_month" value="{{ $date }}">
                     <input type="submit" class="d-none" id="year_month_submit">
                 </div>
             </div>
-
-            <div class="col-1"></div>
-            <div class="h2">
-                {{ $attendance->user->last_name }}{{ $attendance->user->first_name }}
-            </div>
-
         </div>
 
         <table class="table table-bordered">
@@ -121,7 +105,7 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div><!-- /.modal-header -->
-                <form method="GET" action="{{ route('admin.attendance_header.update') }}">
+                <form method="GET" action="{{ route('user.attendance_header.update') }}">
                     @csrf
                 <div class="modal-body">
                     <div class="row">
@@ -198,7 +182,7 @@
 
                 </div><!-- /.modal-body -->
                 <div class="modal-footer">
-                    <a data-url="{{ route('admin.attendance_header.delete', ['user_id' => $attendance->user_id, 'year_month' => $date, 'work_date' => 'work_date']) }}" class="btn btn-secondary" id="delete-url">未入力に戻す</a>
+                    <a data-url="{{ route('user.attendance_header.delete', ['user_id' => $attendance->user_id, 'year_month' => $date, 'work_date' => 'work_date']) }}" class="btn btn-secondary" id="delete-url">未入力に戻す</a>
                     <button type="button" class="btn btn-primary" id="attendance_submit">変更を保存</button>
                 </div><!-- /.modal-footer -->
             </div><!-- /.modal-content -->

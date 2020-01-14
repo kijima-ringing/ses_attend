@@ -31,4 +31,10 @@ Route::middleware('auth')->group(function (){
         Route::get('attendance_header/update', 'AttendanceHeaderController@update')->name('attendance_header.update');
         Route::get('attendance_header/delete/{user_id}/{year_month}/{work_date}', 'AttendanceHeaderController@destroy')->name('attendance_header.delete');
     });
+
+    Route::group(['prefix' => 'user', 'as' => 'user.', 'namespace' => 'User'], function () {
+        Route::get('attendance_header/{user_id}/{year_month}', 'AttendanceHeaderController@show')->name('attendance_header.show');
+        Route::get('attendance_header/update', 'AttendanceHeaderController@update')->name('attendance_header.update');
+        Route::get('attendance_header/delete/{user_id}/{year_month}/{work_date}', 'AttendanceHeaderController@destroy')->name('attendance_header.delete');
+    });
 });
