@@ -6,6 +6,10 @@ use Illuminate\Support\Carbon;
 
 class GetDateService
 {
+    public static function getNowYearMonth() {
+        return Carbon::now()->format('Y-m');
+    }
+
     public function checkYearMonthFormat($yearMonth) {
         if (Carbon::hasFormat($yearMonth, 'Y-m')) {
             return true;

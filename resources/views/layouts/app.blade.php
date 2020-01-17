@@ -7,7 +7,7 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Laravel') }}</title>
+    <title>Adseed勤怠システム</title>
 
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.gstatic.com">
@@ -24,9 +24,8 @@
     <div id="app">
         <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
             <div class="container">
-                <a class="navbar-brand" href="{{ url('/') }}">
-                    {{ config('app.name', 'Laravel') }}
-                </a>
+
+                Adseed勤怠システム
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
                     <span class="navbar-toggler-icon"></span>
                 </button>
@@ -47,7 +46,7 @@
                         @else
                             <li class="nav-item dropdown">
                                 <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-                                    {{ Auth::user()->name }} <span class="caret"></span>
+                                    {{ Auth::user()->last_name }} さんでログイン中<span class="caret"></span>
                                 </a>
 
                                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
@@ -67,21 +66,25 @@
                 </div>
             </div>
         </nav>
-
-        <main class="py-4">
-            <div class="container">
-                @if (session('flash_message'))
-                    <div class="row">
-                        <div class="col-md-12 alert alert-info">
-                            {{ session('flash_message') }}
-                        </div>
+        @can('admin')
+            @include('layouts.sidebar')
+        @else
+            <!-- メインコンテンツ -->
+                <main class="py-4">
+                    <div class="container">
+                        @if (session('flash_message'))
+                            <div class="row">
+                                <div class="col-md-12 alert alert-info">
+                                    {{ session('flash_message') }}
+                                </div>
+                            </div>
+                        @endif
                     </div>
-                @endif
-            </div>
-            @yield('content')
-        </main>
 
-        <!-- Scripts -->
+                    @yield('content')
+                </main>
+            @endcan
+            <!-- Scripts -->
         <script src="{{ asset('js/app.js') }}"></script>
         <script src="{{ asset('vendor/jquery-ui/jquery-ui.js') }}"></script>
         <script src="{{ asset('vendor/jquery-ui/jquery.mtz.monthpicker.js') }}"></script>
