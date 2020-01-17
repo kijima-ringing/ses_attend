@@ -29,7 +29,7 @@
             @foreach ($users AS $user)
                 <tr class="bg-white">
                     <th class="text-center">{{ $user->last_name }}{{ $user->first_name }}</th>
-                    <th class="text-center">{{ $user->working_days }}</th>
+                    <th class="text-center">{{ AttendanceHelper::daysFormat($user->working_days) }}日</th>
                     <th class="text-center">{{ AttendanceHelper::timeFormat($user->scheduled_working_hours) }}</th>
                     <th class="text-center">{{ AttendanceHelper::timeFormat($user->overtime_hours) }}</th>
                     <th class="text-center">{{ AttendanceHelper::timeFormat($user->working_hours) }}</th>
