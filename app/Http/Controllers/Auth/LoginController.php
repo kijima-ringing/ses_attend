@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Providers\RouteServiceProvider;
+use App\Services\GetDateService;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
-use Illuminate\Support\Carbon;
 
 class LoginController extends Controller
 {
@@ -47,11 +47,11 @@ class LoginController extends Controller
     public function redirectTo(){
         $user = $this->guard()->user();
 
-        $date = Carbon::now()->format('Y-m');
+        $year_month = GetDateService::getNowYearMonth();
 
         if($user->admin_flag == '1'){
             return route('admin.attendance_header.index');
         }
-        return route('user.attendance_header.show', ['user_id' => $user->id, 'year_month' => $date]);
+        return route('user.attendance_header.show', ['user_id' => $user->id, 'year_month' => $year_month]);
     }
 }

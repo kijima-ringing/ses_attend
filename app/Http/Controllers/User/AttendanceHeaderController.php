@@ -66,7 +66,7 @@ class AttendanceHeaderController extends Controller
             session()->flash('flash_message', '更新が失敗しました');
         }
 
-        return redirect(route('admin.attendance_header.show', ['user_id' => $request->user_id, 'year_month' => $date]));
+        return redirect(route('user.attendance_header.show', ['user_id' => $request->user_id, 'year_month' => $date]));
     }
 
     public function destroy($user_id, $year_month, $work_date) {
