@@ -102,18 +102,4 @@ function comparisonTime(beforeTime, afterTime) {
     }
 }
 
-function removeErrorElement() {
-    let errorElement = getModalErrorElement();
 
-    errorElement.addClass('d-none')
-}
-
-function addErrorElement() {
-    let errorElement = getModalErrorElement();
-
-    errorElement.removeClass('d-none')
-}
-
-function getModalErrorElement() {
-    return $('#modal-error-element')
-}

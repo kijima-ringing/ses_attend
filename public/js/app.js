@@ -5614,10 +5614,10 @@ module.exports = {
   var Selector$8 = {
     DATA_SPY: '[data-spy="scroll"]',
     ACTIVE: '.active',
-    NAV_LIST_GROUP: '.nav, .list-group',
+    NAV_LIST_GROUP: '.nav, .list-department',
     NAV_LINKS: '.nav-link',
     NAV_ITEMS: '.nav-item',
-    LIST_ITEMS: '.list-group-item',
+    LIST_ITEMS: '.list-department-item',
     DROPDOWN: '.dropdown',
     DROPDOWN_ITEMS: '.dropdown-item',
     DROPDOWN_TOGGLE: '.dropdown-toggle'
@@ -5913,7 +5913,7 @@ module.exports = {
   };
   var Selector$9 = {
     DROPDOWN: '.dropdown',
-    NAV_LIST_GROUP: '.nav, .list-group',
+    NAV_LIST_GROUP: '.nav, .list-department',
     ACTIVE: '.active',
     ACTIVE_UL: '> li > .active',
     DATA_TOGGLE: '[data-toggle="tab"], [data-toggle="pill"], [data-toggle="list"]',
@@ -25482,7 +25482,7 @@ return jQuery;
     /**
      * This method is like `_.unzip` except that it accepts `iteratee` to specify
      * how regrouped values should be combined. The iteratee is invoked with the
-     * elements of each group: (...group).
+     * elements of each department: (...department).
      *
      * @static
      * @memberOf _
@@ -25679,7 +25679,7 @@ return jQuery;
     /**
      * This method is like `_.zip` except that it accepts `iteratee` to specify
      * how grouped values should be combined. The iteratee is invoked with the
-     * elements of each group: (...group).
+     * elements of each department: (...department).
      *
      * @static
      * @memberOf _
@@ -30239,7 +30239,7 @@ return jQuery;
      * // => { '1': ['a', 'c'], '2': ['b'] }
      *
      * _.invertBy(object, function(value) {
-     *   return 'group' + value;
+     *   return 'department' + value;
      * });
      * // => { 'group1': ['a', 'c'], 'group2': ['b'] }
      */
