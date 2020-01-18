@@ -6,6 +6,15 @@ use Illuminate\Database\Eloquent\Model;
 
 class Company extends Model
 {
+
+    const TIME_FRACTION_LIST = [
+        '1' => 'なし',
+        '15' => '15分',
+        '30' => '30分'
+    ];
+
+    const TIME_FRACTION_VALUES = [1, 15, 30];
+
     protected $table = 'company';
 
     protected $fillable = [
@@ -14,8 +23,14 @@ class Company extends Model
         'time_fraction',
     ];
 
-    public static function company() {
-        return self::findOrFail(1);
+    public function getBaseTimeFromAttribute($value)
+    {
+        return substr($value, 0, -3);
+    }
+
+    public function getBaseTimeToAttribute($value)
+    {
+        return substr($value, 0, -3);
     }
 
 }

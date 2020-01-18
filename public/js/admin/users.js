@@ -31,7 +31,8 @@ $(function() {
         $('.alert-danger').remove();
         $('.is-invalid').removeClass('is-invalid');
         $('input[type!="checkbox"][type!="hidden"]').val('');
-        $('input[name="placeholder_email"]').attr('palaceholder', '');
+        $('input[name="placeholder_email"]').val('');
+        $('#email').attr('placeholder', '');
         $('.js-department-checkbox').prop('checked', false);
 
         if( typeof data !== 'undefined'){
