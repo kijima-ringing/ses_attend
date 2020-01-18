@@ -30,5 +30,9 @@ Route::middleware('auth')->group(function (){
         Route::get('attendance_header/{user_id}/{year_month}', 'AttendanceHeaderController@show')->name('attendance_header.show');
         Route::get('attendance_header/update', 'AttendanceHeaderController@update')->name('attendance_header.update');
         Route::get('attendance_header/delete/{user_id}/{year_month}/{work_date}', 'AttendanceHeaderController@destroy')->name('attendance_header.delete');
+        Route::get('users', 'UsersController@index')->name('users.index');
+        Route::get('users/ajax_get_user_info', 'UsersController@ajaxGetUserInfo')->name('users.ajax_get_user_info');
+        Route::post('users/update', 'UsersController@update')->name('users.update');
+        Route::post('users/destroy', 'UsersController@destroy')->name('users.destroy');
     });
 });

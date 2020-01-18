@@ -77,6 +77,13 @@
                         </div>
                     </div>
                 @endif
+                @if (session('error_message'))
+                    <div class="row">
+                        <div class="col-md-12 alert alert-danger">
+                            {{ session('error_message') }}
+                        </div>
+                    </div>
+                @endif
             </div>
             @yield('content')
         </main>
