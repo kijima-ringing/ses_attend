@@ -1,0 +1,7 @@
+.selectable .ui-selecting { background: rgba(93, 185, 247, 0.692); }
+.ui-selectee:hover {
+    background-color: rgb(93, 190, 255);
+}
+.selectable tr {
+    cursor: pointer;
+}
