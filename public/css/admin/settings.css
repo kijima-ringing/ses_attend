@@ -1,0 +1,8 @@
+input[type="time"] {
+    width: 115px;
+}
+
+select.form-control {
+    width: 115px;
+    background-position: right 18px center !important;
+}

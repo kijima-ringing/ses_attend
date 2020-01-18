@@ -34,7 +34,7 @@ class UserRequest extends FormRequest
                 'required',
                 'email',
                 'max:255',
-                Rule::unique('users', 'email')->whereNull('deleted_at')
+                Rule::unique('users', 'email'),
             ],
             'password' => 'required|string|max:255',
             'department_ids' => 'nullable|exists:departments,id'

@@ -42,6 +42,9 @@ Route::middleware('auth')->group(function (){
             Route::get('users/ajax_get_user_info', 'UsersController@ajaxGetUserInfo')->name('users.ajax_get_user_info');
             Route::post('users/update', 'UsersController@update')->name('users.update');
             Route::post('users/destroy', 'UsersController@destroy')->name('users.destroy');
+
+            Route::get('settings', 'SettingsController@edit')->name('settings.edit');
+            Route::post('settings/update', 'SettingsController@update')->name('settings.update');
         });
     });
 
