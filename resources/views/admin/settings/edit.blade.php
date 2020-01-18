@@ -25,7 +25,6 @@
                 <div class="col-sm-1 text-center my-auto">
                     〜
                 </div>
-                <?php xdebug_break(); ?>
                 <div class="col-sm-2">
                     <input id="base_time_to" size="8" type="time" name="base_time_to" class="form-control mx-auto {{ $errors->has('base_time_from') || $errors->has('base_time') ? 'is-invalid' : '' }}" value="{{ ($errors->has('base_time_to') || $errors->has('base_time')) ? old('base_time_to') : $company->base_time_to }}">
                 </div>
