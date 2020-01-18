@@ -25,6 +25,16 @@ class AttendanceHelper
             return substr($time, -8, 5);
         } else if (strlen($time) == 9) {
             return substr($time, -9, 6);
+        } else if (strlen($time) == 0) {
+            return '00:00';
+        }
+    }
+
+    public static function daysFormat($days) {
+        if (isset($days)) {
+            return $days;
+        } else {
+            return 0;
         }
     }
 }

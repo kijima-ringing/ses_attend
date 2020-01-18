@@ -31,7 +31,7 @@
  */
 
 //>>label: Widget
-//>>group: Core
+//>>department: Core
 //>>description: Provides a factory for creating stateful widgets with a common API.
 //>>docs: http://api.jqueryui.com/jQuery.widget/
 //>>demos: http://jqueryui.com/widget/
@@ -756,7 +756,7 @@
  */
 
 //>>label: Position
-//>>group: Core
+//>>department: Core
 //>>description: Positions elements relative to other elements.
 //>>docs: http://api.jqueryui.com/position/
 //>>demos: http://jqueryui.com/position/
@@ -1242,7 +1242,7 @@
  */
 
 //>>label: :data Selector
-//>>group: Core
+//>>department: Core
 //>>description: Selects elements which have data stored under the specified key.
 //>>docs: http://api.jqueryui.com/data-selector/
 
@@ -1271,7 +1271,7 @@
  */
 
 //>>label: disableSelection
-//>>group: Core
+//>>department: Core
 //>>description: Disable selection of text content within the set of matched elements.
 //>>docs: http://api.jqueryui.com/disableSelection/
 
@@ -1307,7 +1307,7 @@
  */
 
 //>>label: Effects Core
-//>>group: Effects
+//>>department: Effects
 // jscs:disable maximumLineLength
 //>>description: Extends the internal jQuery effects. Includes morphing and easing. Required by all other effects.
 // jscs:enable maximumLineLength
@@ -2932,7 +2932,7 @@
  */
 
 //>>label: Blind Effect
-//>>group: Effects
+//>>department: Effects
 //>>description: Blinds the element.
 //>>docs: http://api.jqueryui.com/blind-effect/
 //>>demos: http://jqueryui.com/effect/
@@ -2988,7 +2988,7 @@
  */
 
 //>>label: Bounce Effect
-//>>group: Effects
+//>>department: Effects
 //>>description: Bounces an element horizontally or vertically n times.
 //>>docs: http://api.jqueryui.com/bounce-effect/
 //>>demos: http://jqueryui.com/effect/
@@ -3084,7 +3084,7 @@
  */
 
 //>>label: Clip Effect
-//>>group: Effects
+//>>department: Effects
 //>>description: Clips the element on and off like an old TV.
 //>>docs: http://api.jqueryui.com/clip-effect/
 //>>demos: http://jqueryui.com/effect/
@@ -3135,7 +3135,7 @@
  */
 
 //>>label: Drop Effect
-//>>group: Effects
+//>>department: Effects
 //>>description: Moves an element in one direction and hides it at the same time.
 //>>docs: http://api.jqueryui.com/drop-effect/
 //>>demos: http://jqueryui.com/effect/
@@ -3190,7 +3190,7 @@
  */
 
 //>>label: Explode Effect
-//>>group: Effects
+//>>department: Effects
 // jscs:disable maximumLineLength
 //>>description: Explodes an element in all directions into n pieces. Implodes an element to its original wholeness.
 // jscs:enable maximumLineLength
@@ -3287,7 +3287,7 @@
  */
 
 //>>label: Fade Effect
-//>>group: Effects
+//>>department: Effects
 //>>description: Fades the element.
 //>>docs: http://api.jqueryui.com/fade-effect/
 //>>demos: http://jqueryui.com/effect/
@@ -3320,7 +3320,7 @@
  */
 
 //>>label: Fold Effect
-//>>group: Effects
+//>>department: Effects
 //>>description: Folds an element first horizontally and then vertically.
 //>>docs: http://api.jqueryui.com/fold-effect/
 //>>demos: http://jqueryui.com/effect/
@@ -3395,7 +3395,7 @@
  */
 
 //>>label: Highlight Effect
-//>>group: Effects
+//>>department: Effects
 //>>description: Highlights the background of an element in a defined color for a custom duration.
 //>>docs: http://api.jqueryui.com/highlight-effect/
 //>>demos: http://jqueryui.com/effect/
@@ -3438,7 +3438,7 @@
  */
 
 //>>label: Size Effect
-//>>group: Effects
+//>>department: Effects
 //>>description: Resize an element to a specified width and height.
 //>>docs: http://api.jqueryui.com/size-effect/
 //>>demos: http://jqueryui.com/effect/
@@ -3615,7 +3615,7 @@
  */
 
 //>>label: Scale Effect
-//>>group: Effects
+//>>department: Effects
 //>>description: Grows or shrinks an element and its content.
 //>>docs: http://api.jqueryui.com/scale-effect/
 //>>demos: http://jqueryui.com/effect/
@@ -3656,7 +3656,7 @@
  */
 
 //>>label: Puff Effect
-//>>group: Effects
+//>>department: Effects
 //>>description: Creates a puff effect by scaling the element up and hiding it at the same time.
 //>>docs: http://api.jqueryui.com/puff-effect/
 //>>demos: http://jqueryui.com/effect/
@@ -3683,7 +3683,7 @@
  */
 
 //>>label: Pulsate Effect
-//>>group: Effects
+//>>department: Effects
 //>>description: Pulsates an element n times by changing the opacity to zero and back.
 //>>docs: http://api.jqueryui.com/pulsate-effect/
 //>>demos: http://jqueryui.com/effect/
@@ -3733,7 +3733,7 @@
  */
 
 //>>label: Shake Effect
-//>>group: Effects
+//>>department: Effects
 //>>description: Shakes an element horizontally or vertically n times.
 //>>docs: http://api.jqueryui.com/shake-effect/
 //>>demos: http://jqueryui.com/effect/
@@ -3793,7 +3793,7 @@
  */
 
 //>>label: Slide Effect
-//>>group: Effects
+//>>department: Effects
 //>>description: Slides an element in and out of the viewport.
 //>>docs: http://api.jqueryui.com/slide-effect/
 //>>demos: http://jqueryui.com/effect/
@@ -3855,7 +3855,7 @@
  */
 
 //>>label: Transfer Effect
-//>>group: Effects
+//>>department: Effects
 //>>description: Displays a transfer effect from one element to another.
 //>>docs: http://api.jqueryui.com/transfer-effect/
 //>>demos: http://jqueryui.com/effect/
@@ -3881,7 +3881,7 @@
  */
 
 //>>label: :focusable Selector
-//>>group: Core
+//>>department: Core
 //>>description: Selects elements which can be focused.
 //>>docs: http://api.jqueryui.com/focusable-selector/
 
@@ -3965,7 +3965,7 @@
  */
 
 //>>label: Form Reset Mixin
-//>>group: Core
+//>>department: Core
 //>>description: Refresh input widgets when their form is reset
 //>>docs: http://api.jqueryui.com/form-reset-mixin/
 
@@ -4029,7 +4029,7 @@
  */
 
 //>>label: jQuery 1.7 Support
-//>>group: Core
+//>>department: Core
 //>>description: Support version 1.7.x of jQuery core
 
 
@@ -4107,7 +4107,7 @@
  */
 
 //>>label: Keycode
-//>>group: Core
+//>>department: Core
 //>>description: Provide keycodes as keynames
 //>>docs: http://api.jqueryui.com/jQuery.ui.keyCode/
 
@@ -4153,7 +4153,7 @@
  */
 
 //>>label: labels
-//>>group: Core
+//>>department: Core
 //>>description: Find all the labels associated with a given input
 //>>docs: http://api.jqueryui.com/labels/
 
@@ -4205,7 +4205,7 @@
  */
 
 //>>label: scrollParent
-//>>group: Core
+//>>department: Core
 //>>description: Get the closest ancestor element that is scrollable.
 //>>docs: http://api.jqueryui.com/scrollParent/
 
@@ -4240,7 +4240,7 @@
  */
 
 //>>label: :tabbable Selector
-//>>group: Core
+//>>department: Core
 //>>description: Selects elements which can be tabbed to.
 //>>docs: http://api.jqueryui.com/tabbable-selector/
 
@@ -4265,7 +4265,7 @@
  */
 
 //>>label: uniqueId
-//>>group: Core
+//>>department: Core
 //>>description: Functions to generate and remove uniqueId's
 //>>docs: http://api.jqueryui.com/uniqueId/
 
@@ -4304,7 +4304,7 @@
  */
 
 //>>label: Accordion
-//>>group: Widgets
+//>>department: Widgets
 // jscs:disable maximumLineLength
 //>>description: Displays collapsible content panels for presenting information in a limited amount of space.
 // jscs:enable maximumLineLength
@@ -4931,7 +4931,7 @@
  */
 
 //>>label: Menu
-//>>group: Widgets
+//>>department: Widgets
 //>>description: Creates nestable menus.
 //>>docs: http://api.jqueryui.com/menu/
 //>>demos: http://jqueryui.com/menu/
@@ -5586,7 +5586,7 @@
  */
 
 //>>label: Autocomplete
-//>>group: Widgets
+//>>department: Widgets
 //>>description: Lists suggested words as the user is typing.
 //>>docs: http://api.jqueryui.com/autocomplete/
 //>>demos: http://jqueryui.com/autocomplete/
@@ -6250,7 +6250,7 @@
  */
 
 //>>label: Controlgroup
-//>>group: Widgets
+//>>department: Widgets
 //>>description: Visually groups form control widgets
 //>>docs: http://api.jqueryui.com/controlgroup/
 //>>demos: http://jqueryui.com/controlgroup/
@@ -6535,7 +6535,7 @@
  */
 
 //>>label: Checkboxradio
-//>>group: Widgets
+//>>department: Widgets
 //>>description: Enhances a form with multiple themeable checkboxes or radio buttons.
 //>>docs: http://api.jqueryui.com/checkboxradio/
 //>>demos: http://jqueryui.com/checkboxradio/
@@ -6805,7 +6805,7 @@
  */
 
 //>>label: Button
-//>>group: Widgets
+//>>department: Widgets
 //>>description: Enhances a form with themeable buttons.
 //>>docs: http://api.jqueryui.com/button/
 //>>demos: http://jqueryui.com/button/
@@ -7173,7 +7173,7 @@
  */
 
 //>>label: Datepicker
-//>>group: Widgets
+//>>department: Widgets
 //>>description: Displays a calendar from an input or inline for selecting dates.
 //>>docs: http://api.jqueryui.com/datepicker/
 //>>demos: http://jqueryui.com/datepicker/
@@ -8902,14 +8902,14 @@
                     cornerClass = " ui-corner-all";
                     calender = "";
                     if ( isMultiMonth ) {
-                        calender += "<div class='ui-datepicker-group";
+                        calender += "<div class='ui-datepicker-department";
                         if ( numMonths[ 1 ] > 1 ) {
                             switch ( col ) {
-                                case 0: calender += " ui-datepicker-group-first";
+                                case 0: calender += " ui-datepicker-department-first";
                                     cornerClass = " ui-corner-" + ( isRTL ? "right" : "left" ); break;
-                                case numMonths[ 1 ] - 1: calender += " ui-datepicker-group-last";
+                                case numMonths[ 1 ] - 1: calender += " ui-datepicker-department-last";
                                     cornerClass = " ui-corner-" + ( isRTL ? "left" : "right" ); break;
-                                default: calender += " ui-datepicker-group-middle"; cornerClass = ""; break;
+                                default: calender += " ui-datepicker-department-middle"; cornerClass = ""; break;
                             }
                         }
                         calender += "'>";
@@ -9282,7 +9282,7 @@
  */
 
 //>>label: Mouse
-//>>group: Widgets
+//>>department: Widgets
 //>>description: Abstracts mouse-based interactions to assist in creating certain widgets.
 //>>docs: http://api.jqueryui.com/mouse/
 
@@ -9538,7 +9538,7 @@
  */
 
 //>>label: Draggable
-//>>group: Interactions
+//>>department: Interactions
 //>>description: Enables dragging functionality for any element.
 //>>docs: http://api.jqueryui.com/draggable/
 //>>demos: http://jqueryui.com/draggable/
@@ -10768,7 +10768,7 @@
  */
 
 //>>label: Resizable
-//>>group: Interactions
+//>>department: Interactions
 //>>description: Enables resize functionality for any element.
 //>>docs: http://api.jqueryui.com/resizable/
 //>>demos: http://jqueryui.com/resizable/
@@ -11952,7 +11952,7 @@
  */
 
 //>>label: Dialog
-//>>group: Widgets
+//>>department: Widgets
 //>>description: Displays customizable dialog windows.
 //>>docs: http://api.jqueryui.com/dialog/
 //>>demos: http://jqueryui.com/dialog/
@@ -12867,7 +12867,7 @@
  */
 
 //>>label: Droppable
-//>>group: Interactions
+//>>department: Interactions
 //>>description: Enables drop targets for draggable elements.
 //>>docs: http://api.jqueryui.com/droppable/
 //>>demos: http://jqueryui.com/droppable/
@@ -13348,7 +13348,7 @@
  */
 
 //>>label: Progressbar
-//>>group: Widgets
+//>>department: Widgets
 // jscs:disable maximumLineLength
 //>>description: Displays a status indicator for loading state, standard percentage, and other progress indicators.
 // jscs:enable maximumLineLength
@@ -13512,7 +13512,7 @@
  */
 
 //>>label: Selectable
-//>>group: Interactions
+//>>department: Interactions
 //>>description: Allows groups of elements to be selected with the mouse.
 //>>docs: http://api.jqueryui.com/selectable/
 //>>demos: http://jqueryui.com/selectable/
@@ -13807,7 +13807,7 @@
  */
 
 //>>label: Selectmenu
-//>>group: Widgets
+//>>department: Widgets
 // jscs:disable maximumLineLength
 //>>description: Duplicates and extends the functionality of a native HTML select element, allowing it to be customizable in behavior and appearance far beyond the limitations of a native select.
 // jscs:enable maximumLineLength
@@ -14473,7 +14473,7 @@
  */
 
 //>>label: Slider
-//>>group: Widgets
+//>>department: Widgets
 //>>description: Displays a flexible slider with ranges and accessibility via keyboard.
 //>>docs: http://api.jqueryui.com/slider/
 //>>demos: http://jqueryui.com/slider/
@@ -15209,7 +15209,7 @@
  */
 
 //>>label: Sortable
-//>>group: Interactions
+//>>department: Interactions
 //>>description: Enables items in a list to be sorted using the mouse.
 //>>docs: http://api.jqueryui.com/sortable/
 //>>demos: http://jqueryui.com/sortable/
@@ -16745,7 +16745,7 @@
  */
 
 //>>label: Spinner
-//>>group: Widgets
+//>>department: Widgets
 //>>description: Displays buttons to easily input numbers via the keyboard or mouse.
 //>>docs: http://api.jqueryui.com/spinner/
 //>>demos: http://jqueryui.com/spinner/
@@ -17303,7 +17303,7 @@
  */
 
 //>>label: Tabs
-//>>group: Widgets
+//>>department: Widgets
 //>>description: Transforms a set of container elements into a tab structure.
 //>>docs: http://api.jqueryui.com/tabs/
 //>>demos: http://jqueryui.com/tabs/
@@ -18209,7 +18209,7 @@
  */
 
 //>>label: Tooltip
-//>>group: Widgets
+//>>department: Widgets
 //>>description: Shows additional information for any element on hover or focus.
 //>>docs: http://api.jqueryui.com/tooltip/
 //>>demos: http://jqueryui.com/tooltip/

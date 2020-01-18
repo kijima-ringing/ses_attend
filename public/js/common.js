@@ -38,3 +38,19 @@ $('#year_month').change(function() {
 $('.back-index').click(function() {
     $('#year_month_submit').trigger('click');
 });
+
+function removeErrorElement() {
+    let errorElement = getModalErrorElement();
+
+    errorElement.addClass('d-none')
+}
+
+function addErrorElement() {
+    let errorElement = getModalErrorElement();
+
+    errorElement.removeClass('d-none')
+}
+
+function getModalErrorElement() {
+    return $('#modal-error-element')
+}
