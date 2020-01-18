@@ -12,7 +12,7 @@ class Department extends Model
      * @var array
      */
     protected $fillable = [
-        '*'
+        'name',
     ];
 
     public function getDepartmentSelectList(){
