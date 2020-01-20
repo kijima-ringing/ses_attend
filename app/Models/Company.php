@@ -23,6 +23,10 @@ class Company extends Model
         'time_fraction',
     ];
 
+    public static function company() {
+        return self::findOrFail(1);
+    }
+
     public function getBaseTimeFromAttribute($value)
     {
         return substr($value, 0, -3);
