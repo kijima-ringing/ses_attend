@@ -62,16 +62,16 @@ class GetDateService
     }
 
     public function getHourInt($time) {
-        $time_fraction = Company::company()->time_fraction;
+        $company = Company::company();
         $carbon = Carbon::create($time);
 
-        $min = $this->ceilTime($carbon->minute, $time_fraction);
+        $min = $this->ceilTime($carbon->minute, $company);
 
         return $carbon->hour + ($min / 60);
     }
 
-    public function ceilTime($time, $ceil) {
-
+    public function ceilTime($time, $company) {
+        $ceil = $company->time_fraction;
         if ($ceil == AttendanceHeader::FRACTION_1) {
             $return = $time;
         } else if($ceil == AttendanceHeader::FRACTION_15) {
