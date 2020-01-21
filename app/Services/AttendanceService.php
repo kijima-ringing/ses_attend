@@ -3,9 +3,9 @@ namespace App\Services;
 
 use App\Models\AttendanceDaily;
 use App\Models\Company;
+use App\Services\GetDateService;
 use Illuminate\Support\Carbon;
 use App\Models\AttendanceHeader;
-use App\Services\GetDateService;
 
 class AttendanceService
 {
@@ -110,14 +110,17 @@ class AttendanceService
         $scheduled_working_hours = 0;
         $overtime_hours = 0;
         $working_hours = 0;
+
+        $getDataService = new GetDateService();
+
         foreach ($attendanceDailys as $attendance) {
             $working_days++;
 
-            $scheduled_working_hours = $scheduled_working_hours + GetDateService::getHourInt($attendance->scheduled_working_hours);
+            $scheduled_working_hours = $scheduled_working_hours + $getDataService->getHourInt($attendance->scheduled_working_hours);
 
-            $overtime_hours = $overtime_hours + GetDateService::getHourInt($attendance->overtime_hours);
+            $overtime_hours = $overtime_hours + $getDataService->getHourInt($attendance->overtime_hours);
 
-            $working_hours = $working_hours + GetDateService::getHourInt($attendance->working_hours);
+            $working_hours = $working_hours + $getDataService->getHourInt($attendance->working_hours);
 
         }
 

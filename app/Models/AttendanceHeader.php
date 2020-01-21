@@ -6,6 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class AttendanceHeader extends Model
 {
+    CONST FRACTION_1 = 1;
+    CONST FRACTION_15 = 15;
+    CONST FRACTION_30 = 30;
+
     protected $table = 'attendance_header';
 
     protected $fillable = [
