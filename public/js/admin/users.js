@@ -1,10 +1,11 @@
-$(window).on('load',function(){
-    if ($('.alert-danger').length > 0 ) {
-        $('#InputForm').modal('show');
-    }
-});
-
 $(function() {
+    $(window).on('load',function(){
+        if ($('.alert-danger').length > 0 ) {
+            changeDepartment();
+            $('#InputForm').modal('show');
+        }
+    });
+
     $('tbody.selectable').selectable({
         filter: 'tr',
         selected: function( event, ui ) {
@@ -27,6 +28,27 @@ $(function() {
         });
     }
 
+    function changeDepartment () {
+        // プルダウンの設定(フロントはプルダウンで設定させるが実際は、チェックボックスを用いてpostする)
+        var target_select = $('.js-select');
+        target_select.empty();
+        target_select.append('<option>-</option>');
+
+        var target_added_list = $('.js-added-list');
+        target_added_list.empty();
+        $('.js-department-checkbox').each(function(){
+            if ($(this).prop('checked') == true) {
+                var element = '<div class="offset-sm-2 col-sm-4 my-1">' + $(this).attr('data-label') + '</div>'
+                + '<div class="col-sm-1 my-1"><button class="btn btn-danger js-department-delete-btn" type="button" data-target-id="' + $(this).val() + '">x</button></div>'
+                + '<div class="col-sm-5 my-1"></div>';
+                target_added_list.append(element);
+                return true;
+            }
+
+            target_select.append('<option class="js-option" value="' + $(this).val() + '">' + $(this).attr('data-label') + '</option>');
+        });
+    }
+
     $('.js-add-button').on('click', function(event, data){
         $('.alert-danger').remove();
         $('.is-invalid').removeClass('is-invalid');
@@ -35,6 +57,7 @@ $(function() {
         $('#email').attr('placeholder', '');
         $('.js-department-checkbox').prop('checked', false);
 
+        // チェックボックスの設定
         if( typeof data !== 'undefined'){
             $.each(data, function(key, value){
                 if (key === 'email') {
@@ -58,5 +81,20 @@ $(function() {
         } else {
             $('#HiddenId').val(null);
         }
+
+        changeDepartment();
+    });
+
+    $('.js-department-add-btn').on('click', function(){
+        if ($('.js-select').val() == '-') {
+            return;
+        }
+        $('.js-checkbox-' + $('.js-select').val()).prop('checked', true);
+        changeDepartment();
+    });
+
+    $('form').on('click', '.js-department-delete-btn', function(){
+        $('.js-checkbox-' + $(this).attr('data-target-id')).prop('checked', false);
+        changeDepartment();
     });
 });
