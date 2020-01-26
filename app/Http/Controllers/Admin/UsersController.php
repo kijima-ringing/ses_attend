@@ -60,8 +60,7 @@ class UsersController extends Controller
                 ->delete();
 
                 // 更新①を実行
-                User::find($request->id)
-                ->delete();
+                User::destroy($request->id);
             });
             session()->flash('flash_message', '削除しました。');
         } catch (\Exception $e) {

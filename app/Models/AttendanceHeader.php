@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\AuthorObservable;
 
 class AttendanceHeader extends Model
 {
+    use AuthorObservable;
+
     CONST FRACTION_1 = 1;
     CONST FRACTION_15 = 15;
     CONST FRACTION_30 = 30;
