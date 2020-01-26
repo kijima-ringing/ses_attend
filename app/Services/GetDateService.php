@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Models\AttendanceHeader;
+use App\Models\Company;
 use Illuminate\Support\Carbon;
 
 class GetDateService
@@ -59,8 +61,50 @@ class GetDateService
         return $from->diffInHours($to);
     }
 
-    public static function getHourInt($time) {
+    public function getHourInt($time) {
+        $company = Company::company();
         $carbon = Carbon::create($time);
-        return $carbon->hour + ($carbon->minute / 60);
+
+        $min = $this->ceilTime($carbon->minute, $company);
+
+        return $carbon->hour + ($min / 60);
+    }
+
+    public function ceilTime($time, $company) {
+        $ceil = $company->time_fraction;
+        if ($ceil == AttendanceHeader::FRACTION_1) {
+            $return = $time;
+        } else if($ceil == AttendanceHeader::FRACTION_15) {
+            $return = $this->settingFraction15($time);
+        } else if($ceil == AttendanceHeader::FRACTION_30) {
+            $return = $this->settingFraction30($time);
+        }
+
+        return $return;
+    }
+
+    public function settingFraction15($time) {
+
+        if ($time >= 0 && $time < 15) {
+            $res = 0;
+        } else if ($time > 15 && $time < 30) {
+            $res = 15;
+        } else if ($time >= 30 && $time < 45) {
+            $res = 30;
+        } else if ($time >= 45) {
+            $res = 45;
+        }
+
+        return $res;
+    }
+
+    public function settingFraction30($time) {
+        if ($time >= 0 && $time < 30) {
+            $res = 0;
+        } else if ($time >= 30) {
+            $res = 30;
+        }
+
+        return $res;
     }
 }
