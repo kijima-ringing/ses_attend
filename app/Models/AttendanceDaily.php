@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\AuthorObservable;
 
 class AttendanceDaily extends Model
 {
+    use AuthorObservable;
+
     protected $table = 'attendance_daily';
 
     const NORMAL_WORKING = 0;

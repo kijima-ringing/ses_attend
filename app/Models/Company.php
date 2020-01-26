@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\AuthorObservable;
 
 class Company extends Model
 {
+    use AuthorObservable;
 
     const TIME_FRACTION_LIST = [
         '1' => 'なし',

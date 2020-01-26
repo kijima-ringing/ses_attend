@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\AuthorObservable;
 
 class DepartmentMember extends Model
 {
+    use AuthorObservable;
+
     /**
      * The attributes that are mass assignable.
      *
