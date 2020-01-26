@@ -14,6 +14,8 @@ class User extends Authenticatable
 {
     use Notifiable, SoftDeletes;
 
+    protected $dates = ['deleted_at'];
+
     /**
      * The attributes that are mass assignable.
      *
@@ -67,28 +69,7 @@ class User extends Authenticatable
             'users.first_name_kana',
             'users.email'
         ])
-        ->whereNull('users.deleted_by')
-        ->orderBy('users.id')
         ->get();
-    }
-
-    public function getUserInfo($user_id){
-        return $this->select([
-            'users.id',
-            'users.last_name',
-            'users.first_name',
-            'users.last_name_kana',
-            'users.first_name_kana',
-            'users.email',
-            DB::raw('GROUP_CONCAT(departments.id) AS department_ids'),
-        ])
-        ->leftJoin('department_members', 'users.id', '=', 'department_members.user_id')
-        ->leftJoin('departments', 'department_members.department_id', '=', 'departments.id')
-        ->where('users.id', $user_id)
-        ->whereNull('users.deleted_by')
-        ->groupBy('users.id')
-        ->get()
-        ->toArray();
     }
 
     // ユーザの追加・更新

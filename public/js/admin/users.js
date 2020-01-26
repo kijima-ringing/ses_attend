@@ -21,7 +21,7 @@ $(function() {
             dataType:'json',
             data: {user_id: user_id}
         }).done(function (res){
-            $('.js-add-button').trigger('click', res[0]);
+            $('.js-add-button').trigger('click', res);
         }).fail(function(jqXHR,textStatus,errorThrown){
             alert('ajax通信に失敗しました');
         });
@@ -45,7 +45,11 @@ $(function() {
                 }
             });
 
-            var target_ids = data.department_ids !== null ? data.department_ids.split(',') : '';
+            var target_ids = [];
+            $.each(data.departments, function(index, value){
+                target_ids.push(String(value.id));
+            });
+
             $('.js-department-checkbox').each(function(){
                 if ($.inArray($(this).val(), target_ids) !== -1) {
                     $(this).prop('checked', true)
