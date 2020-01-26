@@ -36,7 +36,8 @@ class UsersController extends Controller
                 $res = User::createOrUpdate($request);
 
                 // 更新②を実行
-                DepartmentMember::where('user_id', $res->id)->delete();
+                DepartmentMember::where('user_id', $res->id)
+                ->delete();
 
                 // 更新④を実行
                 $userService = new userService();
@@ -55,14 +56,12 @@ class UsersController extends Controller
         try {
             DB::transaction(function () use ($request) {
                 // 更新②を実行
-                DepartmentMember::where('user_id', $request->id)->delete();
+                DepartmentMember::where('user_id', $request->id)
+                ->delete();
 
                 // 更新①を実行
-                DB::table('users')->where('id', $request->id)
-                ->update([
-                    'deleted_by' => Auth::user()->id,
-                    'deleted_at' => \Carbon\Carbon::now(),
-                ]);
+                User::find($request->id)
+                ->delete();
             });
             session()->flash('flash_message', '削除しました。');
         } catch (\Exception $e) {
@@ -73,9 +72,10 @@ class UsersController extends Controller
     }
 
     public function ajaxGetUserInfo(Request $request) {
-        $user = new User;
         $query = $request->query();
-        $res = $user->getUserInfo($query['user_id']);
+        $res = User::find($query['user_id'])
+        ->toArray();
+        $res['departments'] = DepartmentMember::getDepartments($query['user_id']);
         return $res;
     }
 }
