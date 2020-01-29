@@ -41,6 +41,9 @@ Route::middleware('auth')->group(function (){
             Route::post('department/validate/update/{department}', 'DepartmentController@validateOnUpdate')->name('department.validate_on_update');
             Route::get('department/delete/{department}', 'DepartmentController@destroy')->name('department.delete');
 
+            Route::get('department/ajax_get_department_info', 'DepartmentController@ajaxGetDepartmentInfo')->name('department.ajax_get_department_info');
+
+
             Route::get('users', 'UsersController@index')->name('users.index');
             Route::get('users/ajax_get_user_info', 'UsersController@ajaxGetUserInfo')->name('users.ajax_get_user_info');
             Route::post('users/update', 'UsersController@update')->name('users.update');

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\DepartmentCreateValidationRequest;
 use App\Http\Requests\DepartmentUpdateValidationRequest;
+use App\Http\Resources\DepartmentResource;
 use App\Models\Department;
 use App\Models\DepartmentMember;
 use Illuminate\Http\Request;
@@ -68,5 +69,11 @@ class DepartmentController extends Controller
 
     public function validateOnUpdate(DepartmentUpdateValidationRequest $request) {
         return response()->json($request->validated());
+    }
+
+    public function ajaxGetDepartmentInfo(Request $request) {
+        $department = Department::findOrNew($request->id);
+
+        return DepartmentResource::make($department);
     }
 }

@@ -7,6 +7,9 @@ var updateValidationUrl = $('#department-index').data('update_validation');
 var createAction = $('#add-department').data('action');
 var updateAction = $('#edit-department').data('action');
 
+var getDepartmentUrl = $('.department-info-url').data('url');
+$('.department-info-url').removeAttr('data-url');
+
 
 $('#department-index').removeAttr('data-create_validation');
 $('#department-index').removeAttr('data-update_validation');
@@ -38,21 +41,32 @@ $(function() {
         var self = $(this);
 
         var id = isset(self.data('id')) ? self.data('id') : '';
-        var name = isset(self.data('name')) ? self.data('name') : '';
 
-        $('#id').val(id);
-        $('#name').val(name);
+        $.ajax({
+            type:'GET',
+            url: getDepartmentUrl,
+            dataType:'json',
+            data: {id: id}
+        }).done(function (res){
+            let data = res.data
 
-        let replaceUpdateAction = updateAction;
+            var name = isset(data.name) ? data.name : '';
 
-        form.attr('action', replaceUpdateAction.replace('department_id', id));
+            $('#name').val(name);
 
-        form.attr('method', 'GET');
+            let replaceUpdateAction = updateAction;
 
-        replaceUpdateUrl = updateValidationUrl;
-        postUrl = replaceUpdateUrl.replace('department_id', id);
+            form.attr('action', replaceUpdateAction.replace('department_id', id));
 
-        $(".modal").modal("show");
+            form.attr('method', 'GET');
+
+            replaceUpdateUrl = updateValidationUrl;
+            postUrl = replaceUpdateUrl.replace('department_id', id);
+
+            $(".modal").modal("show");
+        }).fail(function(jqXHR,textStatus,errorThrown){
+            alert('ajax通信に失敗しました');
+        });
     });
 });
 
@@ -61,11 +75,7 @@ $(function() {
         $.ajax({
             url: postUrl,
             type: 'POST',
-            data:{
-                'id':$('#id').val(),
-                'name':$('#name').val(),
-                '_token':$('#_token').val()
-            }
+            data:$('#modal-form').serialize()
         })
             .done( (data) => {
                 $('form').submit();

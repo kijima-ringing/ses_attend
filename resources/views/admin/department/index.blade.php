@@ -4,7 +4,7 @@
 @endsection
 
 @section('content')
-    <div class="container" id="department-index" data-create_validation="{{ route('admin.department.validate_on_create') }}" data-update_validation="{{ route('admin.department.validate_on_update', ['department' => 'department_id']) }}">
+    <div class="container department-info-url" id="department-index" data-url="{{ route('admin.department.ajax_get_department_info') }}" data-create_validation="{{ route('admin.department.validate_on_create') }}" data-update_validation="{{ route('admin.department.validate_on_update', ['department' => 'department_id']) }}">
 
         <div class="row pb-5">
             <div class="col-12">
@@ -24,7 +24,7 @@
             <tbody>
             @foreach ($departments AS $department)
                 <tr class="bg-white">
-                    <th class="text-center" ><span class="edit-department click-text" data-name="{{ $department->name }}" data-id="{{ $department->id }}">{{ $department->name }}</span></th>
+                    <th class="text-center" ><span class="edit-department click-text" data-id="{{ $department->id }}">{{ $department->name }}</span></th>
 
                     <td class="text-center">
                         <a href="{{ route('admin.department.delete', ['department' => $department->id]) }}" class="btn btn-danger">削除</a>
