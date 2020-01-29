@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\ComparisonTimeRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Carbon;
 
@@ -27,9 +28,17 @@ class AttendanceRequest extends FormRequest
         return [
             'work_date' => 'required|date_format:Y-m-d',
             'attendance_class' => 'required|in:0,1,2',
-            'working_time' => 'nullable|date_format:H:i:s',
+            'working_time' => [
+                'nullable',
+                'date_format:H:i:s',
+                new ComparisonTimeRule($this->input('working_time'), $this->input('leave_time'))
+            ],
             'leave_time' => 'nullable|date_format:H:i:s',
-            'break_time_from' => 'nullable|date_format:H:i:s',
+            'break_time_from' => [
+                'nullable',
+                'date_format:H:i:s',
+                new ComparisonTimeRule($this->input('break_time_from'), $this->input('break_time_to')),
+            ],
             'break_time_to' => 'nullable|date_format:H:i:s',
             'memo' => 'nullable'
         ];

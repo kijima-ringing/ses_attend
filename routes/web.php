@@ -31,6 +31,9 @@ Route::middleware('auth')->group(function (){
             Route::get('attendance_header/{user_id}/{year_month}', 'AttendanceHeaderController@show')->name('attendance_header.show');
             Route::get('attendance_header/update', 'AttendanceHeaderController@update')->name('attendance_header.update');
             Route::get('attendance_header/delete/{user_id}/{year_month}/{work_date}', 'AttendanceHeaderController@destroy')->name('attendance_header.delete');
+            Route::get('attendance_header/ajax_get_attendance_info', 'AttendanceHeaderController@ajaxGetAttendanceInfo')->name('attendance_header.ajax_get_attendance_info');
+            Route::post('attendance_header/validate', 'AttendanceHeaderController@AttendanceValidate')->name('attendance_header.validate');
+
             Route::resource('department', 'DepartmentController', ['except' => ['show', 'edit', 'create', 'update', 'delete']]);
 
             Route::get('department/update/{department}', 'DepartmentController@update')->name('department.update');
@@ -54,6 +57,9 @@ Route::middleware('auth')->group(function (){
                 Route::get('attendance_header/update', 'AttendanceHeaderController@update')->name('attendance_header.update');
                 Route::get('attendance_header/delete/{user_id}/{year_month}/{work_date}', 'AttendanceHeaderController@destroy')->name('attendance_header.delete');
             });
+
+            Route::get('attendance_header/ajax_get_attendance_info', 'AttendanceHeaderController@ajaxGetAttendanceInfo')->name('attendance_header.ajax_get_attendance_info');
+            Route::post('attendance_header/validate', 'AttendanceHeaderController@AttendanceValidate')->name('attendance_header.validate');
 
         });
 });
