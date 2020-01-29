@@ -29,7 +29,7 @@ class AttendanceDaily extends Model
         'working_hours',
     ];
 
-    public static function monthOffailys($attendance_header_id) {
+    public static function monthOfDailys($attendance_header_id) {
         return array_column(self::where('attendance_header_id', '=', $attendance_header_id)->get()->toArray(), null, 'work_date');
     }
 }

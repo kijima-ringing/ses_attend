@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AttendanceRequest;
+use App\Http\Resources\AttendanceDailyResource;
 use App\Models\AttendanceDaily;
 use App\Models\AttendanceHeader;
 use App\Models\Company;
@@ -41,7 +42,7 @@ class AttendanceHeaderController extends Controller
 
         $attendance = AttendanceHeader::firstOrNew(['user_id' => $user_id, 'year_month' => $date]);
 
-        $atendanceDaily = AttendanceDaily::monthOffailys($attendance->id);
+        $atendanceDaily = AttendanceDaily::monthOfDailys($attendance->id);
 
         $daysOfMonth = $getDateService->getDaysOfMonth($date->copy());
 
@@ -107,4 +108,15 @@ class AttendanceHeaderController extends Controller
 
         return redirect(route('admin.attendance_header.show', ['user_id' => $user_id, 'year_month' => $date]));
     }
+
+
+    public function ajaxGetAttendanceInfo(Request $request) {
+        $attendanceDaily = AttendanceDaily::findOrNew($request->id);
+        return AttendanceDailyResource::make($attendanceDaily);
+    }
+
+    public function AttendanceValidate(AttendanceRequest $request) {
+        return response()->json($request->validated());
+    }
+
 }

@@ -4,8 +4,9 @@
 @endsection
 
 @section('content')
-    <div class="container company" data-base_time_from="{{ $company->base_time_from }}" data-base_time_to="{{ $company->base_time_to }}">
-        <div class="row pb-3">
+    <div class="container company validation-url" id="attendance-info-url" data-validation_url="{{ route('user.attendance_header.validate') }}" data-url="{{ route('user.attendance_header.ajax_get_attendance_info') }}" data-base_time_from="{{ $company->base_time_from }}" data-base_time_to="{{ $company->base_time_to }}">
+
+    <div class="row pb-3">
             <div class="col-2">
                 <div data-action="{{ route('user.attendance_header.show', ['user_id' => $attendance->user_id, 'year_month' => 'year_month']) }}" id="year_month_url">
                     <input type="text" class="monthPick" id="year_month" name="year_month" value="{{ $date }}">
@@ -52,7 +53,7 @@
                         <th class="text-center">{{ $day['dayOfWeek'] }}</th>
                         @if (count($atendanceDaily) > 0)
                                 @if (isset($atendanceDaily[$day['work_date']]))
-                                    <th class="text-center attendance_class memo " data-attendance_class="{{ $atendanceDaily[$day['work_date']]['attendance_class'] }}" data-memo="{{ $atendanceDaily[$day['work_date']]['memo'] }}">
+                                    <th class="text-center attendance_class memo id" data-id="{{ $atendanceDaily[$day['work_date']]['id'] }}" data-attendance_class="{{ $atendanceDaily[$day['work_date']]['attendance_class'] }}" data-memo="{{ $atendanceDaily[$day['work_date']]['memo'] }}">
                                         {{ AttendanceHelper::attendanceClass($atendanceDaily[$day['work_date']]['attendance_class']) }}
                                     </th>
                                     <th class="text-center working_time leave_time" data-working_time="{{ $atendanceDaily[$day['work_date']]['working_time'] }}" data-leave_time="{{ $atendanceDaily[$day['work_date']]['leave_time']  }}">
@@ -105,8 +106,8 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div><!-- /.modal-header -->
-                <form method="GET" action="{{ route('user.attendance_header.update') }}">
-                    @csrf
+                <form method="GET" action="{{ route('user.attendance_header.update') }}" id="update-form">
+                @csrf
                 <div class="modal-body">
                     <div class="row">
                         <div class="col-md-10 offset-md-1 alert alert-danger d-none" id="modal-error-element">
