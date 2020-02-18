@@ -36,9 +36,7 @@ Route::middleware('auth')->group(function (){
 
             Route::resource('department', 'DepartmentController', ['except' => ['show', 'edit', 'create', 'update', 'delete']]);
 
-            Route::get('department/update/{department}', 'DepartmentController@update')->name('department.update');
-            Route::post('department/validate', 'DepartmentController@validateOnCreate')->name('department.validate_on_create');
-            Route::post('department/validate/update/{department}', 'DepartmentController@validateOnUpdate')->name('department.validate_on_update');
+            Route::post('department/update/{department}', 'DepartmentController@update')->name('department.update');
             Route::get('department/delete/{department}', 'DepartmentController@destroy')->name('department.delete');
 
             Route::get('department/ajax_get_department_info', 'DepartmentController@ajaxGetDepartmentInfo')->name('department.ajax_get_department_info');
