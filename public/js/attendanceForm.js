@@ -11,10 +11,6 @@ var companyBaseTimeTo = isset($('.company').data('base_time_to')) ? $('.company'
 var getAttendanceInfoUrl = $('#attendance-info-url').data('url');
 $('#department-index').removeAttr('data-url');
 
-var validationUrl = $('.validation-url').data('validation_url');
-$('.validation-url').removeAttr('data-validation_url');
-
-
 $(function() {
     $(".dialog").click(function() {
         var parent = $(this).parent();
@@ -89,11 +85,10 @@ $(function() {
         removeErrorElement();
         $.ajax({
             type:'POST',
-            url: validationUrl,
-            dataType:'json',
+            url: $('#update-form').attr('action'),
             data: $('#update-form').serialize()
         }).done(function (res){
-            $('form').submit();
+            location.reload();
         }).fail(function(jqXHR,textStatus,errorThrown){
             addErrorElement();
         });

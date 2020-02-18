@@ -1,8 +1,6 @@
 
 var form = $('#modal-form');
 
-var createValidationUrl = $('#department-index').data('create_validation');
-var updateValidationUrl = $('#department-index').data('update_validation');
 
 var createAction = $('#add-department').data('action');
 var updateAction = $('#edit-department').data('action');
@@ -27,8 +25,6 @@ $(function() {
         form.attr('action', createAction);
 
         form.attr('method', 'POST');
-
-        postUrl = createValidationUrl;
 
         $(".modal").modal("show");
     });
@@ -58,11 +54,6 @@ $(function() {
 
             form.attr('action', replaceUpdateAction.replace('department_id', id));
 
-            form.attr('method', 'GET');
-
-            replaceUpdateUrl = updateValidationUrl;
-            postUrl = replaceUpdateUrl.replace('department_id', id);
-
             $(".modal").modal("show");
         }).fail(function(jqXHR,textStatus,errorThrown){
             alert('ajax通信に失敗しました');
@@ -73,15 +64,15 @@ $(function() {
 $(function() {
     $("#department-submit").click(function() {
         $.ajax({
-            url: postUrl,
+            url: form.attr('action'),
             type: 'POST',
             data:$('#modal-form').serialize()
         })
             .done( (data) => {
-                $('form').submit();
+                location.reload();
             })
             .fail( (data) => {
                 addErrorElement();
             });
-    });
+     });
 });

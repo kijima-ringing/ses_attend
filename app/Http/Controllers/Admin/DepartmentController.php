@@ -63,14 +63,6 @@ class DepartmentController extends Controller
         return redirect(route('admin.department.index'));
     }
 
-    public function validateOnCreate(DepartmentCreateValidationRequest $request) {
-        return response()->json($request->validated());
-    }
-
-    public function validateOnUpdate(DepartmentUpdateValidationRequest $request) {
-        return response()->json($request->validated());
-    }
-
     public function ajaxGetDepartmentInfo(Request $request) {
         $department = Department::findOrNew($request->id);
 
