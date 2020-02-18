@@ -29,10 +29,9 @@ Route::middleware('auth')->group(function (){
         Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin'], function () {
             Route::resource('attendance_header', 'AttendanceHeaderController', ['except' => ['show', 'edit', 'delete', 'update']]);
             Route::get('attendance_header/{user_id}/{year_month}', 'AttendanceHeaderController@show')->name('attendance_header.show');
-            Route::get('attendance_header/update', 'AttendanceHeaderController@update')->name('attendance_header.update');
+            Route::post('attendance_header/update', 'AttendanceHeaderController@update')->name('attendance_header.update');
             Route::get('attendance_header/delete/{user_id}/{year_month}/{work_date}', 'AttendanceHeaderController@destroy')->name('attendance_header.delete');
             Route::get('attendance_header/ajax_get_attendance_info', 'AttendanceHeaderController@ajaxGetAttendanceInfo')->name('attendance_header.ajax_get_attendance_info');
-            Route::post('attendance_header/validate', 'AttendanceHeaderController@AttendanceValidate')->name('attendance_header.validate');
 
             Route::resource('department', 'DepartmentController', ['except' => ['show', 'edit', 'create', 'update', 'delete']]);
 
@@ -55,12 +54,11 @@ Route::middleware('auth')->group(function (){
         Route::group(['prefix' => 'user', 'as' => 'user.', 'namespace' => 'User'], function () {
             Route::group(['middleware' => ['loginUserCheck']], function () {
                 Route::get('attendance_header/{user_id}/{year_month}', 'AttendanceHeaderController@show')->name('attendance_header.show');
-                Route::get('attendance_header/update', 'AttendanceHeaderController@update')->name('attendance_header.update');
+                Route::post('attendance_header/update', 'AttendanceHeaderController@update')->name('attendance_header.update');
                 Route::get('attendance_header/delete/{user_id}/{year_month}/{work_date}', 'AttendanceHeaderController@destroy')->name('attendance_header.delete');
             });
 
             Route::get('attendance_header/ajax_get_attendance_info', 'AttendanceHeaderController@ajaxGetAttendanceInfo')->name('attendance_header.ajax_get_attendance_info');
-            Route::post('attendance_header/validate', 'AttendanceHeaderController@AttendanceValidate')->name('attendance_header.validate');
 
         });
 });

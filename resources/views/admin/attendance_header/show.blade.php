@@ -4,7 +4,7 @@
 @endsection
 
 @section('content')
-    <div class="container company validation-url" id="attendance-info-url" data-validation_url="{{ route('admin.attendance_header.validate') }}" data-url="{{ route('admin.attendance_header.ajax_get_attendance_info') }}" data-base_time_from="{{ $company->base_time_from }}" data-base_time_to="{{ $company->base_time_to }}">
+    <div class="container company validation-url" id="attendance-info-url" data-url="{{ route('admin.attendance_header.ajax_get_attendance_info') }}" data-base_time_from="{{ $company->base_time_from }}" data-base_time_to="{{ $company->base_time_to }}">
         <div class="row pb-3">
             <form method="GET" action="{{ route('admin.attendance_header.index') }}">
                 @csrf

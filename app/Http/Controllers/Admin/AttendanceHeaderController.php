@@ -114,9 +114,4 @@ class AttendanceHeaderController extends Controller
         $attendanceDaily = AttendanceDaily::findOrNew($request->id);
         return AttendanceDailyResource::make($attendanceDaily);
     }
-
-    public function AttendanceValidate(AttendanceRequest $request) {
-        return response()->json($request->validated());
-    }
-
 }
