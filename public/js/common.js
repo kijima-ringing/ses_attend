@@ -39,18 +39,52 @@ $('.back-index').click(function() {
     $('#year_month_submit').trigger('click');
 });
 
+function modalAjaxPost(form) {
+    removeErrorElement();
+
+    form.submit(function() {
+        return false;
+    });
+
+    let url = form.attr('action');
+
+    $.ajax({
+        url: url,
+        type: 'POST',
+        data:$('#modal-form').serialize()
+    })
+        .done( (data) => {
+            location.reload();
+        })
+        .fail( (data) => {
+            let errors = data.responseJSON.errors;
+            addErrorElement(errors);
+        });
+}
+
+
 function removeErrorElement() {
     let errorElement = getModalErrorElement();
 
-    errorElement.addClass('d-none')
+    errorElement.addClass('d-none');
+    errorElement.find('ul').empty();
+    $('.is-invalid').removeClass('is-invalid');
 }
 
-function addErrorElement() {
+function addErrorElement(errors) {
     let errorElement = getModalErrorElement();
 
+    let ul = errorElement.find('ul')
+
+    $.each(errors,function(key, error) {
+        ul.append("<li>" + error[0] + "</li>");
+
+        $('#' + key).addClass('is-invalid');
+
+    });
     errorElement.removeClass('d-none')
 }
 
 function getModalErrorElement() {
-    return $('#modal-error-element')
+    return $('.alert-danger')
 }

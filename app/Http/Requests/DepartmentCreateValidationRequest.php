@@ -27,4 +27,11 @@ class DepartmentCreateValidationRequest extends FormRequest
             'name' => 'required|unique:departments,name|max:20'
         ];
     }
+
+    public function attributes()
+    {
+        return [
+            'name' => '部門名',
+        ];
+    }
 }

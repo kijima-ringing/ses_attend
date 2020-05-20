@@ -32,4 +32,11 @@ class DepartmentUpdateValidationRequest extends FormRequest
             ],
         ];
     }
+
+    public function attributes()
+    {
+        return [
+            'name' => '部門名',
+        ];
+    }
 }

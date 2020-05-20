@@ -62,6 +62,19 @@ class AttendanceRequest extends FormRequest
         return $results;
     }
 
+    public function attributes()
+    {
+        return [
+            'work_date' => '日付',
+            'attendance_class' => '区分',
+            'working_time' => '出勤時間',
+            'leave_time' => '退勤時間',
+            'break_time_from' => '休憩開始時間',
+            'break_time_to' => '休憩終了時間',
+            'memo' => 'メモ',
+        ];
+    }
+
 
 
 }

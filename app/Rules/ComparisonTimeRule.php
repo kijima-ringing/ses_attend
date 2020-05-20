@@ -15,10 +15,10 @@ class ComparisonTimeRule implements Rule
      *
      * @return void
      */
-    public function __construct(string $fromTime, string $toTime)
+    public function __construct($fromTime, $toTime)
     {
-        $this->fromTime = $fromTime;
-        $this->toTime = $toTime;
+        $this->fromTime = isset($fromTime) ? $fromTime : 0;
+        $this->toTime = isset($toTime) ? $toTime : 0;
     }
 
     /**
@@ -51,6 +51,6 @@ class ComparisonTimeRule implements Rule
      */
     public function message()
     {
-        return 'The validation error message.';
+        return '時間を正しく入力してください。';
     }
 }

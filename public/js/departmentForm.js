@@ -63,16 +63,6 @@ $(function() {
 
 $(function() {
     $("#department-submit").click(function() {
-        $.ajax({
-            url: form.attr('action'),
-            type: 'POST',
-            data:$('#modal-form').serialize()
-        })
-            .done( (data) => {
-                location.reload();
-            })
-            .fail( (data) => {
-                addErrorElement();
-            });
+        modalAjaxPost(form);
      });
 });

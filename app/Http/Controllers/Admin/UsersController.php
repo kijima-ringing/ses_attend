@@ -40,7 +40,7 @@ class UsersController extends Controller
                 ->delete();
 
                 // 更新④を実行
-                $userService = new userService();
+                $userService = new UserService();
                 $userService->associateDepartment($request, $res);
             });
             session()->flash('flash_message', '社員リストを更新しました。');

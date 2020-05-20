@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('addCss')
-<link rel="stylesheet" href="{{ asset('/css/admin/users.css') }}">
+    <link rel="stylesheet" href="{{ asset('/css/admin/users.css') }}">
 @endsection
 
 @section('content')
@@ -19,43 +19,39 @@
             </tr>
             </thead>
             <tbody class="selectable">
-                @foreach ($user_list AS $user)
-                    <form method="POST" action="{{ route('admin.users.destroy') }}">
-                        @csrf
-                        <input type="hidden" name="id" value="{{ $user->id }}">
-                        <tr data-user_id="{{ $user->id }}">
-                            <td>{{ $user->last_name }}　{{ $user->first_name }}</td>
-                            <td>{{ $user->last_name_kana }}　{{ $user->first_name_kana }}</td>
-                            <td>{{ $user->email }}</td>
-                            <td class="text-center"><button class="btn btn-danger" value="{{ $user->id }}">削除</button></td>
-                        </tr>
-                    </form>
-                @endforeach
+            @foreach ($user_list AS $user)
+                <form method="POST" action="{{ route('admin.users.destroy') }}">
+                    @csrf
+                    <input type="hidden" name="id" value="{{ $user->id }}">
+                    <tr data-user_id="{{ $user->id }}">
+                        <td>{{ $user->last_name }}　{{ $user->first_name }}</td>
+                        <td>{{ $user->last_name_kana }}　{{ $user->first_name_kana }}</td>
+                        <td>{{ $user->email }}</td>
+                        <td class="text-center"><button class="btn btn-danger" value="{{ $user->id }}">削除</button></td>
+                    </tr>
+                </form>
+            @endforeach
             </tbody>
         </table>
     </div>
-    <form method="POST" action="{{ route('admin.users.update') }}">
+    <form method="POST" action="{{ route('admin.users.update') }}" id="modal-form">
         @csrf
         <input name="id" type="hidden" id="HiddenId" value="{{ empty(old('id')) ? '' : old('id') }}">
         <input type="hidden" name="placeholder_email">
         <div class="modal fade" id="InputForm" tabindex="-1" role="dialog" aria-labelledby="label1" aria-hidden="true">
             <div class="modal-dialog modal-xl" role="document">
                 <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
                     <div class="modal-body">
-                        @if(count($errors) > 0)
-                            <div class="alert-danger">
-                                <ul>
-                                    @foreach ($errors->all() as $error)
-                                        <li>{{ $error }}</li>
-                                    @endforeach
-                                </ul>
-                            </div>
-                        @endif
+                        <div class="alert-danger d-none col-12">
+                            <ul>
+
+                            </ul>
+                        </div>
                         <div class="form-group row">
                             <label for="inputLastname" class="col-sm-2 col-form-label">姓</label>
                             <div class="col-sm-3">
@@ -103,7 +99,7 @@
                         <div class="form-group row js-added-list">
                         </div>
                         <div class="form-group row d-none">
-                        
+
                             <div class="col-sm-10">
                                 <div class="form-group" data-department_select_json="{{ $department_select_list->toJson() }}">
                                     @foreach ($department_select_list AS $item)
@@ -117,7 +113,7 @@
                     </div>
                     <div class="modal-footer">
                         <div class="w-100">
-                            <button type="submit" class="btn btn-primary float-right col-sm-1 js-save-submit">保存</button>
+                            <button type="submit" class="btn btn-primary float-right col-sm-1 js-save-submit" id="user-submit">保存</button>
                         </div>
                     </div>
                 </div>

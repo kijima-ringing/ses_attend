@@ -1,11 +1,4 @@
 $(function() {
-    $(window).on('load',function(){
-        if ($('.alert-danger').length > 0 ) {
-            changeDepartment();
-            $('#InputForm').modal('show');
-        }
-    });
-
     $('tbody.selectable').selectable({
         filter: 'tr',
         selected: function( event, ui ) {
@@ -39,8 +32,8 @@ $(function() {
         $('.js-department-checkbox').each(function(){
             if ($(this).prop('checked') == true) {
                 var element = '<div class="offset-sm-2 col-sm-4 my-1">' + $(this).attr('data-label') + '</div>'
-                + '<div class="col-sm-1 my-1"><button class="btn btn-danger js-department-delete-btn" type="button" data-target-id="' + $(this).val() + '">x</button></div>'
-                + '<div class="col-sm-5 my-1"></div>';
+                    + '<div class="col-sm-1 my-1"><button class="btn btn-danger js-department-delete-btn" type="button" data-target-id="' + $(this).val() + '">x</button></div>'
+                    + '<div class="col-sm-5 my-1"></div>';
                 target_added_list.append(element);
                 return true;
             }
@@ -50,8 +43,8 @@ $(function() {
     }
 
     $('.js-add-button').on('click', function(event, data){
-        $('.alert-danger').remove();
-        $('.is-invalid').removeClass('is-invalid');
+        removeErrorElement()
+
         $('input[type!="checkbox"][type!="hidden"]').val('');
         $('input[name="placeholder_email"]').val('');
         $('#email').attr('placeholder', '');
@@ -97,4 +90,15 @@ $(function() {
         $('.js-checkbox-' + $(this).attr('data-target-id')).prop('checked', false);
         changeDepartment();
     });
+
+    $(function() {
+        $("#user-submit").click(function() {
+            let form = $('#modal-form');
+
+            modalAjaxPost(form);
+        });
+    });
+
+
+
 });

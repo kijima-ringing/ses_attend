@@ -120,14 +120,14 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div><!-- /.modal-header -->
-                <form method="GET" action="{{ route('admin.attendance_header.update') }}" id="update-form">
+                <form method="GET" action="{{ route('admin.attendance_header.update') }}" id="modal-form">
                 @csrf
                     <div class="modal-body">
                         <div class="row">
-                            <div class="col-md-10 offset-md-1 alert alert-danger d-none" id="modal-error-element">
-                            <span role="alert">
-                                <strong>入力された項目に誤りがあります。内容をご確認ください。</strong>
-                            </span>
+                            <div class="alert-danger d-none col-12">
+                                <ul>
+
+                                </ul>
                             </div>
                         </div>
                         <input type="hidden" name="user_id" value="{{ $attendance->user_id }}">

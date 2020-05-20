@@ -82,16 +82,8 @@ $(function() {
 
 $(function() {
     $('#attendance_submit').click(function() {
-        removeErrorElement();
-        $.ajax({
-            type:'POST',
-            url: $('#update-form').attr('action'),
-            data: $('#update-form').serialize()
-        }).done(function (res){
-            location.reload();
-        }).fail(function(jqXHR,textStatus,errorThrown){
-            addErrorElement();
-        });
+        let form = $('#modal-form');
+        modalAjaxPost(form);
 
     });
 });

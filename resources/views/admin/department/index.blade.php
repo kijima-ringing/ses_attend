@@ -47,12 +47,10 @@
                 <form method="GET" id="modal-form">
                     <input type="hidden" name="_token" id="_token" value="{{ csrf_token() }}">
                     <div class="modal-body">
-                        <div class="row">
-                            <div class="col-md-10 offset-md-1 alert alert-danger d-none" id="modal-error-element">
-                            <span role="alert">
-                                <strong>入力された項目に誤りがあります。内容をご確認ください。</strong>
-                            </span>
-                            </div>
+                        <div class="alert-danger d-none col-12">
+                            <ul>
+
+                            </ul>
                         </div>
                         <input type="hidden" name="id" value="" id="id">
 
@@ -61,7 +59,7 @@
                                 部門名
                             </label>
                             <div class="col-md-6">
-                                <input id="name" type="text" class="form-control" name="name">
+                                <input id="name" type="text" class="form-control" name="name" id="name">
                             </div>
                         </div>
 
