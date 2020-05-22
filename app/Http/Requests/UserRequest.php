@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\KanaRule;
+use App\Rules\PasswordRegexRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Carbon;
 use Illuminate\Validation\Rule;
@@ -28,8 +30,18 @@ class UserRequest extends FormRequest
         $rules = [
             'last_name' => 'required|string|max:20',
             'first_name' => 'required|string|max:20',
-            'last_name_kana' => 'required|string|max:40',
-            'first_name_kana' => 'required|string|max:40',
+            'last_name_kana' => [
+                'required',
+                'string',
+                'max:40',
+                new KanaRule()
+            ],
+            'first_name_kana' => [
+                'required',
+                'string',
+                'max:40',
+                new KanaRule()
+            ],
             'email' => [
                 'required',
                 'email',
@@ -41,14 +53,18 @@ class UserRequest extends FormRequest
         ];
 
         if (!empty($this->id)) {
-            $rules['id'] = 'required|alpha_num';
+            $rules['id'] = 'required|exists:users,id';
             $rules['email'] = [
                 'nullable',
                 'email',
                 'max:255',
                 Rule::unique('users', 'email')->whereNull('deleted_at')
             ];
-            $rules['password'] = 'nullable|string|max:255';
+            $rules['password'] = [
+                'nullable',
+                'max:255',
+                new PasswordRegexRule()
+            ];
 
             if (empty($this->email)) {
                 $this->request->remove('email');
