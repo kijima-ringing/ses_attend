@@ -73,7 +73,7 @@ class AttendanceHeaderController extends Controller
                 $updateDailyParams = $attendanceService->getUpdateDailyParams($requestParams);
 
                 // 更新処理①を実行
-                $attendanceDaily = Attendancedaily::firstOrNew(['attendance_header_id' => $attendanceHeader->id, 'work_date' => $request->work_date]);
+                $attendanceDaily = AttendanceDaily::firstOrNew(['attendance_header_id' => $attendanceHeader->id, 'work_date' => $request->work_date]);
                 $attendanceDaily->fill($updateDailyParams)->saveOrfail();
 
                 // 労働時間計算処理(月)
