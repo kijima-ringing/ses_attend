@@ -55,33 +55,33 @@
                         <div class="form-group row">
                             <label for="inputLastname" class="col-sm-2 col-form-label">姓</label>
                             <div class="col-sm-3">
-                                <input type="text" class="form-control {{ $errors->has('last_name') ? 'is-invalid' : '' }}" id="last_name" name="last_name" value="{{ empty(old('last_name')) ? '' : old('last_name') }}">
+                                <input type="text" class="form-control" id="last_name" name="last_name" value="">
                             </div>
                             <label for="inputFirstname" class="offset-sm-1 col-sm-2 col-form-label">名</label>
                             <div class="col-sm-3">
-                                <input type="text" class="form-control {{ $errors->has('first_name') ? 'is-invalid' : '' }}" id="first_name" name="first_name" value="{{ empty(old('first_name')) ? '' : old('first_name') }}">
+                                <input type="text" class="form-control" id="first_name" name="first_name" value="">
                             </div>
                         </div>
                         <div class="form-group row">
                             <label for="inputLastnameKana" class="col-sm-2 col-form-label">セイ</label>
                             <div class="col-sm-3">
-                                <input type="text" class="form-control {{ $errors->has('last_name_kana') ? 'is-invalid' : '' }}" id="last_name_kana" name="last_name_kana" value="{{ empty(old('last_name_kana')) ? '' : old('last_name_kana') }}">
+                                <input type="text" class="form-control" id="last_name_kana" name="last_name_kana" value="">
                             </div>
                             <label for="inputFirstnameKana" class="offset-sm-1 col-sm-2 col-form-label">メイ</label>
                             <div class="col-sm-3">
-                                <input type="text" class="form-control {{ $errors->has('first_name_kana') ? 'is-invalid' : '' }}" id="first_name_kana" name="first_name_kana" value="{{ empty(old('first_name_kana')) ? '' : old('first_name_kana') }}">
+                                <input type="text" class="form-control" id="first_name_kana" name="first_name_kana" value="">
                             </div>
                         </div>
                         <div class="form-group row">
                             <label for="inputMail" class="col-sm-2 col-form-label">メールアドレス</label>
                             <div class="col-sm-5">
-                                <input type="text" class="form-control {{ $errors->has('email') ? 'is-invalid' : '' }}" id="email" name="email" value="{{ empty(old('email')) ? '' : old('email') }}" placeholder="{{ old('placeholder_email') }}">
+                                <input type="text" class="form-control" id="email" name="email" value="" placeholder="">
                             </div>
                         </div>
                         <div class="form-group row">
                             <label for="inputPassword" class="col-sm-2 col-form-label">パスワード</label>
                             <div class="col-sm-5">
-                                <input type="password" class="form-control {{ $errors->has('password') ? 'is-invalid' : '' }}" id="inputPassword" name="password">
+                                <input type="password" class="form-control" id="inputPassword" name="password">
                             </div>
                         </div>
                         <div class="form-group row">
