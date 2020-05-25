@@ -53,26 +53,26 @@
                         <th class="text-center">{{ $day['dayOfWeek'] }}</th>
                         @if (count($atendanceDaily) > 0)
                                 @if (isset($atendanceDaily[$day['work_date']]))
-                                    <th class="text-center attendance_class memo id" data-id="{{ $atendanceDaily[$day['work_date']]['id'] }}" data-attendance_class="{{ $atendanceDaily[$day['work_date']]['attendance_class'] }}" data-memo="{{ $atendanceDaily[$day['work_date']]['memo'] }}">
+                                    <th class="text-center attendance_class memo id" data-id="{{ $atendanceDaily[$day['work_date']]['id'] }}">
                                         {{ AttendanceHelper::attendanceClass($atendanceDaily[$day['work_date']]['attendance_class']) }}
                                     </th>
-                                    <th class="text-center working_time leave_time" data-working_time="{{ $atendanceDaily[$day['work_date']]['working_time'] }}" data-leave_time="{{ $atendanceDaily[$day['work_date']]['leave_time']  }}">
+                                    <th class="text-center working_time leave_time">
                                         {{ AttendanceHelper::timeFormat($atendanceDaily[$day['work_date']]['working_time'])  }}
                                         ~
                                         {{ AttendanceHelper::timeFormat($atendanceDaily[$day['work_date']]['leave_time']) }}
                                     </th>
-                                    <th class="text-center break_time_from break_time_from" data-break_time_from="{{ $atendanceDaily[$day['work_date']]['break_time_from']  }}" data-break_time_from="{{ $atendanceDaily[$day['work_date']]['break_time_from']  }}">
+                                    <th class="text-center break_time_from break_time_from">
                                         {{ AttendanceHelper::timeFormat($atendanceDaily[$day['work_date']]['break_time_from'])  }}
                                         ~
                                         {{ AttendanceHelper::timeFormat($atendanceDaily[$day['work_date']]['break_time_to']) }}
                                     </th>
-                                    <th class="text-right scheduled_working_hours" data-schedule_working_hours="{{ $atendanceDaily[$day['work_date']]['scheduled_working_hours'] }}">
+                                    <th class="text-right scheduled_working_hours">
                                         {{ AttendanceHelper::timeFormat($atendanceDaily[$day['work_date']]['scheduled_working_hours']) }}
                                     </th>
-                                    <th class="text-right overtime_hours" dta-overtime_hours="{{ $atendanceDaily[$day['work_date']]['overtime_hours'] }}">
+                                    <th class="text-right overtime_hours">
                                         {{ AttendanceHelper::timeFormat($atendanceDaily[$day['work_date']]['overtime_hours']) }}
                                     </th>
-                                    <th class="text-right working_hours" dta-working_hours="{{ $atendanceDaily[$day['work_date']]['working_hours'] }}">
+                                    <th class="text-right working_hours">
                                         {{ AttendanceHelper::timeFormat($atendanceDaily[$day['work_date']]['working_hours']) }}
                                     </th>
                                 @else
