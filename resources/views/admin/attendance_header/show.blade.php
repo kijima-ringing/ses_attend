@@ -75,7 +75,7 @@
                                 ~
                                 {{ AttendanceHelper::timeFormat($atendanceDaily[$day['work_date']]['leave_time']) }}
                             </th>
-                            <th class="text-center break_time_from break_time_from">
+                            <th class="text-center break_time_from break_time_to">
                                 {{ AttendanceHelper::timeFormat($atendanceDaily[$day['work_date']]['break_time_from'])  }}
                                 ~
                                 {{ AttendanceHelper::timeFormat($atendanceDaily[$day['work_date']]['break_time_to']) }}
@@ -121,7 +121,7 @@
                     </button>
                 </div><!-- /.modal-header -->
                 <form method="GET" action="{{ route('admin.attendance_header.update') }}" id="modal-form">
-                @csrf
+                    @csrf
                     <div class="modal-body">
                         <div class="row">
                             <div class="alert-danger d-none col-12">
