@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Services;
 
 use App\Models\AttendanceDaily;
@@ -11,7 +12,8 @@ class AttendanceService
 {
     const TIME_FORMAT = 'H:i:s';
 
-    public function getUpdateDailyParams($params) {
+    public function getUpdateDailyParams($params)
+    {
         $company = Company::company();
 
         if ($params['attendance_class'] == AttendanceDaily::NORMAL_WORKING) {
@@ -27,11 +29,12 @@ class AttendanceService
         return $updateDailyParams;
     }
 
-    public function setDailyParamsNormalWorking($params, $company) {
+    public function setDailyParamsNormalWorking($params, $company)
+    {
 
         $scheduledWorkingHours = $this->getScheduledWorkingHours($company->base_time_to, $company->base_time_from);
 
-        $workingHours = $this->getworkingHours($params);
+        $workingHours = $this->getWorkingHours($params);
 
         $overtimeHours = $this->getOvertimeHours($workingHours, $scheduledWorkingHours);
 
@@ -42,7 +45,8 @@ class AttendanceService
         ];
     }
 
-    public function setDailyParamsPaidHolidays($params, $company) {
+    public function setDailyParamsPaidHolidays($params, $company)
+    {
         $scheduledWorkingHours = $this->getScheduledWorkingHours($company->base_time_to, $company->base_time_from);
 
         $workingHours = $scheduledWorkingHours;
@@ -56,7 +60,8 @@ class AttendanceService
         ];
     }
 
-    public function setDailyParamsDefault() {
+    public function setDailyParamsDefault()
+    {
         $scheduledWorkingHours = date(self::TIME_FORMAT, 0);
 
         $workingHours = date(self::TIME_FORMAT, 0);
@@ -70,7 +75,8 @@ class AttendanceService
         ];
     }
 
-    public function getScheduledWorkingHours($time_to, $time_from) {
+    public function getScheduledWorkingHours($time_to, $time_from)
+    {
         $from = strtotime($time_from);
         $to = strtotime($time_to);
 
@@ -80,7 +86,8 @@ class AttendanceService
         return date('H:i:s', $dif);
     }
 
-    public function getworkingHours($params) {
+    public function getWorkingHours($params)
+    {
         $working_time = strtotime($params['working_time']);
         $leave_time = strtotime($params['leave_time']);
         $break_time_from = strtotime($params['break_time_from']);
@@ -89,10 +96,10 @@ class AttendanceService
         $scheduled_working_hours = $leave_time - $working_time - ($break_time_to - $break_time_from);
 
         return date(self::TIME_FORMAT, $scheduled_working_hours);
-
     }
 
-    public function getOvertimeHours($workingHours, $scheduledWorkingHours) {
+    public function getOvertimeHours($workingHours, $scheduledWorkingHours)
+    {
         $time = strtotime($workingHours) - strtotime($scheduledWorkingHours);
         if ($time < 0) {
             $overtime_hours = 0;
@@ -102,8 +109,9 @@ class AttendanceService
         return date(self::TIME_FORMAT, $overtime_hours);
     }
 
-    public function getUpdateMonthParams($attendance_header_id) {
-        $attendanceDailys = AttendanceDaily::where('attendance_header_id', '=', $attendance_header_id)->get();
+    public function getUpdateMonthParams($attendance_header_id)
+    {
+        $attendanceDailies = AttendanceDaily::where('attendance_header_id', '=', $attendance_header_id)->get();
 
         $working_days = 0;
 
@@ -113,7 +121,7 @@ class AttendanceService
 
         $getDataService = new GetDateService();
 
-        foreach ($attendanceDailys as $attendance) {
+        foreach ($attendanceDailies as $attendance) {
             $working_days++;
 
             $scheduled_working_hours = $scheduled_working_hours + $getDataService->getHourInt($attendance->scheduled_working_hours);
@@ -121,7 +129,6 @@ class AttendanceService
             $overtime_hours = $overtime_hours + $getDataService->getHourInt($attendance->overtime_hours);
 
             $working_hours = $working_hours + $getDataService->getHourInt($attendance->working_hours);
-
         }
 
         return [
@@ -132,7 +139,8 @@ class AttendanceService
         ];
     }
 
-    public function amountHourFormat($time) {
+    public function amountHourFormat($time)
+    {
         $hour = $time * 3600;
         return floor($hour / 3600) . gmdate(":i:s", $hour);
     }

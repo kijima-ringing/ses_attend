@@ -9,9 +9,9 @@ class AttendanceHeader extends Model
 {
     use AuthorObservable;
 
-    CONST FRACTION_1 = 1;
-    CONST FRACTION_15 = 15;
-    CONST FRACTION_30 = 30;
+    const FRACTION_1 = 1;
+    const FRACTION_15 = 15;
+    const FRACTION_30 = 30;
 
     protected $table = 'attendance_header';
 
@@ -24,11 +24,13 @@ class AttendanceHeader extends Model
         'working_hours',
     ];
 
-    public function attendancDailies() {
+    public function attendanceDailies()
+    {
         return $this->hasMany('App\Models\AttendanceDaily', 'attendance_header_id');
     }
 
-    public function user() {
+    public function user()
+    {
         return $this->belongsTo('App\Models\User');
     }
 }

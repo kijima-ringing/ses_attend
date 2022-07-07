@@ -39,7 +39,8 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    public function scopeLedftJoinAttendanceHeader($query, $date) {
+    public function scopeLeftJoinAttendanceHeader($query, $date)
+    {
 
         return $query->select(
             'users.id AS user_id',
@@ -50,13 +51,14 @@ class User extends Authenticatable
             'attendance_header.overtime_hours AS overtime_hours',
             'attendance_header.working_hours AS working_hours'
         )
-            ->leftjoin('attendance_header', function($join) use ($date) {
-            $join->on('users.id', 'attendance_header.user_id')
-                ->where('attendance_header.year_month', '=', $date);
-        })->get();
+            ->leftjoin('attendance_header', function ($join) use ($date) {
+                $join->on('users.id', 'attendance_header.user_id')
+                    ->where('attendance_header.year_month', '=', $date);
+            })->get();
     }
 
-    public function getViewListForIndex(){
+    public function getViewListForIndex()
+    {
         return $this->select([
             'users.id',
             'users.last_name',
@@ -65,11 +67,12 @@ class User extends Authenticatable
             'users.first_name_kana',
             'users.email'
         ])
-        ->get();
+            ->get();
     }
 
     // ユーザの追加・更新
-    public static function createOrUpdate($request) {
+    public static function createOrUpdate($request)
+    {
         $data = [
             'last_name' => $request->last_name,
             'first_name' => $request->first_name,

@@ -14,7 +14,7 @@ class AddColumnAttendanceHeader extends Migration
     public function up()
     {
         Schema::table('attendance_header', function (Blueprint $table) {
-            $table->unsignedTinyInteger('comfirm_flag')->nullable();
+            $table->unsignedTinyInteger('confirm_flag')->nullable();
         });
     }
 
@@ -26,7 +26,7 @@ class AddColumnAttendanceHeader extends Migration
     public function down()
     {
         Schema::table('attendance_header', function (Blueprint $table) {
-            $table->dropColumn('comfirm_flag');
+            $table->dropColumn('confirm_flag');
         });
     }
 }

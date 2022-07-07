@@ -15,7 +15,8 @@ use Illuminate\Support\Facades\DB;
 
 class AttendanceHeaderController extends Controller
 {
-    public function show($user_id, $yearMonth) {
+    public function show($user_id, $yearMonth)
+    {
 
         $getDateService = new GetDateService();
 
@@ -23,7 +24,7 @@ class AttendanceHeaderController extends Controller
 
         $attendance = AttendanceHeader::firstOrNew(['user_id' => $user_id, 'year_month' => $date]);
 
-        $atendanceDaily = AttendanceDaily::monthOfDailys($attendance->id);
+        $attendanceDaily = AttendanceDaily::monthOfDailies($attendance->id);
 
         $daysOfMonth = $getDateService->getDaysOfMonth($date->copy());
 
@@ -31,14 +32,15 @@ class AttendanceHeaderController extends Controller
 
         return view('user.attendance_header.show')->with([
             'attendance' => $attendance,
-            'atendanceDaily' => $atendanceDaily,
+            'attendanceDaily' => $attendanceDaily,
             'daysOfMonth' => $daysOfMonth,
             'date' => $date->format('Y-m'),
             'company' => $company,
         ]);
     }
 
-    public function update(AttendanceRequest $request) {
+    public function update(AttendanceRequest $request)
+    {
 
         $attendanceService = new AttendanceService();
         $getDateService = new GetDateService();
@@ -70,7 +72,8 @@ class AttendanceHeaderController extends Controller
         return redirect(route('user.attendance_header.show', ['user_id' => $request->user_id, 'year_month' => $date]));
     }
 
-    public function destroy($user_id, $year_month, $work_date) {
+    public function destroy($user_id, $year_month, $work_date)
+    {
         $attendanceService = new AttendanceService();
 
         // 抽出①を実行
@@ -79,7 +82,7 @@ class AttendanceHeaderController extends Controller
         $attendanceHeader = AttendanceHeader::firstOrCreate(['user_id' => $user_id, 'year_month' => $date]);
 
         // 更新処理④
-        Attendancedaily::where(['attendance_header_id' => $attendanceHeader->id, 'work_date' => $work_date])->delete();
+        AttendanceDaily::where(['attendance_header_id' => $attendanceHeader->id, 'work_date' => $work_date])->delete();
 
         // 労働時間計算処理(月)
         $updateMonthParams = $attendanceService->getUpdateMonthParams($attendanceHeader->id);
@@ -90,7 +93,8 @@ class AttendanceHeaderController extends Controller
         return redirect(route('user.attendance_header.show', ['user_id' => $user_id, 'year_month' => $date]));
     }
 
-    public function ajaxGetAttendanceInfo(Request $request) {
+    public function ajaxGetAttendanceInfo(Request $request)
+    {
         $attendanceDaily = AttendanceDaily::findOrNew($request->id);
         return AttendanceDailyResource::make($attendanceDaily);
     }
