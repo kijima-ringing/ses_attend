@@ -27,13 +27,13 @@ $(function() {
 
     $('.js-add-button').on('click', function(event, data){
         removeErrorElement();
-    
+
         $('input[type!="checkbox"][type!="hidden"]').val('');
         $('input[name="placeholder_email"]').val('');
         $('#email').attr('placeholder', '');
         $('.js-department-checkbox').prop('checked', false);
         $('#admin_flag').prop('checked', false); // 初期状態ではチェックを外す
-    
+
         if (typeof data !== 'undefined') {
             $.each(data, function(key, value){
                 if (key === 'email') {
@@ -42,18 +42,18 @@ $(function() {
                 } else {
                     $('#' + key).val(value);
                 }
-    
+
                 // admin_flagの反映
                 if (key === 'admin_flag') {
                     $('#admin_flag').prop('checked', value == 1); // 1ならチェック、0なら非チェック
                 }
             });
-    
+
             var target_ids = [];
             $.each(data.departments, function(index, value){
                 target_ids.push(String(value.id));
             });
-    
+
             $('.js-department-checkbox').each(function(){
                 if ($.inArray($(this).val(), target_ids) !== -1) {
                     $(this).prop('checked', true);
@@ -62,7 +62,7 @@ $(function() {
         } else {
             $('#HiddenId').val(null);
         }
-    
+
         changeDepartment();
     });
 
