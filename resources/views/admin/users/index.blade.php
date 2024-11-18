@@ -100,7 +100,7 @@
                             <label for="admin_flag" class="col-sm-2 col-form-label">管理者権限</label>
                             <div class="col-sm-10">
                                 <input type="checkbox" id="admin_flag" name="admin_flag" value="1"
-                                    {{ old('admin_flag') == 1 ? 'checked' : '' }}>
+                                {{ old('admin_flag', !empty($user) ? $user->admin_flag : 0) == 1 ? 'checked' : '' }}>
                                 <label for="admin_flag">管理者として登録</label>
                             </div>
                         </div>
@@ -131,5 +131,5 @@
 
 @endsection
 @section('addJs')
-    <script src="{{ asset('js/admin/users.js') }}"></script>
+    <script src="{{ asset('/js/admin/users.js') }}"></script>
 @endsection

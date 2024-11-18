@@ -47,14 +47,9 @@ class UsersController extends Controller
     }
 
     public function destroy(Request $request) {
-
         try {
             DB::transaction(function () use ($request) {
-                // 更新②を実行
-                DepartmentMember::where('user_id', $request->id)
-                ->delete();
-
-                // 更新①を実行
+                DepartmentMember::where('user_id', $request->id)->delete();
                 User::destroy($request->id);
             });
             session()->flash('flash_message', '削除しました。');
@@ -67,9 +62,10 @@ class UsersController extends Controller
 
     public function ajaxGetUserInfo(Request $request) {
         $query = $request->query();
-        $res = User::find($query['user_id'])
-        ->toArray();
+        $res = User::find($query['user_id'])->toArray(); // admin_flagが正しく含まれているか確認
         $res['departments'] = DepartmentMember::getDepartments($query['user_id']);
+        \Log::info('User Data:', $res); // デバッグ用ログ出力
         return $res;
     }
+
 }

@@ -65,7 +65,8 @@ class User extends Authenticatable
             'users.first_name',
             'users.last_name_kana',
             'users.first_name_kana',
-            'users.email'
+            'users.email',
+            'users.admin_flag',
         ])
             ->get();
     }
