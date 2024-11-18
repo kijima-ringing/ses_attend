@@ -28,21 +28,16 @@ class UsersController extends Controller
     }
 
     public function update(UserRequest $request) {
-        // バリデーションはUserRequest内で実施済み
-
         try {
             DB::transaction(function () use ($request) {
-                // 更新③を実行
-                $res = User::createOrUpdate($request);
+                $res = User::createOrUpdate($request->merge(['admin_flag' => $request->has('admin_flag') ? 1 : 0]));
 
-                // 更新②を実行
-                DepartmentMember::where('user_id', $res->id)
-                ->delete();
+                DepartmentMember::where('user_id', $res->id)->delete();
 
-                // 更新④を実行
                 $userService = new UserService();
                 $userService->associateDepartment($request, $res);
             });
+
             session()->flash('flash_message', '社員リストを更新しました。');
         } catch (\Exception $e) {
             session()->flash('error_message', '社員リストの更新に失敗しました');

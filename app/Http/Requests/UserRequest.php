@@ -49,7 +49,8 @@ class UserRequest extends FormRequest
                 Rule::unique('users', 'email'),
             ],
             'password' => 'required|string|max:255',
-            'department_ids' => 'nullable|exists:departments,id'
+            'department_ids' => 'nullable|exists:departments,id',
+            'admin_flag' => 'boolean'
         ];
 
         if (!empty($this->id)) {
@@ -70,7 +71,7 @@ class UserRequest extends FormRequest
                 $this->request->remove('email');
                 unset($rules['email']);
             }
-    
+
             if (empty($this->password)) {
                 $this->request->remove('password');
                 unset($rules['password']);

@@ -18,7 +18,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'last_name', 'first_name', 'last_name_kana', 'first_name_kana', 'email', 'password',
+        'last_name', 'first_name', 'last_name_kana', 'first_name_kana', 'email', 'password', 'admin_flag',
     ];
 
     /**
@@ -78,6 +78,7 @@ class User extends Authenticatable
             'first_name' => $request->first_name,
             'last_name_kana' => $request->last_name_kana,
             'first_name_kana' => $request->first_name_kana,
+            'admin_flag' => $request->admin_flag,
         ];
 
         if (isset($request->email)) {
