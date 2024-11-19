@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('addCss')
+<link rel="stylesheet" href="{{ asset('/css/admin/show.css') }}">
 @endsection
 
 @section('content')
@@ -27,19 +28,20 @@
         </div>
 
         <div class="col-1"></div>
-        <!-- 月次勤怠を確定ボタン配置 -->
+
+        <div class="h2">
+            {{ $attendance->user->last_name }}{{ $attendance->user->first_name }}
+        </div>
+    </div>
+    <!-- 月次勤怠を確定ボタン配置 -->
+    <div class="month-button">
         <form method="POST" action="{{ route('admin.attendance_header.confirm', ['user_id' => $attendance->user_id, 'year_month' => $date]) }}">
             @csrf
             <button type="submit" class="btn btn-success">
                 {{ $attendance->confirm_flag ? '確定を取り消す' : '勤怠を確定する' }}
             </button>
         </form>
-
-        <div class="h2">
-            {{ $attendance->user->last_name }}{{ $attendance->user->first_name }}
-        </div>
     </div>
-
     <table class="table table-bordered">
         <thead class="bg-info">
             <tr>
