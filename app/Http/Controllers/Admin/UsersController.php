@@ -55,7 +55,7 @@ class UsersController extends Controller
         try {
             DB::transaction(function () use ($request) {
                 DepartmentMember::where('user_id', $request->id)->delete();
-                User::destroy($request->id);
+                User::where('id', $request->id)->forceDelete();
             });
             session()->flash('flash_message', '削除しました。');
         } catch (\Exception $e) {
