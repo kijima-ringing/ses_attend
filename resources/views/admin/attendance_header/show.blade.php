@@ -27,6 +27,14 @@
         </div>
 
         <div class="col-1"></div>
+        <!-- 月次勤怠を確定ボタン配置 -->
+        <form method="POST" action="{{ route('admin.attendance_header.confirm', ['user_id' => $attendance->user_id, 'year_month' => $date]) }}">
+            @csrf
+            <button type="submit" class="btn btn-success">
+                {{ $attendance->confirm_flag ? '確定を取り消す' : '勤怠を確定する' }}
+            </button>
+        </form>
+
         <div class="h2">
             {{ $attendance->user->last_name }}{{ $attendance->user->first_name }}
         </div>
@@ -217,5 +225,5 @@
 </div><!-- /.modal -->
 @endsection
 @section('addJs')
-<script src="{{ asset('js/attendanceForm.js') }}"></script>
+<script src="{{ asset('/js/attendanceForm.js') }}"></script>
 @endsection

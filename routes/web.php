@@ -48,6 +48,8 @@ Route::middleware('auth')->group(function (){
 
             Route::get('settings', 'SettingsController@edit')->name('settings.edit');
             Route::post('settings/update', 'SettingsController@update')->name('settings.update');
+
+            Route::post('attendance_header/confirm/{user_id}/{year_month}', 'AttendanceHeaderController@confirm')->name('attendance_header.confirm');
         });
     });
 

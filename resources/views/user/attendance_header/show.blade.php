@@ -131,7 +131,7 @@
                         </label>
                         <div class="col-md-8">
                             <div class="form-inline">
-                                <select name="attendance_class" class="form-control" id="attendance_class">
+                                <select name="attendance_class" class="form-control" id="attendance_class" {{ $attendance->confirm ? 'disabled' : '' }}>
                                     <option value="0">通常勤務</option>
                                     <option value="1">有給休暇</option>
                                     <option value="2">欠勤</option>
@@ -148,14 +148,14 @@
                             <div class="form-inline">
                                 <div class="input-group mb-2 mr-sm-2 mb-sm-0">
                                     <input id="working_time" size="8" type="time" name="working_time"
-                                        class="form-control" value="{{ $company->base_time_from }}">
+                                        class="form-control" value="{{ $company->base_time_from }}" {{ $attendance->confirm ? 'disabled' : '' }}>
                                 </div>
                                 <div class="input-group mb-2 mr-sm-2  ml-sm-2 mb-sm-0">
                                     〜
                                 </div>
                                 <div class="input-group mb-2 ml-sm-2 mb-sm-0">
                                     <input id="leave_time" type="time" size="8" name="leave_time" class="form-control"
-                                        value="{{ $company->base_time_to }}">
+                                        value="{{ $company->base_time_to }}" {{ $attendance->confirm ? 'disabled' : '' }}>
                                 </div>
                             </div>
                         </div>
@@ -169,14 +169,14 @@
                             <div class="form-inline">
                                 <div class="input-group mb-2 mr-sm-2 mb-sm-0">
                                     <input id="break_time_from" size="8" type="time" name="break_time_from"
-                                        class="form-control" value="12:00">
+                                        class="form-control" value="12:00" {{ $attendance->confirm ? 'disabled' : '' }}>
                                 </div>
                                 <div class="input-group mb-2 mr-sm-2  ml-sm-2 mb-sm-0">
                                     〜
                                 </div>
                                 <div class="input-group mb-2 ml-sm-2 mb-sm-0">
                                     <input id="break_time_to" type="time" size="8" name="break_time_to"
-                                        class="form-control" value="13:00">
+                                        class="form-control" value="13:00" {{ $attendance->confirm ? 'disabled' : '' }}>
                                 </div>
                             </div>
                         </div>
@@ -187,22 +187,22 @@
                             メモ
                         </label>
                         <div class="col-md-8">
-                            <textarea class="field-textarea" id="memo" class="form-control" name="memo"></textarea>
+                            <textarea class="field-textarea" id="memo" class="form-control" name="memo" {{ $attendance->confirm ? 'disabled' : '' }}></textarea>
                         </div>
                     </div>
 
                 </div><!-- /.modal-body -->
                 <div class="modal-footer">
                     <a data-url="{{ route('user.attendance_header.delete', ['user_id' => $attendance->user_id, 'year_month' => $date, 'work_date' => 'work_date']) }}"
-                        class="btn btn-secondary" id="delete-url">未入力に戻す</a>
-                    <button type="button" class="btn btn-primary" id="attendance_submit">変更を保存</button>
+                        class="btn btn-secondary" id="delete-url" {{ $attendance->confirm_flag ? 'disabled' : '' }}>未入力に戻す</a>
+                    <button type="button" class="btn btn-primary" id="attendance_submit" {{ $attendance->confirm_flag ? 'disabled' : '' }}>変更を保存</button>
                 </div><!-- /.modal-footer -->
-        </div><!-- /.modal-content -->
+            </div><!-- /.modal-content -->
         </form>
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 
 @endsection
 @section('addJs')
-<script src="{{ asset('js/attendanceForm.js') }}"></script>
+<script src="{{ asset('/js/attendanceForm.js') }}"></script>
 @endsection

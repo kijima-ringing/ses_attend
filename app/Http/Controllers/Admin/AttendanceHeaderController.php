@@ -119,4 +119,24 @@ class AttendanceHeaderController extends Controller
         $attendanceDaily = AttendanceDaily::findOrNew($request->id);
         return AttendanceDailyResource::make($attendanceDaily);
     }
+
+    public function confirm(Request $request, $user_id, $year_month)
+    {
+        $getDateService = new GetDateService();
+        $date = $getDateService->createYearMonthFormat($year_month);
+
+        $attendanceHeader = AttendanceHeader::where([
+            'user_id' => $user_id,
+            'year_month' => $date
+        ])->firstOrFail();
+
+        // 勤怠の確定状態をトグル
+        $attendanceHeader->confirm_flag = !$attendanceHeader->confirm_flag;
+        $attendanceHeader->save();
+
+        $message = $attendanceHeader->confirm_flag ? '勤怠を確定しました。' : '勤怠の確定を取り消しました。';
+        session()->flash('flash_message', $message);
+
+        return redirect()->route('admin.attendance_header.show', ['user_id' => $user_id, 'year_month' => $year_month]);
+    }
 }
