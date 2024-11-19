@@ -1,7 +1,7 @@
-console.log('users.js loaded');
-
-
 $(function() {
+    console.log('users.js loaded');
+    let isSubmitting = false; // 送信フラグを追加
+
     $('tbody.selectable').selectable({
         filter: 'tr',
         selected: function(event, ui) {
@@ -18,24 +18,33 @@ $(function() {
             dataType: 'json',
             data: { user_id: user_id }
         }).done(function(res) {
-            console.log('Ajax Response:', res); // レスポンス内容を確認
+            console.log('Ajax Response:', res);
             $('.js-add-button').trigger('click', res);
         }).fail(function(jqXHR, textStatus, errorThrown) {
+            console.error('Ajax error:', textStatus, errorThrown);
             alert('ajax通信に失敗しました');
         });
     }
 
     $('.js-add-button').on('click', function(event, data){
         removeErrorElement();
+        isSubmitting = false; // モーダルを開く時にフラグをリセット
 
+        if (typeof data === 'undefined') {
+            $('#HiddenId').val(''); // null ではなく空文字列を使用
+        } else {
+            $('#HiddenId').val(data.id);
+        }
+
+        // 入力フォームをリセット
         $('input[type!="checkbox"][type!="hidden"]').val('');
         $('input[name="placeholder_email"]').val('');
         $('#email').attr('placeholder', '');
         $('.js-department-checkbox').prop('checked', false);
-        $('#admin_flag').prop('checked', false); // 初期状態ではチェックを外す
+        $('#admin_flag').prop('checked', false);
 
         if (typeof data !== 'undefined') {
-            $.each(data, function(key, value){
+            $.each(data, function(key, value) {
                 if (key === 'email') {
                     $('#email').attr('placeholder', value);
                     $('input[name="placeholder_email"]').val(value);
@@ -43,29 +52,25 @@ $(function() {
                     $('#' + key).val(value);
                 }
 
-                // admin_flagの反映
                 if (key === 'admin_flag') {
-                    $('#admin_flag').prop('checked', value == 1); // 1ならチェック、0なら非チェック
+                    $('#admin_flag').prop('checked', value == 1);
                 }
             });
 
             var target_ids = [];
-            $.each(data.departments, function(index, value){
+            $.each(data.departments, function(index, value) {
                 target_ids.push(String(value.id));
             });
 
-            $('.js-department-checkbox').each(function(){
+            $('.js-department-checkbox').each(function() {
                 if ($.inArray($(this).val(), target_ids) !== -1) {
                     $(this).prop('checked', true);
                 }
             });
-        } else {
-            $('#HiddenId').val(null);
         }
 
         changeDepartment();
     });
-
 
     function changeDepartment() {
         var target_select = $('.js-select');
@@ -100,11 +105,18 @@ $(function() {
         changeDepartment();
     });
 
-    $(function() {
-        $("#user-submit").click(function() {
-            let form = $('#modal-form');
-            modalAjaxPost(form);
-        });
+    $("#modal-form").off('submit').on('submit', function(e) {
+        e.preventDefault();
+
+        // 二重送信防止
+        if (isSubmitting) {
+            console.log('Form submission prevented - already submitting');
+            return false;
+        }
+
+        isSubmitting = true;
+        let form = $(this);
+        modalAjaxPost(form);
     });
 
     function removeErrorElement() {
@@ -112,6 +124,9 @@ $(function() {
     }
 
     function modalAjaxPost(form) {
+        const submitButton = $("#user-submit");
+        submitButton.prop('disabled', true);
+
         $.ajax({
             type: form.attr('method'),
             url: form.attr('action'),
@@ -120,11 +135,25 @@ $(function() {
                 location.reload();
             },
             error: function(xhr) {
-                var errors = xhr.responseJSON.errors;
-                $.each(errors, function(key, value) {
-                    $('.alert-danger').removeClass('d-none').find('ul').append('<li>' + value + '</li>');
-                });
+                if (xhr.responseJSON && xhr.responseJSON.errors) {
+                    var errors = xhr.responseJSON.errors;
+                    $.each(errors, function(key, value) {
+                        $('.alert-danger').removeClass('d-none').find('ul').append('<li>' + value + '</li>');
+                    });
+                } else {
+                    $('.alert-danger').removeClass('d-none').find('ul').append('<li>予期せぬエラーが発生しました</li>');
+                }
+            },
+            complete: function() {
+                isSubmitting = false;  // リクエストが完了したらフラグをリセット
+                submitButton.prop('disabled', false);
             }
         });
     }
+
+    // モーダルが閉じられたときのイベントハンドラを追加
+    $('#InputForm').on('hidden.bs.modal', function () {
+        isSubmitting = false; // フラグをリセット
+        removeErrorElement();
+    });
 });

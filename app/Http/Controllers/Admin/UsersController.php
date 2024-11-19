@@ -30,17 +30,22 @@ class UsersController extends Controller
     public function update(UserRequest $request) {
         try {
             DB::transaction(function () use ($request) {
-                $res = User::createOrUpdate($request->merge(['admin_flag' => $request->has('admin_flag') ? 1 : 0]));
+                $existingUser = User::where('email', $request->email)->first();
 
-                DepartmentMember::where('user_id', $res->id)->delete();
+                if (!$existingUser || $existingUser->id == $request->id) {
+                    $res = User::createOrUpdate($request->merge(['admin_flag' => $request->has('admin_flag') ? 1 : 0]));
+                    DepartmentMember::where('user_id', $res->id)->delete();
 
-                $userService = new UserService();
-                $userService->associateDepartment($request, $res);
+                    $userService = new UserService();
+                    $userService->associateDepartment($request, $res);
+                } else {
+                    throw new \Exception('このメールアドレスはすでに使用されています');
+                }
             });
 
             session()->flash('flash_message', '社員リストを更新しました。');
         } catch (\Exception $e) {
-            session()->flash('error_message', '社員リストの更新に失敗しました');
+            session()->flash('error_message', $e->getMessage());
         }
 
         return redirect(route('admin.users.index'));
