@@ -6,7 +6,9 @@
 @section('content')
 <div class="container company validation-url" id="attendance-info-url"
     data-url="{{ route('user.attendance_header.ajax_get_attendance_info') }}"
-    data-base_time_from="{{ $company->base_time_from }}" data-base_time_to="{{ $company->base_time_to }}">
+    data-confirmed="{{ $attendance->confirm_flag }}"
+    data-base_time_from="{{ $company->base_time_from }}"
+    data-base_time_to="{{ $company->base_time_to }}">
 
     <div class="row pb-3">
         <div class="col-2">
@@ -56,8 +58,7 @@
                     data-date_info="{{ $date . '-' . $day['day'] . '(' . $day['dayOfWeek'] . ')' }}"
                     data-work_date="{{ $day['work_date'] }}">{{ $day['day'] }}日</th>
                 <th class="text-center">{{ $day['dayOfWeek'] }}</th>
-                @if (count($attendanceDaily) > 0)
-                @if (isset($attendanceDaily[$day['work_date']]))
+                @if (count($attendanceDaily) > 0 && isset($attendanceDaily[$day['work_date']]))
                 <th class="text-center attendance_class memo id"
                     data-id="{{ $attendanceDaily[$day['work_date']]['id'] }}">
                     {{ AttendanceHelper::attendanceClass($attendanceDaily[$day['work_date']]['attendance_class']) }}
@@ -89,14 +90,6 @@
                 <th></th>
                 <th></th>
                 @endif
-                @else
-                <th></th>
-                <th></th>
-                <th></th>
-                <th></th>
-                <th></th>
-                <th></th>
-                @endif
             </tr>
             @endforeach
         </tbody>
@@ -112,7 +105,7 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div><!-- /.modal-header -->
-            <form method="GET" action="{{ route('user.attendance_header.update') }}" id="modal-form">
+            <form method="POST" action="{{ route('user.attendance_header.update') }}" id="modal-form">
                 @csrf
                 <div class="modal-body">
                     <div class="row">
@@ -190,12 +183,10 @@
                             <textarea class="field-textarea" id="memo" class="form-control" name="memo" {{ $attendance->confirm ? 'disabled' : '' }}></textarea>
                         </div>
                     </div>
-
                 </div><!-- /.modal-body -->
                 <div class="modal-footer">
-                    <a data-url="{{ route('user.attendance_header.delete', ['user_id' => $attendance->user_id, 'year_month' => $date, 'work_date' => 'work_date']) }}"
-                        class="btn btn-secondary" id="delete-url" {{ $attendance->confirm_flag ? 'disabled' : '' }}>未入力に戻す</a>
-                    <button type="button" class="btn btn-primary" id="attendance_submit" {{ $attendance->confirm_flag ? 'disabled' : '' }}>変更を保存</button>
+                    <button type="button" data-url="{{ route('user.attendance_header.delete', ['user_id' => $attendance->user_id, 'year_month' => $date, 'work_date' => 'work_date']) }}" class="btn btn-secondary" id="delete-url" {{ $attendance->confirm_flag ? 'disabled' : '' }}>未入力に戻す</button>
+                    <button type="submit" class="btn btn-primary" id="attendance_submit" {{ $attendance->confirm_flag ? 'disabled' : '' }}>変更を保存</button>
                 </div><!-- /.modal-footer -->
             </div><!-- /.modal-content -->
         </form>
@@ -203,6 +194,7 @@
 </div><!-- /.modal -->
 
 @endsection
+
 @section('addJs')
 <script src="{{ asset('/js/attendanceForm.js') }}"></script>
 @endsection

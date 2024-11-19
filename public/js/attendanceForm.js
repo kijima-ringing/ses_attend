@@ -73,21 +73,49 @@ function resetModalFields() {
 function lockFieldsIfConfirmed() {
     let isConfirmed = $('#attendance-info-url').data('confirmed'); // 勤怠確定状態を取得
     if (isConfirmed) {
+        $('#modal-form :input').not('#attendance_submit, #delete-url').prop('disabled', true); // 必要なボタンを除外
         $('#attendance_submit').prop('disabled', true);
-        $('#modal-form :input').prop('disabled', true);
+        $('#delete-url').prop('disabled', true);
     } else {
-        $('#attendance_submit').prop('disabled', false);
         $('#modal-form :input').prop('disabled', false);
+        $('#attendance_submit').prop('disabled', false);
+        $('#delete-url').prop('disabled', false);
     }
 }
 
 $(function () {
-    $('#attendance_submit').click(function () {
-        let form = $('#modal-form');
-        modalAjaxPost(form);
+    $(".dialog").click(function () {
+        let parent = $(this).parent();
+        let id = parent.find('.id').data('id');
+        let dateInfo = parent.find('.date_info').data('date_info');
+        let workDate = parent.find('.work_date').data('work_date');
+
+        let deleteUrl = $('#delete-url').data("url").replace('work_date', workDate);
+        $('#work_date').val(workDate);
+        $('#delete-url').attr("href", deleteUrl);
+
+        $('.modal-title').text(dateInfo);
+
+        lockFieldsIfConfirmed();
+        $(".modal").modal("show");
     });
 });
 
+$(document).ready(function () {
+    $('#delete-url').click(function () {
+        if ($(this).prop('disabled')) {
+            return;
+        }
 
+        // `work_date`の値を取得
+        var workDate = $('#work_date').val(); // モーダルの隠しフィールドから取得
+        var deleteUrlTemplate = $(this).data('url');
 
+        // URL内の`work_date`を置き換え
+        var deleteUrl = deleteUrlTemplate.replace('work_date', workDate);
+
+        // URLを取得してリダイレクト
+        window.location.href = deleteUrl;
+    });
+});
 

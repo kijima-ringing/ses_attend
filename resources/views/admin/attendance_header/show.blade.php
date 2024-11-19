@@ -134,7 +134,7 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div><!-- /.modal-header -->
-            <form method="GET" action="{{ route('admin.attendance_header.update') }}" id="modal-form">
+            <form method="POST" action="{{ route('admin.attendance_header.update') }}" id="modal-form">
                 @csrf
                 <div class="modal-body">
                     <div class="row">
@@ -217,7 +217,7 @@
                 <div class="modal-footer">
                     <a data-url="{{ route('admin.attendance_header.delete', ['user_id' => $attendance->user_id, 'year_month' => $date, 'work_date' => 'work_date']) }}"
                         class="btn btn-secondary" id="delete-url">未入力に戻す</a>
-                    <button type="button" class="btn btn-primary" id="attendance_submit">変更を保存</button>
+                    <button type="submit" class="btn btn-primary" id="attendance_submit">変更を保存</button>
                 </div><!-- /.modal-footer -->
         </div><!-- /.modal-content -->
         </form>
