@@ -35,6 +35,7 @@ class DatabaseSeeder extends Seeder
                 'base_time_from' => new Carbon('10:00'),
                 'base_time_to' => new Carbon('19:00'),
                 'time_fraction' => 1,
+                'rounding_scope' => 0,
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now()
             ]
