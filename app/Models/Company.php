@@ -23,6 +23,7 @@ class Company extends Model
         'base_time_from',
         'base_time_to',
         'time_fraction',
+        'rounding_scope',
     ];
 
     public static function company() {

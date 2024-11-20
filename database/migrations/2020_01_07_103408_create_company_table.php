@@ -18,6 +18,7 @@ class CreateCompanyTable extends Migration
             $table->time('base_time_from');
             $table->time('base_time_to');
             $table->integer('time_fraction');
+            $table->integer('rounding_scope');
             $table->unsignedBigInteger('created_by')->nullable();
             $table->unsignedBigInteger('updated_by')->nullable();
             $table->timestamps();
