@@ -2,9 +2,7 @@
 
 namespace App\Http\Requests;
 
-use App\Models\Company;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Contracts\Validation\Validator;
 
 class SettingRequest extends FormRequest
 {
@@ -25,31 +23,30 @@ class SettingRequest extends FormRequest
      */
     public function rules()
     {
-        $rules = [
-            'base_time_from' => 'required|date_format:"H:i"',
-            'base_time_to' => 'required|date_format:"H:i"',
+        return [
+            'base_time_from' => 'required|date_format:H:i',
+            'base_time_to' => 'required|date_format:H:i',
+            'time_fraction' => 'required|integer|in:1,15,30',
+            'rounding_scope' => 'required|integer|in:0,1', // 新規追加
         ];
-
-        return $rules;
     }
 
-    public function withValidator(Validator $validator) {
-        $time_fraction_values = Company::TIME_FRACTION_VALUES;
-        $validator->after(function ($validator) use ($time_fraction_values) {
-            if (!in_array((int)$this->input('time_fraction'), $time_fraction_values, true)) {
-                $validator->errors()->add('time_fraction', '端数処理が対応しているのは、なし・15分・30分のいずれかです。');
-            }
-
-            if ($this->base_time_from >= $this->base_time_to) {
-                $validator->errors()->add('base_time', '出勤時間 < 退勤時間で設定してください。');
-            }
-        });
-    }
-
-    public function all($keys = null)
+    /**
+     * エラーメッセージのカスタマイズ
+     *
+     * @return array
+     */
+    public function messages()
     {
-        $results = parent::all($keys);
-
-        return $results;
+        return [
+            'base_time_from.required' => '基準時間（From）は必須です。',
+            'base_time_from.date_format' => '基準時間（From）は正しい形式で入力してください。',
+            'base_time_to.required' => '基準時間（To）は必須です。',
+            'base_time_to.date_format' => '基準時間（To）は正しい形式で入力してください。',
+            'time_fraction.required' => '端数処理単位は必須です。',
+            'time_fraction.in' => '端数処理単位は1、15、30のいずれかを選択してください。',
+            'rounding_scope.required' => '端数処理の適用範囲は必須です。',
+            'rounding_scope.in' => '端数処理の適用範囲は全体適用または日別適用を選択してください。',
+        ];
     }
 }

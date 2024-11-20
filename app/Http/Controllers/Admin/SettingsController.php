@@ -7,33 +7,39 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\SettingRequest;
 use App\Models\Company;
 use Illuminate\Support\Facades\DB;
-use App\Services\UserService;
-use Illuminate\Http\Request;
 
 class SettingsController extends Controller
 {
-    public function edit() {
-
+    /**
+     * 設定編集画面を表示
+     *
+     * @return \Illuminate\View\View
+     */
+    public function edit()
+    {
         return view('admin.settings.edit')->with([
-            'company' => Company::where('id', 1)->first(), // 抽出①
+            'company' => Company::where('id', 1)->first(), // 固定IDで1を抽出
             'time_fraction_list' => Company::TIME_FRACTION_LIST,
         ]);
     }
 
-    public function update(SettingRequest $request) {
-        // バリデーションはSettingRequest内で実施済み
-    $test = 1;
+    /**
+     * 設定の更新処理
+     *
+     * @param  \App\Http\Requests\SettingRequest  $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function update(SettingRequest $request)
+    {
+        // バリデーション済みデータを取得
+        $validated = $request->validated();
 
-        try {
-            DB::transaction(function () use ($request) {
-                // 更新①を実行
-                Company::updateOrCreate(['id' => 1], $request->all());
-            });
-            session()->flash('flash_message', '設定を更新しました。');
-        } catch (\Exception $e) {
-            session()->flash('error_message', '設定の更新に失敗しました');
-        }
+        // トランザクションでデータを更新
+        DB::transaction(function () use ($validated) {
+            $company = Company::find(1); // 固定IDを使用
+            $company->update($validated);
+        });
 
-        return redirect(route('admin.settings.edit'));
+        return redirect()->route('admin.settings.edit')->with('success', '設定を更新しました。');
     }
 }
