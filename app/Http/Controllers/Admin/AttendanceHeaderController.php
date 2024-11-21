@@ -89,7 +89,6 @@ class AttendanceHeaderController extends Controller
      */
     public function update(AttendanceRequest $request)
     {
-        // サービスクラスのインスタンスを作成
         $attendanceService = new AttendanceService();
         $getDateService = new GetDateService();
 
@@ -110,8 +109,15 @@ class AttendanceHeaderController extends Controller
                 $attendanceDaily = AttendanceDaily::firstOrNew(['attendance_header_id' => $attendanceHeader->id, 'work_date' => $request->work_date]);
                 $attendanceDaily->fill($updateDailyParams)->saveOrfail();
 
-                // 労働時間計算処理（月次）のパラメータを取得
-                $updateMonthParams = $attendanceService->getUpdateMonthParams($attendanceHeader->id);
+                // 端数処理設定を取得
+                $company = Company::find(1);
+
+                // 労働時間計算処理（月次）のパラメータを取得（端数処理を考慮）
+                if ($company->rounding_scope == 0) { // 全体適用
+                    $updateMonthParams = $attendanceService->getUpdateMonthParamsWithGlobalRounding($attendanceHeader->id);
+                } else { // 日別適用
+                    $updateMonthParams = $attendanceService->getUpdateMonthParams($attendanceHeader->id);
+                }
 
                 // 勤怠ヘッダー情報を更新
                 $attendanceHeader->fill($updateMonthParams)->saveOrFail();
