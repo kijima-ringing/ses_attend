@@ -7,6 +7,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\SettingRequest;
 use App\Models\Company;
 use Illuminate\Support\Facades\DB;
+use App\Models\AttendanceHeader;
+use App\Services\AttendanceService;
 
 class SettingsController extends Controller
 {
@@ -34,19 +36,37 @@ class SettingsController extends Controller
      */
     public function update(SettingRequest $request)
     {
-        // バリデーション済みデータを取得
         $validated = $request->validated();
 
-        // トランザクションでデータを更新
         DB::transaction(function () use ($validated) {
             // 固定ID（1）の会社情報を取得
             $company = Company::find(1);
 
             // バリデーション済みデータで会社情報を更新
             $company->update($validated);
+
+            // 勤怠ヘッダーの再計算を実行
+            $this->recalculateAttendanceHeader();
         });
 
-        // 更新後に編集画面へリダイレクトし、成功メッセージを表示
-        return redirect()->route('admin.settings.edit')->with('success', '設定を更新しました。');
+        return redirect()->route('admin.settings.edit')->with('success', '設定を更新し、勤怠データを再計算しました。');
+    }
+
+    /**
+     * 勤怠ヘッダー（attendance_header）の再計算処理
+     */
+    protected function recalculateAttendanceHeader()
+    {
+        // 全ての勤怠ヘッダーデータを取得
+        $attendanceHeaders = AttendanceHeader::all();
+
+        foreach ($attendanceHeaders as $attendanceHeader) {
+            // 月次データの再計算
+            $attendanceService = new AttendanceService();
+            $updateParams = $attendanceService->getUpdateMonthParams($attendanceHeader->id);
+
+            // 再計算されたデータで更新
+            $attendanceHeader->fill($updateParams)->save();
+        }
     }
 }
