@@ -41,28 +41,34 @@ class AttendanceHeaderController extends Controller
 
     public function update(AttendanceRequest $request)
     {
-
         $attendanceService = new AttendanceService();
         $getDateService = new GetDateService();
         $date = $getDateService->createYearMonthFormat($request->year_month);
 
         try {
             DB::transaction(function () use ($request, $attendanceService, $date) {
-                // 抽出①を実行
+                // 勤怠ヘッダーを取得または作成
                 $attendanceHeader = AttendanceHeader::firstOrCreate(['user_id' => $request->user_id, 'year_month' => $date]);
 
-                // 労働時間計算処理(日)
+                // 日次勤怠データのパラメータ取得
                 $requestParams = $request->validated();
                 $updateDailyParams = $attendanceService->getUpdateDailyParams($requestParams);
 
-                // 更新処理①を実行
+                // 日次勤怠データの更新または作成
                 $attendanceDaily = AttendanceDaily::firstOrNew(['attendance_header_id' => $attendanceHeader->id, 'work_date' => $request->work_date]);
                 $attendanceDaily->fill($updateDailyParams)->saveOrfail();
 
-                // 労働時間計算処理(月)
-                $updateMonthParams = $attendanceService->getUpdateMonthParams($attendanceHeader->id);
+                // 会社の端数処理設定を取得
+                $company = Company::find(1);
 
-                // 更新処理②を実行
+                // 月次勤怠データの再計算
+                if ($company->rounding_scope == 0) { // 全体適用
+                    $updateMonthParams = $attendanceService->getUpdateMonthParamsWithGlobalRounding($attendanceHeader->id);
+                } else { // 日別適用
+                    $updateMonthParams = $attendanceService->getUpdateMonthParams($attendanceHeader->id);
+                }
+
+                // 月次勤怠データの更新
                 $attendanceHeader->fill($updateMonthParams)->saveOrFail();
             });
         } catch (\Exception $e) {
