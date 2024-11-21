@@ -45,14 +45,13 @@
                 </div>
             </div>
             <div class="form-group row">
-                <label for="rounding_scope">端数処理の適用範囲</label><br>
-                <input type="radio" id="rounding_scope_global" name="rounding_scope" value="0"
-                    {{ $company->rounding_scope == 0 ? 'checked' : '' }}>
-                <label for="rounding_scope_global">全体適用</label>
-
-                <input type="radio" id="rounding_scope_daily" name="rounding_scope" value="1"
-                    {{ $company->rounding_scope == 1 ? 'checked' : '' }}>
-                <label for="rounding_scope_daily">日別適用</label>
+                <label for="rounding_scope" class="col-sm-2 col-sm-form-label text-right">適用範囲</label>
+                <div class="offset-md-1 col-sm-2">
+                    <select class="form-control mx-auto {{ $errors->has('rounding_scope') ? 'is-invalid' : '' }}" name="rounding_scope">
+                        <option value="0" {{ $company->rounding_scope == 0 ? 'selected' : '' }}>全体</option>
+                        <option value="1" {{ $company->rounding_scope == 1 ? 'selected' : '' }}>日別</option>
+                    </select>
+                </div>
             </div>
             <button class="btn btn-primary col-sm-2 float-right">更新</button>
         </form>
