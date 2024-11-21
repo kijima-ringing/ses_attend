@@ -139,6 +139,39 @@ class AttendanceService
         ];
     }
 
+    public function getUpdateMonthParamsWithGlobalRounding($attendance_header_id)
+    {
+        $attendanceDailies = AttendanceDaily::where('attendance_header_id', '=', $attendance_header_id)->get();
+
+        $working_days = 0;
+        $scheduled_working_hours = 0;
+        $overtime_hours = 0;
+        $working_hours = 0;
+
+        foreach ($attendanceDailies as $attendance) {
+            $working_days++;
+
+            $scheduled_working_hours += (new GetDateService())->getRawHourInt($attendance->scheduled_working_hours);
+            $overtime_hours += (new GetDateService())->getRawHourInt($attendance->overtime_hours);
+            $working_hours += (new GetDateService())->getRawHourInt($attendance->working_hours);
+        }
+
+        // 合計値に対して丸め処理を適用
+        $getDateService = new GetDateService();
+        $company = Company::find(1); // 現在の会社設定を取得
+
+        $scheduled_working_hours = $getDateService->applyRounding($scheduled_working_hours, $company);
+        $overtime_hours = $getDateService->applyRounding($overtime_hours, $company);
+        $working_hours = $getDateService->applyRounding($working_hours, $company);
+
+        return [
+            'working_days' => $working_days,
+            'scheduled_working_hours' => $this->amountHourFormat($scheduled_working_hours),
+            'overtime_hours' => $this->amountHourFormat($overtime_hours),
+            'working_hours' => $this->amountHourFormat($working_hours),
+        ];
+    }
+
     public function amountHourFormat($time)
     {
         $hour = $time * 3600;

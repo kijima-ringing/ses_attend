@@ -107,4 +107,25 @@ class GetDateService
 
         return $res;
     }
+
+    public function getRawHourInt($time)
+    {
+        // 時刻をそのまま計算に使用する（丸め処理なし）
+        $carbon = Carbon::create($time);
+
+        return $carbon->hour + ($carbon->minute / 60);
+    }
+
+    public function applyRounding($hours, $company)
+    {
+        $timeInMinutes = $hours * 60;
+
+        if ($company->time_fraction == AttendanceHeader::FRACTION_15) {
+            $timeInMinutes = floor($timeInMinutes / 15) * 15; // 15分単位で切り捨て
+        } elseif ($company->time_fraction == AttendanceHeader::FRACTION_30) {
+            $timeInMinutes = floor($timeInMinutes / 30) * 30; // 30分単位で切り捨て
+        }
+
+        return $timeInMinutes / 60; // 分を時間に戻す
+    }
 }

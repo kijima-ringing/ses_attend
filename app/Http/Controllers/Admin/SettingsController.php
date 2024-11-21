@@ -57,15 +57,18 @@ class SettingsController extends Controller
      */
     protected function recalculateAttendanceHeader()
     {
-        // 全ての勤怠ヘッダーデータを取得
         $attendanceHeaders = AttendanceHeader::all();
+        $company = Company::find(1); // 設定の適用範囲を取得
 
         foreach ($attendanceHeaders as $attendanceHeader) {
-            // 月次データの再計算
             $attendanceService = new AttendanceService();
-            $updateParams = $attendanceService->getUpdateMonthParams($attendanceHeader->id);
 
-            // 再計算されたデータで更新
+            if ($company->rounding_scope == 0) { // 全体適用
+                $updateParams = $attendanceService->getUpdateMonthParamsWithGlobalRounding($attendanceHeader->id);
+            } else { // 日別適用
+                $updateParams = $attendanceService->getUpdateMonthParams($attendanceHeader->id);
+            }
+
             $attendanceHeader->fill($updateParams)->save();
         }
     }
