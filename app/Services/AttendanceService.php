@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\AttendanceDaily;
+use App\Models\BreakTime;
 use App\Models\Company;
 use App\Services\GetDateService;
 use Illuminate\Support\Carbon;
@@ -31,8 +32,11 @@ class AttendanceService
 
     public function setDailyParamsNormalWorking($params, $company)
     {
-
-        $scheduledWorkingHours = $this->getScheduledWorkingHours($company->base_time_to, $company->base_time_from);
+        $scheduledWorkingHours = $this->getScheduledWorkingHours(
+            $company->base_time_to,
+            $company->base_time_from,
+            $params['break_times'] ?? []
+            );
 
         $workingHours = $this->getWorkingHours($params);
 
@@ -75,27 +79,42 @@ class AttendanceService
         ];
     }
 
-    public function getScheduledWorkingHours($time_to, $time_from)
+    public function getScheduledWorkingHours($time_to, $time_from, $breakTimes = [])
     {
         $from = strtotime($time_from);
         $to = strtotime($time_to);
 
-        // 休憩時間の1時間をマイナスする
-        $dif = $to - $from - 3600;
+        // 休憩時間の合計を計算
+        $totalBreakTime = 0;
+        foreach ($breakTimes as $breakTime) {
+            $break_time_from = strtotime($breakTime['break_time_from']);
+            $break_time_to = strtotime($breakTime['break_time_to']);
+            $totalBreakTime += ($break_time_to - $break_time_from);
+        }
 
-        return date('H:i:s', $dif);
+        // 所定内労働時間 = 終了時間 - 開始時間 - 休憩時間
+        $dif = $to - $from - $totalBreakTime;
+
+        return date(self::TIME_FORMAT, $dif);
     }
 
     public function getWorkingHours($params)
     {
         $working_time = strtotime($params['working_time']);
         $leave_time = strtotime($params['leave_time']);
-        $break_time_from = strtotime($params['break_time_from']);
-        $break_time_to = strtotime($params['break_time_to']);
 
-        $scheduled_working_hours = $leave_time - $working_time - ($break_time_to - $break_time_from);
+        // 休憩時間の合計を計算
+        $totalBreakTime = 0;
+        foreach ($params['break_times'] ?? [] as $breakTime) {
+            $break_time_from = strtotime($breakTime['break_time_from']);
+            $break_time_to = strtotime($breakTime['break_time_to']);
+            $totalBreakTime += ($break_time_to - $break_time_from);
+        }
 
-        return date(self::TIME_FORMAT, $scheduled_working_hours);
+        // 実働時間 = 退勤時間 - 出勤時間 - 休憩時間合計
+        $actualWorkingHours = $leave_time - $working_time - $totalBreakTime;
+
+        return date(self::TIME_FORMAT, $actualWorkingHours);
     }
 
     public function getOvertimeHours($workingHours, $scheduledWorkingHours)

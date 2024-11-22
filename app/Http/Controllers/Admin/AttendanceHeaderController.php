@@ -56,33 +56,32 @@ class AttendanceHeaderController extends Controller
      * @return \Illuminate\View\View
      */
     public function show($user_id, $yearMonth)
-{
-    $getDateService = new GetDateService();
-    $date = $getDateService->createYearMonthFormat($yearMonth);
+    {
+        $getDateService = new GetDateService();
+        $date = $getDateService->createYearMonthFormat($yearMonth);
 
-    $attendance = AttendanceHeader::firstOrNew(['user_id' => $user_id, 'year_month' => $date]);
-    $attendanceDaily = AttendanceDaily::where('attendance_header_id', $attendance->id)
-        ->with('breakTimes') // 休憩時間を含めて取得
-        ->get()
-        ->keyBy('work_date')
-        ->toArray();
+        $attendance = AttendanceHeader::firstOrNew(['user_id' => $user_id, 'year_month' => $date]);
+        $attendanceDaily = AttendanceDaily::where('attendance_header_id', $attendance->id)
+            ->with('breakTimes') // 休憩時間を含めて取得
+            ->get()
+            ->keyBy('work_date')
+            ->toArray();
 
-    foreach ($attendanceDaily as &$daily) {
-        $daily['break_times'] = BreakTime::where('attendance_daily_id', $daily['id'])->get()->toArray();
+        foreach ($attendanceDaily as &$daily) {
+            $daily['break_times'] = BreakTime::where('attendance_daily_id', $daily['id'])->get()->toArray();
+        }
+
+        $daysOfMonth = $getDateService->getDaysOfMonth($date->copy());
+        $company = Company::company();
+
+        return view('admin.attendance_header.show')->with([
+            'attendance' => $attendance,
+            'attendanceDaily' => $attendanceDaily,
+            'daysOfMonth' => $daysOfMonth,
+            'date' => $date->format('Y-m'),
+            'company' => $company,
+        ]);
     }
-
-    $daysOfMonth = $getDateService->getDaysOfMonth($date->copy());
-    $company = Company::company();
-
-    return view('admin.attendance_header.show')->with([
-        'attendance' => $attendance,
-        'attendanceDaily' => $attendanceDaily,
-        'daysOfMonth' => $daysOfMonth,
-        'date' => $date->format('Y-m'),
-        'company' => $company,
-    ]);
-}
-
 
     /**
      * 勤怠情報を更新するメソッド。
@@ -109,7 +108,10 @@ class AttendanceHeaderController extends Controller
                         'attendance_header_id' => $attendanceHeader->id,
                         'work_date' => $request->work_date,
                     ],
-                    $request->validated()
+                    $attendanceService->getUpdateDailyParams(array_merge(
+                        $request->validated(),
+                        ['break_times' => $request->input('break_times', [])]
+                    ))
                 );
 
                 // 休憩時間を保存
