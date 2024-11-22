@@ -28,8 +28,12 @@ class AttendanceDaily extends Model
     ];
 
     public static function monthOfDailies($attendance_header_id)
-    {
-        return array_column(self::where('attendance_header_id', '=', $attendance_header_id)->get()->toArray(), null, 'work_date');
+{
+    return self::where('attendance_header_id', $attendance_header_id)
+        ->with('breakTimes') // リレーションで休憩時間も取得
+        ->get()
+        ->keyBy('work_date')
+        ->toArray();
     }
 
     public function breakTimes()

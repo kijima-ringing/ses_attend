@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AttendanceRequest;
+use App\Http\Requests\BreakTimeRequest;
 use App\Http\Resources\AttendanceDailyResource;
 use App\Models\AttendanceDaily;
 use App\Models\AttendanceHeader;
+use App\Models\BreakTime;
 use App\Models\Company;
 use App\Models\User;
 use App\Services\AttendanceService;
@@ -54,32 +56,33 @@ class AttendanceHeaderController extends Controller
      * @return \Illuminate\View\View
      */
     public function show($user_id, $yearMonth)
-    {
-        // 日付操作サービスを利用してフォーマットされた日付を取得
-        $getDateService = new GetDateService();
-        $date = $getDateService->createYearMonthFormat($yearMonth);
+{
+    $getDateService = new GetDateService();
+    $date = $getDateService->createYearMonthFormat($yearMonth);
 
-        // ユーザーと年月に基づいて勤怠ヘッダーを取得または新規作成
-        $attendance = AttendanceHeader::firstOrNew(['user_id' => $user_id, 'year_month' => $date]);
+    $attendance = AttendanceHeader::firstOrNew(['user_id' => $user_id, 'year_month' => $date]);
+    $attendanceDaily = AttendanceDaily::where('attendance_header_id', $attendance->id)
+        ->with('breakTimes') // 休憩時間を含めて取得
+        ->get()
+        ->keyBy('work_date')
+        ->toArray();
 
-        // 勤怠ヘッダー ID に基づき日次勤怠を取得
-        $attendanceDaily = AttendanceDaily::monthOfDailies($attendance->id);
-
-        // 月の日数リストを取得
-        $daysOfMonth = $getDateService->getDaysOfMonth($date->copy());
-
-        // 会社情報を取得
-        $company = Company::company();
-
-        // ビューに必要なデータを渡して表示
-        return view('admin.attendance_header.show')->with([
-            'attendance' => $attendance,
-            'attendanceDaily' => $attendanceDaily,
-            'daysOfMonth' => $daysOfMonth,
-            'date' => $date->format('Y-m'),
-            'company' => $company,
-        ]);
+    foreach ($attendanceDaily as &$daily) {
+        $daily['break_times'] = BreakTime::where('attendance_daily_id', $daily['id'])->get()->toArray();
     }
+
+    $daysOfMonth = $getDateService->getDaysOfMonth($date->copy());
+    $company = Company::company();
+
+    return view('admin.attendance_header.show')->with([
+        'attendance' => $attendance,
+        'attendanceDaily' => $attendanceDaily,
+        'daysOfMonth' => $daysOfMonth,
+        'date' => $date->format('Y-m'),
+        'company' => $company,
+    ]);
+}
+
 
     /**
      * 勤怠情報を更新するメソッド。
@@ -91,43 +94,46 @@ class AttendanceHeaderController extends Controller
     {
         $attendanceService = new AttendanceService();
         $getDateService = new GetDateService();
-
-        // フォーマットされた年月データを取得
         $date = $getDateService->createYearMonthFormat($request->year_month);
 
         try {
-            // トランザクション処理を開始
             DB::transaction(function () use ($request, $attendanceService, $date) {
-                // 勤怠ヘッダーを取得または作成
-                $attendanceHeader = AttendanceHeader::firstOrCreate(['user_id' => $request->user_id, 'year_month' => $date]);
+                $attendanceHeader = AttendanceHeader::firstOrCreate([
+                    'user_id' => $request->user_id,
+                    'year_month' => $date
+                ]);
 
-                // 労働時間計算処理（日次）のパラメータを取得
-                $requestParams = $request->validated();
-                $updateDailyParams = $attendanceService->getUpdateDailyParams($requestParams);
+                // 日次勤怠を作成または更新
+                $attendanceDaily = AttendanceDaily::updateOrCreate(
+                    [
+                        'attendance_header_id' => $attendanceHeader->id,
+                        'work_date' => $request->work_date,
+                    ],
+                    $request->validated()
+                );
 
-                // 日次勤怠情報を更新または新規作成
-                $attendanceDaily = AttendanceDaily::firstOrNew(['attendance_header_id' => $attendanceHeader->id, 'work_date' => $request->work_date]);
-                $attendanceDaily->fill($updateDailyParams)->saveOrfail();
-
-                // 端数処理設定を取得
-                $company = Company::find(1);
-
-                // 労働時間計算処理（月次）のパラメータを取得（端数処理を考慮）
-                if ($company->rounding_scope == 0) { // 全体適用
-                    $updateMonthParams = $attendanceService->getUpdateMonthParamsWithGlobalRounding($attendanceHeader->id);
-                } else { // 日別適用
-                    $updateMonthParams = $attendanceService->getUpdateMonthParams($attendanceHeader->id);
+                // 休憩時間を保存
+                BreakTime::where('attendance_daily_id', $attendanceDaily->id)->delete();
+                foreach ($request->input('break_times', []) as $breakTime) {
+                    BreakTime::create([
+                        'attendance_daily_id' => $attendanceDaily->id,
+                        'break_time_from' => $breakTime['break_time_from'],
+                        'break_time_to' => $breakTime['break_time_to'],
+                    ]);
                 }
 
-                // 勤怠ヘッダー情報を更新
-                $attendanceHeader->fill($updateMonthParams)->saveOrFail();
+                // 月次勤怠計算を更新
+                $company = Company::find(1);
+                $updateMonthParams = $company->rounding_scope == 0
+                    ? $attendanceService->getUpdateMonthParamsWithGlobalRounding($attendanceHeader->id)
+                    : $attendanceService->getUpdateMonthParams($attendanceHeader->id);
+
+                $attendanceHeader->fill($updateMonthParams)->save();
             });
         } catch (\Exception $e) {
-            // エラーメッセージをセッションに保存
             session()->flash('flash_message', '更新が失敗しました');
         }
 
-        // 勤怠詳細画面にリダイレクト
         return redirect(route('admin.attendance_header.show', ['user_id' => $request->user_id, 'year_month' => $date]));
     }
 
