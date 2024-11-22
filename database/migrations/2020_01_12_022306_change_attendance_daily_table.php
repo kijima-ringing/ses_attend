@@ -16,8 +16,6 @@ class ChangeAttendanceDailyTable extends Migration
         Schema::table('attendance_daily', function (Blueprint $table) {
             $table->time('working_time')->nullable()->change();
             $table->time('leave_time')->nullable()->change();
-            $table->time('break_time_from')->nullable()->change();
-            $table->time('break_time_to')->nullable()->change();
             $table->text('memo')->nullable()->change();
             $table->time('scheduled_working_hours')->nullable()->change();
             $table->time('overtime_hours')->nullable()->change();
@@ -35,8 +33,6 @@ class ChangeAttendanceDailyTable extends Migration
         Schema::table('attendance_daily', function (Blueprint $table) {
             $table->time('working_time')->nullable(false)->change();
             $table->time('leave_time')->nullable(false)->change();
-            $table->time('break_time_from')->nullable(false)->change();
-            $table->time('break_time_to')->nullable(false)->change();
             $table->text('memo')->nullable(false)->change();
             $table->time('scheduled_working_hours')->nullable(false)->change();
             $table->time('overtime_hours')->nullable(false)->change();
