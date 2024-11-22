@@ -17,13 +17,25 @@ class DatabaseSeeder extends Seeder
         DB::table('users')->insert([
             [
                 'id' => 1,
-                'last_name' => '山田',
+                'last_name' => '管理者',
                 'first_name' => '太郎',
-                'last_name_kana' => 'ヤマダ',
+                'last_name_kana' => 'カンリシャ',
                 'first_name_kana' => 'タロウ',
-                'email' => 'test001@example.com',
-                'password' => Hash::make('test123+'),
+                'email' => 'test1@example.com',
+                'password' => Hash::make('test1'),
                 'admin_flag' => 1,
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now()
+            ],
+            [
+                'id' => 2,
+                'last_name' => '一般社員',
+                'first_name' => '太郎',
+                'last_name_kana' => 'イッパンシャイン',
+                'first_name_kana' => 'タロウ',
+                'email' => 'test2@example.com',
+                'password' => Hash::make('test2'),
+                'admin_flag' => 0,
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now()
             ]
