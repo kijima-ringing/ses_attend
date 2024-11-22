@@ -21,8 +21,6 @@ class AttendanceDaily extends Model
         'attendance_class',
         'working_time',
         'leave_time',
-        'break_time_from',
-        'break_time_to',
         'memo',
         'scheduled_working_hours',
         'overtime_hours',
@@ -32,5 +30,10 @@ class AttendanceDaily extends Model
     public static function monthOfDailies($attendance_header_id)
     {
         return array_column(self::where('attendance_header_id', '=', $attendance_header_id)->get()->toArray(), null, 'work_date');
+    }
+
+    public function breakTimes()
+    {
+        return $this->hasMany(BreakTime::class, 'attendance_daily_id');
     }
 }

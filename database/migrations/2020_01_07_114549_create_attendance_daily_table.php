@@ -21,8 +21,6 @@ class CreateAttendanceDailyTable extends Migration
             $table->unsignedTinyInteger('attendance_class');
             $table->time('working_time');
             $table->time('leave_time');
-            $table->time('break_time_from');
-            $table->time('break_time_to');
             $table->text('memo');
             $table->time('scheduled_working_hours');
             $table->time('overtime_hours');

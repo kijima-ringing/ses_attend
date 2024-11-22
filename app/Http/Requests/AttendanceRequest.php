@@ -29,37 +29,78 @@ class AttendanceRequest extends FormRequest
             'work_date' => 'required|date_format:Y-m-d',
             'attendance_class' => 'required|in:0,1,2',
             'working_time' => [
-                'nullable',
-                'date_format:H:i:s',
+                'required',
+                'date_format:H:i',
+            ],
+            'leave_time' => [
+                'required',
+                'date_format:H:i',
                 new ComparisonTimeRule($this->input('working_time'), $this->input('leave_time'))
             ],
-            'leave_time' => 'nullable|date_format:H:i:s',
-            'break_time_from' => [
-                'nullable',
-                'date_format:H:i:s',
-                new ComparisonTimeRule($this->input('break_time_from'), $this->input('break_time_to')),
+            'break_times' => 'array|min:1',
+            'break_times.*.break_time_from' => [
+                'required',
+                'date_format:H:i',
             ],
-            'break_time_to' => 'nullable|date_format:H:i:s',
-            'memo' => 'nullable'
+            'break_times.*.break_time_to' => [
+                'required',
+                'date_format:H:i',
+                new ComparisonTimeRule(
+                    $this->input('break_times.*.break_time_from'),
+                    $this->input('break_times.*.break_time_to')
+                )
+            ],
         ];
     }
 
-    public function all($keys = null)
+    /**
+     * Additional validation logic for custom rules.
+     *
+     * @param Validator $validator
+     * @return void
+     */
+    public function withValidator($validator)
     {
-        $results = parent::all($keys);
+        $validator->after(function ($validator) {
+            $this->validateBreakTimes($validator);
+        });
+    }
 
+    private function validateBreakTimes($validator)
+    {
+        $workingTime = Carbon::parse($this->input('working_time'));
+        $leaveTime = Carbon::parse($this->input('leave_time'));
+        $breakTimes = $this->input('break_times', []);
 
-        $working_time = new Carbon($this->input('working_time'));
-        $leave_time = new Carbon($this->input('leave_time'));
-        $break_time_from = new Carbon($this->input('break_time_from'));
-        $break_time_to = new Carbon($this->input('break_time_to'));
+        foreach ($breakTimes as $index => $break) {
+            $breakFrom = Carbon::parse($break['break_time_from']);
+            $breakTo = Carbon::parse($break['break_time_to']);
 
-        $results['working_time'] = $working_time->format('H:i:s');
-        $results['leave_time'] = $leave_time->format('H:i:s');
-        $results['break_time_from'] = $break_time_from->format('H:i:s');
-        $results['break_time_to'] = $break_time_to->format('H:i:s');
+            // 勤務時間外チェック
+            if ($breakFrom->lt($workingTime) || $breakTo->gt($leaveTime)) {
+                $validator->errors()->add(
+                    "break_times.$index.break_time_from",
+                    '休憩時間は勤務時間内である必要があります。'
+                );
+            }
 
-        return $results;
+            // 他の休憩時間と重複チェック
+            foreach ($breakTimes as $subIndex => $otherBreak) {
+                if ($index === $subIndex) {
+                    continue;
+                }
+
+                $otherFrom = Carbon::parse($otherBreak['break_time_from']);
+                $otherTo = Carbon::parse($otherBreak['break_time_to']);
+
+                if ($breakFrom->lt($otherTo) && $breakTo->gt($otherFrom)) {
+                    $validator->errors()->add(
+                        "break_times.$index.break_time_from",
+                        '休憩時間が重複しています。'
+                    );
+                }
+            }
+        }
     }
 
     public function attributes()
@@ -69,12 +110,8 @@ class AttendanceRequest extends FormRequest
             'attendance_class' => '区分',
             'working_time' => '出勤時間',
             'leave_time' => '退勤時間',
-            'break_time_from' => '休憩開始時間',
-            'break_time_to' => '休憩終了時間',
-            'memo' => 'メモ',
+            'break_times.*.break_time_from' => '休憩開始時間',
+            'break_times.*.break_time_to' => '休憩終了時間',
         ];
     }
-
-
-
 }
