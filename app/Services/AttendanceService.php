@@ -156,16 +156,17 @@ class AttendanceService
         return date(self::TIME_FORMAT, $actualWorkingHours);
     }
 
-    public function getOvertimeHours($workingHours, $scheduledWorkingHours, $breakTimeOutsideBase)
+    public function getOvertimeHours($workingHours, $scheduledWorkingHours)
     {
-        // 残業時間 = 実働時間 - 所定内労働時間 - 基準外休憩時間
-        $time = strtotime($workingHours) - strtotime($scheduledWorkingHours) - $breakTimeOutsideBase;
-        if ($time < 0) {
-            $overtimeHours = 0;
-        } else {
-            $overtimeHours = $time;
+        // 残業時間 = 実働時間 - 所定内労働時間
+        $overtime = strtotime($workingHours) - strtotime($scheduledWorkingHours);
+
+        // 残業時間が負の値にならないようにする
+        if ($overtime < 0) {
+            $overtime = 0;
         }
-        return date(self::TIME_FORMAT, $overtimeHours);
+
+        return date(self::TIME_FORMAT, $overtime);
     }
 
     public function getUpdateMonthParams($attendance_header_id)
