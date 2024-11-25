@@ -208,26 +208,4 @@
 @endsection
 @section('addJs')
 <script src="{{ asset('/js/attendanceForm.js') }}"></script>
-<script>
-$(document).ready(function () {
-    let breakTimeIndex = 1;
-
-    $('#add-break-time').click(function () {
-    $('#break-times-container').append(`
-        <div class="form-inline mb-2 break-time-entry">
-            <input type="time" name="break_times[${breakTimeIndex}][break_time_from]" class="form-control" placeholder="開始時間">
-            <span class="mx-2">〜</span>
-            <input type="time" name="break_times[${breakTimeIndex}][break_time_to]" class="form-control" placeholder="終了時間">
-            <button type="button" class="btn btn-danger btn-sm ml-2 remove-break-time">削除</button>
-        </div>
-    `);
-    breakTimeIndex++;
-});
-
-    // 休憩時間の削除
-    $(document).on('click', '.remove-break-time', function () {
-        $(this).closest('.break-time-entry').remove();
-    });
-});
-</script>
 @endsection
