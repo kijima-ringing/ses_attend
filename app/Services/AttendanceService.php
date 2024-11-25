@@ -33,14 +33,29 @@ class AttendanceService
     public function setDailyParamsNormalWorking($params, $company)
     {
         $scheduledWorkingHours = $this->getScheduledWorkingHours(
+        $company->base_time_to,
+        $company->base_time_from,
+        $params['break_times'] ?? [],
+        $company->base_time_to,
+        $company->base_time_from
+        );
+
+        $workingHours = $this->getWorkingHours(
+            $params,
             $company->base_time_to,
-            $company->base_time_from,
-            $params['break_times'] ?? []
-            );
+            $company->base_time_from
+        );
 
-        $workingHours = $this->getWorkingHours($params);
+        // 基準外の休憩時間を計算
+        $breakTimeOutsideBase = 0;
+        foreach ($params['break_times'] ?? [] as $breakTime) {
+            $breakFrom = strtotime($breakTime['break_time_from']);
+            $breakTo = strtotime($breakTime['break_time_to']);
+            $outsideBase = ($breakTo - $breakFrom) - max(0, min($breakTo, strtotime($company->base_time_to)) - max($breakFrom, strtotime($company->base_time_from)));
+            $breakTimeOutsideBase += $outsideBase;
+        }
 
-        $overtimeHours = $this->getOvertimeHours($workingHours, $scheduledWorkingHours);
+        $overtimeHours = $this->getOvertimeHours($workingHours, $scheduledWorkingHours, $breakTimeOutsideBase);
 
         return [
             'scheduled_working_hours' => $scheduledWorkingHours,
@@ -79,53 +94,78 @@ class AttendanceService
         ];
     }
 
-    public function getScheduledWorkingHours($time_to, $time_from, $breakTimes = [])
+    public function getScheduledWorkingHours($time_to, $time_from, $breakTimes = [], $base_time_to = null, $base_time_from = null)
     {
         $from = strtotime($time_from);
         $to = strtotime($time_to);
 
-        // 休憩時間の合計を計算
-        $totalBreakTime = 0;
+        // 基準時間（所定内労働時間の範囲）を設定
+        $baseFrom = strtotime($base_time_from ?? $time_from);
+        $baseTo = strtotime($base_time_to ?? $time_to);
+
+        $breakTimeInsideBase = 0; // 基準時間内の休憩時間
+        $breakTimeOutsideBase = 0; // 基準時間外の休憩時間
+
+        // 各休憩時間を基準時間内外で分類
         foreach ($breakTimes as $breakTime) {
-            $break_time_from = strtotime($breakTime['break_time_from']);
-            $break_time_to = strtotime($breakTime['break_time_to']);
-            $totalBreakTime += ($break_time_to - $break_time_from);
+            $breakFrom = strtotime($breakTime['break_time_from']);
+            $breakTo = strtotime($breakTime['break_time_to']);
+
+            // 基準時間内の重複部分を計算
+            $insideBase = max(0, min($breakTo, $baseTo) - max($breakFrom, $baseFrom));
+            $outsideBase = ($breakTo - $breakFrom) - $insideBase;
+
+            $breakTimeInsideBase += $insideBase;
+            $breakTimeOutsideBase += $outsideBase;
         }
 
-        // 所定内労働時間 = 終了時間 - 開始時間 - 休憩時間
-        $dif = $to - $from - $totalBreakTime;
+        // 所定内労働時間 = 基準時間範囲内の実労働時間 - 基準内の休憩時間
+        $scheduledWorkingHours = ($baseTo - $baseFrom) - $breakTimeInsideBase;
 
-        return date(self::TIME_FORMAT, $dif);
+        return date(self::TIME_FORMAT, $scheduledWorkingHours);
     }
 
-    public function getWorkingHours($params)
+    public function getWorkingHours($params, $base_time_to = null, $base_time_from = null)
     {
-        $working_time = strtotime($params['working_time']);
-        $leave_time = strtotime($params['leave_time']);
+        $workingTime = strtotime($params['working_time']);
+        $leaveTime = strtotime($params['leave_time']);
 
-        // 休憩時間の合計を計算
-        $totalBreakTime = 0;
+        // 基準時間（所定内労働の範囲）
+        $baseFrom = strtotime($base_time_from ?? $params['working_time']);
+        $baseTo = strtotime($base_time_to ?? $params['leave_time']);
+
+        $breakTimeInsideBase = 0; // 基準時間内の休憩時間
+        $breakTimeOutsideBase = 0; // 基準時間外の休憩時間
+
+        // 各休憩時間を基準時間内外で分類
         foreach ($params['break_times'] ?? [] as $breakTime) {
-            $break_time_from = strtotime($breakTime['break_time_from']);
-            $break_time_to = strtotime($breakTime['break_time_to']);
-            $totalBreakTime += ($break_time_to - $break_time_from);
+            $breakFrom = strtotime($breakTime['break_time_from']);
+            $breakTo = strtotime($breakTime['break_time_to']);
+
+            // 基準時間内の重複部分を計算
+            $insideBase = max(0, min($breakTo, $baseTo) - max($breakFrom, $baseFrom));
+            $outsideBase = ($breakTo - $breakFrom) - $insideBase;
+
+            $breakTimeInsideBase += $insideBase;
+            $breakTimeOutsideBase += $outsideBase;
         }
 
-        // 実働時間 = 退勤時間 - 出勤時間 - 休憩時間合計
-        $actualWorkingHours = $leave_time - $working_time - $totalBreakTime;
+        // 実働時間 = 総労働時間（退勤 - 出勤） - 全休憩時間
+        $actualWorkingHours = ($leaveTime - $workingTime) - ($breakTimeInsideBase + $breakTimeOutsideBase);
 
         return date(self::TIME_FORMAT, $actualWorkingHours);
     }
 
-    public function getOvertimeHours($workingHours, $scheduledWorkingHours)
+    public function getOvertimeHours($workingHours, $scheduledWorkingHours, $breakTimeOutsideBase)
     {
-        $time = strtotime($workingHours) - strtotime($scheduledWorkingHours);
+        // 残業時間 = 実働時間 - 所定内労働時間 - 基準外休憩時間
+        $time = strtotime($workingHours) - strtotime($scheduledWorkingHours) - $breakTimeOutsideBase;
         if ($time < 0) {
-            $overtime_hours = 0;
+            $overtimeHours = 0;
         } else {
-            $overtime_hours = $time;
+            $overtimeHours = $time;
         }
-        return date(self::TIME_FORMAT, $overtime_hours);
+        return date(self::TIME_FORMAT, $overtimeHours);
     }
 
     public function getUpdateMonthParams($attendance_header_id)
