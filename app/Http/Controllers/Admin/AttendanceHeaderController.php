@@ -212,4 +212,5 @@ class AttendanceHeaderController extends Controller
         // 勤怠詳細画面にリダイレクト
         return redirect()->route('admin.attendance_header.show', ['user_id' => $user_id, 'year_month' => $year_month]);
     }
+
 }
