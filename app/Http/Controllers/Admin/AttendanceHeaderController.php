@@ -138,6 +138,11 @@ class AttendanceHeaderController extends Controller
             });
 
             session()->flash('flash_message', '勤怠情報を更新しました');
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            // バリデーションエラー時の処理
+        return redirect()->back()->withErrors($e->validator)->withInput();
+
         } catch (\Exception $e) {
             session()->flash('flash_message', '更新が失敗しました');
         }

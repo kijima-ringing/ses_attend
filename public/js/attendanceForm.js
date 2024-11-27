@@ -156,3 +156,38 @@ $(document).ready(function () {
         $(this).closest('.break-time-entry').remove();
     });
 });
+
+// 休憩時間の重複を検出
+function hasDuplicateBreakTimes(breakTimes) {
+    const seen = new Set();
+    for (const breakTime of breakTimes) {
+        const key = `${breakTime.break_time_from}-${breakTime.break_time_to}`;
+        if (seen.has(key)) {
+            return true; // 重複が見つかった場合
+        }
+        seen.add(key);
+    }
+    return false;
+}
+
+// 保存ボタンのクリックイベント
+$('#attendance-submit-button').click(function (e) {
+    e.preventDefault();
+
+    const breakTimes = [];
+    $('.break-time-entry').each(function () {
+        const from = $(this).find('input[name*="[break_time_from]"]').val();
+        const to = $(this).find('input[name*="[break_time_to]"]').val();
+        if (from && to) {
+            breakTimes.push({ break_time_from: from, break_time_to: to });
+        }
+    });
+
+    if (hasDuplicateBreakTimes(breakTimes)) {
+        alert('休憩時間が重複しています。異なる時間を入力してください。');
+        return false;
+    }
+
+    // 重複がなければサーバーに送信
+    $('#attendance-form').submit();
+});
