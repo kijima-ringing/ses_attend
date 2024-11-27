@@ -4,8 +4,8 @@ const PAID_HOLIDAYS = '1'; // 有給休暇
 const ABSENT_WORKING = '2'; // 欠勤
 
 // デフォルトの休憩時間を定義
-const BASE_BREAK_TIME_FROM = '12:00:00'; // 休憩開始時間
-const BASE_BREAK_TIME_TO = '13:00:00';   // 休憩終了時間
+const BASE_BREAK_TIME_FROM = '12:00'; // 休憩開始時間
+const BASE_BREAK_TIME_TO = '13:00';   // 休憩終了時間
 
 // 会社の勤務時間を取得（HTMLのdata属性から読み込む）
 var companyBaseTimeFrom = $('.company').data('base_time_from') || ''; // 勤務開始時間
@@ -16,6 +16,12 @@ var getAttendanceInfoUrl = $('#attendance-info-url').data('url');
 
 // 部門インデックスのデータ属性を削除
 $('#department-index').removeAttr('data-url');
+
+// HH:mm:ss を HH:mm に変換する関数
+function formatTimeToHHMM(time) {
+    if (!time) return ''; // 空値の場合はそのまま返す
+    return time.substring(0, 5); // HH:mm 部分だけを抽出
+}
 
 // ドキュメント読み込み後の処理
 $(function () {
@@ -37,8 +43,8 @@ $(function () {
 
                 // 勤怠データを取得、またはデフォルト値を設定
                 var attendance_class = data.attendance_class || NORMAL_WORKING;
-                var working_time = data.working_time || companyBaseTimeFrom;
-                var leave_time = data.leave_time || companyBaseTimeTo;
+                var working_time = formatTimeToHHMM(data.working_time) || companyBaseTimeFrom;
+                var leave_time = formatTimeToHHMM(data.leave_time) || companyBaseTimeTo;
                 var memo = data.memo || '';
 
                 // モーダル内の各フィールドに値をセット
@@ -51,11 +57,13 @@ $(function () {
                 $('#break-times-container').empty(); // 既存の休憩時間をクリア
                 if (data.break_times && data.break_times.length > 0) {
                     data.break_times.forEach(function (breakTime, index) {
+                        var breakTimeFrom = formatTimeToHHMM(breakTime.break_time_from);
+                        var breakTimeTo = formatTimeToHHMM(breakTime.break_time_to);
                         $('#break-times-container').append(`
                             <div class="form-inline mb-2 break-time-entry">
-                                <input type="time" name="break_times[${index}][break_time_from]" value="${breakTime.break_time_from}" class="form-control">
+                                <input type="time" name="break_times[${index}][break_time_from]" value="${breakTimeFrom}" class="form-control">
                                 <span class="mx-2">〜</span>
-                                <input type="time" name="break_times[${index}][break_time_to]" value="${breakTime.break_time_to}" class="form-control">
+                                <input type="time" name="break_times[${index}][break_time_to]" value="${breakTimeTo}" class="form-control">
                                 <button type="button" class="btn btn-danger btn-sm ml-2 remove-break-time">削除</button>
                             </div>
                         `);
