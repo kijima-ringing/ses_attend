@@ -8,15 +8,6 @@
 <div class="container company validation-url" id="attendance-info-url"
     data-url="{{ route('admin.attendance_header.ajax_get_attendance_info') }}"
     data-base_time_from="{{ $company->base_time_from }}" data-base_time_to="{{ $company->base_time_to }}">
-    @if ($errors->any())
-    <div class="alert alert-danger">
-        <ul>
-            @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-    </div>
-    @endif
     <div class="row pb-3">
         <form method="GET" action="{{ route('admin.attendance_header.index') }}">
             @csrf

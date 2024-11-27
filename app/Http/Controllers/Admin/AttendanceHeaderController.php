@@ -141,12 +141,10 @@ class AttendanceHeaderController extends Controller
 
         } catch (\Illuminate\Validation\ValidationException $e) {
             // バリデーションエラー時の処理
-        return redirect()->back()->withErrors($e->validator)->withInput();
-
+            return redirect()->back()->withErrors($e->errors())->withInput();
         } catch (\Exception $e) {
             session()->flash('flash_message', '更新が失敗しました');
         }
-
         return redirect(route('admin.attendance_header.show', ['user_id' => $request->user_id, 'year_month' => $date]));
     }
 
