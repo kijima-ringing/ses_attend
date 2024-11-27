@@ -68,10 +68,12 @@
                     ~
                     {{ AttendanceHelper::timeFormat($attendanceDaily[$day['work_date']]['leave_time']) }}
                 </th>
-                <th class="text-center break_time_from break_time_to">
-                    {{ AttendanceHelper::timeFormat($attendanceDaily[$day['work_date']]['break_time_from']) }}
-                    ~
-                    {{ AttendanceHelper::timeFormat($attendanceDaily[$day['work_date']]['break_time_to']) }}
+                <th class="text-center break_times">
+                    @if (isset($attendanceDaily[$day['work_date']]))
+                        @foreach ($attendanceDaily[$day['work_date']]['break_times'] ?? [] as $breakTime)
+                            {{ AttendanceHelper::timeFormat($breakTime['break_time_from']) }} ~ {{ AttendanceHelper::timeFormat($breakTime['break_time_to']) }}<br>
+                        @endforeach
+                    @endif
                 </th>
                 <th class="text-right scheduled_working_hours">
                     {{ AttendanceHelper::timeFormat($attendanceDaily[$day['work_date']]['scheduled_working_hours']) }}
@@ -108,88 +110,68 @@
             <form method="POST" action="{{ route('user.attendance_header.update') }}" id="modal-form">
                 @csrf
                 <div class="modal-body">
-                    <div class="row">
-                        <div class="alert-danger d-none col-12">
-                            <ul>
-
-                            </ul>
-                        </div>
-                    </div>
                     <input type="hidden" name="user_id" value="{{ $attendance->user_id }}">
                     <input type="hidden" name="year_month" value="{{ $date }}">
                     <input type="hidden" name="work_date" value="" id="work_date">
+
+                    <!-- 勤務区分 -->
                     <div class="form-group row">
-                        <label for="attendance_class" class="col-md-4 col-form-label text-right">
-                            区分
-                        </label>
+                        <label for="attendance_class" class="col-md-4 col-form-label text-right">区分</label>
+                        <div class="col-md-8">
+                            <select name="attendance_class" class="form-control" id="attendance_class">
+                                <option value="0">通常勤務</option>
+                                <option value="1">有給休暇</option>
+                                <option value="2">欠勤</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- 勤務時間 -->
+                    <div class="form-group row">
+                        <label for="working_time" class="col-md-4 col-form-label text-right">出勤</label>
                         <div class="col-md-8">
                             <div class="form-inline">
-                                <select name="attendance_class" class="form-control" id="attendance_class" {{ $attendance->confirm ? 'disabled' : '' }}>
-                                    <option value="0">通常勤務</option>
-                                    <option value="1">有給休暇</option>
-                                    <option value="2">欠勤</option>
-                                </select>
+                                <input id="working_time" size="8" type="time" name="working_time"
+                                    class="form-control" value="{{ $company->base_time_from }}">
+                                <span class="mx-2">〜</span>
+                                <input id="leave_time" size="8" type="time" name="leave_time"
+                                    class="form-control" value="{{ $company->base_time_to }}">
                             </div>
                         </div>
                     </div>
 
+                    <!-- 休憩時間 -->
                     <div class="form-group row">
-                        <label for="working_time" class="col-md-4 col-form-label text-right">
-                            出勤
-                        </label>
+                        <label for="break_times" class="col-md-4 col-form-label text-right">休憩</label>
                         <div class="col-md-8">
-                            <div class="form-inline">
-                                <div class="input-group mb-2 mr-sm-2 mb-sm-0">
-                                    <input id="working_time" size="8" type="time" name="working_time"
-                                        class="form-control" value="{{ $company->base_time_from }}" {{ $attendance->confirm ? 'disabled' : '' }}>
-                                </div>
-                                <div class="input-group mb-2 mr-sm-2  ml-sm-2 mb-sm-0">
-                                    〜
-                                </div>
-                                <div class="input-group mb-2 ml-sm-2 mb-sm-0">
-                                    <input id="leave_time" type="time" size="8" name="leave_time" class="form-control"
-                                        value="{{ $company->base_time_to }}" {{ $attendance->confirm ? 'disabled' : '' }}>
+                            <div id="break-times-container">
+                                <!-- 休憩時間入力エリア -->
+                                <div class="form-inline mb-2 break-time-entry">
+                                    <input type="time" name="break_times[0][break_time_from]" class="form-control" placeholder="開始時間">
+                                    <span class="mx-2">〜</span>
+                                    <input type="time" name="break_times[0][break_time_to]" class="form-control" placeholder="終了時間">
+                                    <button type="button" class="btn btn-danger btn-sm ml-2 remove-break-time">削除</button>
                                 </div>
                             </div>
+                            <button type="button" id="add-break-time" class="btn btn-primary btn-sm mt-2">休憩時間を追加</button>
                         </div>
                     </div>
 
+                    <!-- メモ -->
                     <div class="form-group row">
-                        <label for="break_time_from" class="col-md-4 col-form-label text-right">
-                            休憩
-                        </label>
+                        <label for="memo" class="col-md-4 col-form-label text-right">メモ</label>
                         <div class="col-md-8">
-                            <div class="form-inline">
-                                <div class="input-group mb-2 mr-sm-2 mb-sm-0">
-                                    <input id="break_time_from" size="8" type="time" name="break_time_from"
-                                        class="form-control" value="12:00" {{ $attendance->confirm ? 'disabled' : '' }}>
-                                </div>
-                                <div class="input-group mb-2 mr-sm-2  ml-sm-2 mb-sm-0">
-                                    〜
-                                </div>
-                                <div class="input-group mb-2 ml-sm-2 mb-sm-0">
-                                    <input id="break_time_to" type="time" size="8" name="break_time_to"
-                                        class="form-control" value="13:00" {{ $attendance->confirm ? 'disabled' : '' }}>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-group row">
-                        <label for="memo" class="col-md-4 control-label col-form-label text-right">
-                            メモ
-                        </label>
-                        <div class="col-md-8">
-                            <textarea class="field-textarea" id="memo" class="form-control" name="memo" {{ $attendance->confirm ? 'disabled' : '' }}></textarea>
+                            <textarea class="form-control" id="memo" name="memo"></textarea>
                         </div>
                     </div>
                 </div><!-- /.modal-body -->
                 <div class="modal-footer">
-                    <button type="button" data-url="{{ route('user.attendance_header.delete', ['user_id' => $attendance->user_id, 'year_month' => $date, 'work_date' => 'work_date']) }}" class="btn btn-secondary" id="delete-url" {{ $attendance->confirm_flag ? 'disabled' : '' }}>未入力に戻す</button>
-                    <button type="submit" class="btn btn-primary" id="attendance_submit" {{ $attendance->confirm_flag ? 'disabled' : '' }}>変更を保存</button>
+                    <a data-url="{{ route('user.attendance_header.delete', ['user_id' => $attendance->user_id, 'year_month' => $date, 'work_date' => 'work_date']) }}"
+                        class="btn btn-secondary" id="delete-url">未入力に戻す</a>
+                    <button type="submit" class="btn btn-primary">変更を保存</button>
                 </div><!-- /.modal-footer -->
-            </div><!-- /.modal-content -->
-        </form>
+            </form>
+        </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 
