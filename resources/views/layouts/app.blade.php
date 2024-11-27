@@ -86,15 +86,13 @@
                                 </div>
                             </div>
                         @endif
-                    </div>
-                    <div class="container validation-url">
-                    @if ($errors->any())
-                            <div class="alert alert-danger">
-                                <ul>
+                        @if ($errors->any())
+                            <div class="row">
+                                <div class="col-md-12 alert alert-danger">
                                     @foreach ($errors->all() as $error)
-                                        <li>{{ $error }}</li>
+                                        {{ $error }}
                                     @endforeach
-                                </ul>
+                                </div>
                             </div>
                         @endif
                     </div>
