@@ -26,7 +26,7 @@ class AttendanceRequest extends FormRequest
                 new UniqueBreakTimesRule($this->input('working_time'), $this->input('leave_time')),
             ],
             'break_times.*.break_time_from' => 'required_with:break_times.*.break_time_to|date_format:H:i',
-            'break_times.*.break_time_to' => 'required_with:break_times.*.break_time_from|date_format:H:i|after:break_times.*.break_time_from',
+            'break_times.*.break_time_to' => 'required_with:break_times.*.break_time_from|date_format:H:i|',
             'memo' => 'nullable|string',
         ];
     }
