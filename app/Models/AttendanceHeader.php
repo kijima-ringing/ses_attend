@@ -21,7 +21,7 @@ class AttendanceHeader extends Model
         'working_days',
         'scheduled_working_hours',
         'overtime_hours',
-        'working_hours',
+        'confirm_flag',
     ];
 
     public function attendanceDailies()
