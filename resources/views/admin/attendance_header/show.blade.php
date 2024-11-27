@@ -76,9 +76,12 @@
         <tbody>
             @foreach($daysOfMonth as $day)
             <tr class="bg-white dateInfo">
-                <th class="text-right dialog date_info work_date click-text"
+            <th class="text-right dialog date_info work_date click-text"
                     data-date_info="{{ $date . '-' . $day['day'] . '(' . $day['dayOfWeek'] . ')' }}"
-                    data-work_date="{{ $day['work_date'] }}">{{ $day['day'] }}日</th>
+                    data-work_date="{{ $day['work_date'] }}"
+                    @if($attendance->confirm_flag) style="pointer-events: none; color: gray;" @endif>
+                    {{ $day['day'] }}日
+                </th>
                 <th class="text-center">{{ $day['dayOfWeek'] }}</th>
                 @if (count($attendanceDaily) > 0)
                 @if (isset($attendanceDaily[$day['work_date']]))

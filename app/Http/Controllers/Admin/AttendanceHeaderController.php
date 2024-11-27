@@ -82,6 +82,7 @@ class AttendanceHeaderController extends Controller
             'daysOfMonth' => $daysOfMonth,
             'date' => $date->format('Y-m'),
             'company' => $company,
+            'confirmFlag' => $attendance->confirm_flag,
         ]);
     }
 

@@ -20,7 +20,6 @@ class AttendanceHeaderController extends Controller
     {
 
         $getDateService = new GetDateService();
-
         $date = $getDateService->createYearMonthFormat($yearMonth);
 
         $attendance = AttendanceHeader::firstOrNew(['user_id' => $user_id, 'year_month' => $date]);
@@ -42,6 +41,7 @@ class AttendanceHeaderController extends Controller
             'daysOfMonth' => $daysOfMonth,
             'date' => $date->format('Y-m'),
             'company' => $company,
+            'confirmFlag' => $attendance->confirm_flag,
         ]);
     }
 

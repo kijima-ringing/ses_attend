@@ -25,23 +25,31 @@ function formatTimeToHHMM(time) {
 
 // ドキュメント読み込み後の処理
 $(function () {
-    // 「.dialog」クラスの要素がクリックされたときの処理
-    $(".dialog").click(function () {
-        var parent = $(this).parent(); // クリックされた要素の親要素を取得
-        var id = parent.find('.id').data('id'); // 勤怠IDを取得
+    $(".dialog").click(function (event) {
+        // 確定フラグを取得し、数値型で比較
+        let isConfirmed = Number($('#attendance-info-url').data('confirmed')) === 1;
+
+        // 確定済みの場合はクリックを無効化
+        if (isConfirmed) {
+            event.preventDefault();
+            alert('このデータは確定済みのため編集できません。');
+            return;
+        }
+
+        var parent = $(this).parent();
+        var id = parent.find('.id').data('id');
 
         // 勤怠IDがある場合、AJAXで勤怠データを取得
         if (id) {
             $.ajax({
-                type: 'GET',                // HTTPメソッドはGET
-                url: getAttendanceInfoUrl, // 勤怠情報取得用URL
-                dataType: 'json',          // 応答データ形式はJSON
-                data: { id: id }           // リクエストに勤怠IDを含める
+                type: 'GET',
+                url: getAttendanceInfoUrl,
+                dataType: 'json',
+                data: { id: id }
             }).done(function (res) {
-                // AJAX成功時の処理
                 let data = res.data;
 
-                // 勤怠データを取得、またはデフォルト値を設定
+                // 勤怠データを取得またはデフォルト値を設定
                 var attendance_class = data.attendance_class || NORMAL_WORKING;
                 var working_time = formatTimeToHHMM(data.working_time) || companyBaseTimeFrom;
                 var leave_time = formatTimeToHHMM(data.leave_time) || companyBaseTimeTo;
@@ -54,7 +62,7 @@ $(function () {
                 $('#memo').val(memo);
 
                 // 休憩時間の表示処理
-                $('#break-times-container').empty(); // 既存の休憩時間をクリア
+                $('#break-times-container').empty();
                 if (data.break_times && data.break_times.length > 0) {
                     data.break_times.forEach(function (breakTime, index) {
                         var breakTimeFrom = formatTimeToHHMM(breakTime.break_time_from);
@@ -69,7 +77,6 @@ $(function () {
                         `);
                     });
                 } else {
-                    // デフォルトの休憩時間を追加
                     $('#break-times-container').append(`
                         <div class="form-inline mb-2 break-time-entry">
                             <input type="time" name="break_times[0][break_time_from]" value="${BASE_BREAK_TIME_FROM}" class="form-control">
@@ -80,28 +87,24 @@ $(function () {
                     `);
                 }
             }).fail(function () {
-                // AJAX失敗時のエラーメッセージ表示
-                alert('ajax通信に失敗しました');
+                alert('AJAX通信に失敗しました');
             });
         } else {
-            // 勤怠IDがない場合はモーダルのフィールドをリセット
-            resetModalFields();
+            resetModalFields(); // フィールドをリセット
         }
 
-        // 日付情報と勤務日を取得
         let dateInfo = parent.find('.date_info').data('date_info');
         let work_date = parent.find('.work_date').data('work_date');
 
-        // URLのプレースホルダーを勤務日に置き換え
         let replace = $('#delete-url').data("url").replace('work_date', work_date);
-        $('#work_date').val(work_date);           // モーダルの隠しフィールドに勤務日をセット
-        $('#delete-url').attr("href", replace);   // 削除ボタンのURLを設定
+        $('#work_date').val(work_date);
+        $('#delete-url').attr("href", replace);
 
-        $('.modal-title').text(dateInfo); // モーダルのタイトルを設定
-        lockFieldsIfConfirmed();         // 確定状態に応じてフィールドをロック
-        $(".modal").modal("show");       // モーダルを表示
+        $('.modal-title').text(dateInfo);
+        $(".modal").modal("show");
     });
 });
+
 
 // モーダル内のフィールドをリセットする関数
 function resetModalFields() {
@@ -118,20 +121,6 @@ function resetModalFields() {
             <button type="button" class="btn btn-danger btn-sm ml-2 remove-break-time">削除</button>
         </div>
     `);
-}
-
-// 確定済みの場合にモーダルのフィールドをロックする関数
-function lockFieldsIfConfirmed() {
-    let isConfirmed = $('#attendance-info-url').data('confirmed'); // 確定状態を取得
-    if (isConfirmed) {
-        $('#modal-form :input').not('#attendance_submit, #delete-url').prop('disabled', true);
-        $('#attendance_submit').prop('disabled', true);
-        $('#delete-url').prop('disabled', true);
-    } else {
-        $('#modal-form :input').prop('disabled', false);
-        $('#attendance_submit').prop('disabled', false);
-        $('#delete-url').prop('disabled', false);
-    }
 }
 
 // 休憩時間追加・削除機能
