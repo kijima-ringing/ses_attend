@@ -19,8 +19,9 @@ class AttendanceHeader extends Model
         'user_id',
         'year_month',
         'working_days',
-        'scheduled_working_hours',
         'overtime_hours',
+        'scheduled_working_hours',
+        'working_hours',
         'confirm_flag',
     ];
 
