@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\SettingRequest;
 use App\Models\Company;
 use Illuminate\Support\Facades\DB;
+use App\Models\AttendanceDaily;
 use App\Models\AttendanceHeader;
 use App\Services\AttendanceService;
 
@@ -58,11 +59,26 @@ class SettingsController extends Controller
     protected function recalculateAttendanceHeader()
     {
         $attendanceHeaders = AttendanceHeader::all();
-        $company = Company::find(1); // 設定の適用範囲を取得
+        $company = Company::find(1); // 現在の会社設定を取得
 
         foreach ($attendanceHeaders as $attendanceHeader) {
             $attendanceService = new AttendanceService();
 
+            // 基準時間、端数処理、適用範囲を考慮して日次データを再計算
+            $attendanceDailies = AttendanceDaily::where('attendance_header_id', $attendanceHeader->id)->get();
+
+            foreach ($attendanceDailies as $attendanceDaily) {
+                $dailyParams = $attendanceService->getUpdateDailyParams([
+                    'attendance_class' => $attendanceDaily->attendance_class,
+                    'working_time' => $attendanceDaily->working_time,
+                    'leave_time' => $attendanceDaily->leave_time,
+                    'break_times' => $attendanceDaily->breakTimes->toArray(), // 休憩時間を含む
+                ]);
+
+                $attendanceDaily->update($dailyParams);
+            }
+
+            // 月次データの再計算
             if ($company->rounding_scope == 0) { // 全体適用
                 $updateParams = $attendanceService->getUpdateMonthParamsWithGlobalRounding($attendanceHeader->id);
             } else { // 日別適用

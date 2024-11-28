@@ -25,6 +25,7 @@ class AttendanceService
             $dailyParams = $this->setDailyParamsDefault();
         }
 
+        // 更新された基準時間を考慮した結果を返す
         $updateDailyParams = array_merge($params, $dailyParams);
 
         return $updateDailyParams;
@@ -32,21 +33,21 @@ class AttendanceService
 
     public function setDailyParamsNormalWorking($params, $company)
     {
+        // 基準時間を考慮して所定労働時間を再計算
         $scheduledWorkingHours = $this->getScheduledWorkingHours(
-        $company->base_time_to,
-        $company->base_time_from,
-        $params['break_times'] ?? [],
-        $company->base_time_to,
-        $company->base_time_from
+            $company->base_time_to,
+            $company->base_time_from,
+            $params['break_times'] ?? []
         );
 
+        // 実働時間を再計算
         $workingHours = $this->getWorkingHours(
             $params,
             $company->base_time_to,
             $company->base_time_from
         );
 
-        // 基準外の休憩時間を計算
+        // 基準外休憩時間を再計算
         $breakTimeOutsideBase = 0;
         foreach ($params['break_times'] ?? [] as $breakTime) {
             $breakFrom = strtotime($breakTime['break_time_from']);
@@ -55,6 +56,7 @@ class AttendanceService
             $breakTimeOutsideBase += $outsideBase;
         }
 
+        // 残業時間を計算
         $overtimeHours = $this->getOvertimeHours($workingHours, $scheduledWorkingHours, $breakTimeOutsideBase);
 
         return [
