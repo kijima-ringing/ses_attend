@@ -143,6 +143,7 @@ class AttendanceHeaderController extends Controller
             // バリデーションエラー時の処理
             return redirect()->back()->withErrors($e->errors())->withInput();
         } catch (\Exception $e) {
+            \Log::error('設定更新エラー: ' . $e->getMessage());
             session()->flash('flash_message', '更新が失敗しました');
         }
         return redirect(route('admin.attendance_header.show', ['user_id' => $request->user_id, 'year_month' => $date]));

@@ -87,7 +87,7 @@ class GetDateService
 
         if ($time >= 0 && $time < 15) {
             $res = 0;
-        } else if ($time > 15 && $time < 30) {
+        } else if ($time >= 15 && $time < 30) {
             $res = 15;
         } else if ($time >= 30 && $time < 45) {
             $res = 30;
