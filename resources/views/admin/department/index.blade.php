@@ -14,11 +14,11 @@
                 <div class="create-route">
                     <form action="{{ route('admin.department.overtime_report.export') }}" method="GET" class="form-inline">
                         <div class="form-group mr-2">
-                            <label for="thresholdOvertimeHours" class="mr-2">基準残業時間 (時間)</label>
+                            <label for="thresholdOvertimeHours" class="mr-2">基準残業時間</label>
                             <input type="number" name="thresholdOvertimeHours" id="thresholdOvertimeHours" class="form-control" value="40" required>
                         </div>
                         <div class="form-group mr-2">
-                            <label for="targetMonth" class="mr-2">抽出月</label>
+                            <label for="targetMonth" class="mr-2">年月</label>
                             <input type="month" name="targetMonth" id="targetMonth" class="form-control" value="{{ now()->format('Y-m') }}" required>
                         </div>
                         <button type="submit" class="btn btn-success px-5">Excelに抽出</button>
