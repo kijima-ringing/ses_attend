@@ -10,10 +10,13 @@ use App\Models\Department;
 use App\Models\DepartmentMember;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Exports\DepartmentOvertimeReportExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class DepartmentController extends Controller
 {
-    public function index() {
+    public function index()
+    {
         $departments = Department::all();
 
         return view('admin.department.index')->with([
@@ -21,7 +24,8 @@ class DepartmentController extends Controller
         ]);
     }
 
-    public function store(DepartmentCreateValidationRequest $request) {
+    public function store(DepartmentCreateValidationRequest $request)
+    {
         $params = $request->validated();
 
         DB::transaction(function () use ($request, $params) {
@@ -33,7 +37,8 @@ class DepartmentController extends Controller
         return redirect(route('admin.department.index'));
     }
 
-    public function update(DepartmentUpdateValidationRequest $request, $id) {
+    public function update(DepartmentUpdateValidationRequest $request, $id)
+    {
         $params = $request->validated();
 
         DB::transaction(function () use ($request, $params, $id) {
@@ -47,7 +52,8 @@ class DepartmentController extends Controller
         return redirect(route('admin.department.index'));
     }
 
-    public function destroy($id) {
+    public function destroy($id)
+    {
 
         DB::transaction(function () use ($id) {
 
@@ -63,9 +69,31 @@ class DepartmentController extends Controller
         return redirect(route('admin.department.index'));
     }
 
-    public function ajaxGetDepartmentInfo(Request $request) {
+    public function ajaxGetDepartmentInfo(Request $request)
+    {
         $department = Department::findOrNew($request->id);
 
         return DepartmentResource::make($department);
     }
+
+    /**
+     * 部門ごとの基準残業時間超過人数をエクセル形式でエクスポート
+     */
+    public function exportOvertimeReport(Request $request)
+    {
+        $validated = $request->validate([
+            'thresholdOvertimeHours' => 'required|numeric|min:0',
+            'targetMonth' => 'required|date_format:Y-m',
+        ]);
+
+        $thresholdOvertimeHours = $validated['thresholdOvertimeHours'];
+        $targetMonth = $validated['targetMonth'];
+
+        // Exportクラスに基準残業時間と抽出月を渡す
+        return Excel::download(
+            new DepartmentOvertimeReportExport($thresholdOvertimeHours, $targetMonth),
+            "department_overtime_report_{$targetMonth}.xlsx"
+        );
+    }
+
 }
