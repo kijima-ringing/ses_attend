@@ -81,10 +81,19 @@ class DepartmentController extends Controller
      */
     public function exportOvertimeReport(Request $request)
     {
-        $validated = $request->validate([
-            'thresholdOvertimeHours' => 'required|numeric|min:0',
-            'targetMonth' => 'required|date_format:Y-m',
-        ]);
+        $validated = $request->validate(
+            [
+                'thresholdOvertimeHours' => 'required|numeric|min:0',
+                'targetMonth' => 'required|date_format:Y-m',
+            ],
+            [
+                'thresholdOvertimeHours.required' => '基準残業時間を入力してください。',
+                'thresholdOvertimeHours.numeric' => '基準残業時間は数値で入力してください。',
+                'thresholdOvertimeHours.min' => '基準残業時間は0以上である必要があります。',
+                'targetMonth.required' => '年月を選択してください。',
+                'targetMonth.date_format' => '年月の形式が正しくありません。',
+            ]
+        );
 
         $thresholdOvertimeHours = $validated['thresholdOvertimeHours'];
         $targetMonth = $validated['targetMonth'];
