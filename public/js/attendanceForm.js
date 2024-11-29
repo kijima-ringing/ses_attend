@@ -86,6 +86,9 @@ $(function () {
                         </div>
                     `);
                 }
+                // エラー表示エリアを非表示
+                $('#error-messages').addClass('d-none');
+                $('#error-list').empty();
             }).fail(function () {
                 alert('AJAX通信に失敗しました');
             });
@@ -105,7 +108,6 @@ $(function () {
     });
 });
 
-
 // モーダル内のフィールドをリセットする関数
 function resetModalFields() {
     $('#attendance_class').val(NORMAL_WORKING);          // 勤務区分を通常勤務にリセット
@@ -121,6 +123,50 @@ function resetModalFields() {
             <button type="button" class="btn btn-danger btn-sm ml-2 remove-break-time">削除</button>
         </div>
     `);
+}
+
+// 保存ボタンのクリックイベント（AJAX送信）
+$('#modal-form').on('submit', function (e) {
+    e.preventDefault();
+
+    const form = $(this);
+    const url = form.attr('action');
+    const formData = form.serialize();
+
+    $.ajax({
+        type: 'POST',
+        url: url,
+        data: formData,
+        success: function (response) {
+            if (response.success) {
+                alert(response.message);
+                location.reload(); // 必要に応じてリロード
+            }
+        },
+        error: function (xhr) {
+            if (xhr.status === 422) {
+                const errors = xhr.responseJSON.errors;
+                displayErrors(errors);
+            } else {
+                alert('サーバーエラーが発生しました。もう一度お試しください。');
+            }
+        }
+    });
+});
+
+// エラーメッセージを表示する関数
+function displayErrors(errors) {
+    const errorContainer = $('#error-messages');
+    const errorList = $('#error-list');
+
+    errorList.empty();
+    errorContainer.removeClass('d-none');
+
+    $.each(errors, function (key, messages) {
+        messages.forEach(function (message) {
+            errorList.append(`<li>${message}</li>`);
+        });
+    });
 }
 
 // 休憩時間追加・削除機能

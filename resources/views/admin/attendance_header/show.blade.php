@@ -149,6 +149,10 @@
                     <input type="hidden" name="year_month" value="{{ $date }}">
                     <input type="hidden" name="work_date" value="" id="work_date">
 
+                    <div id="error-messages" class="alert alert-danger d-none">
+                        <ul id="error-list"></ul>
+                    </div>
+
                     <!-- 勤務区分 -->
                     <div class="form-group row">
                         <label for="attendance_class" class="col-md-4 col-form-label text-right">

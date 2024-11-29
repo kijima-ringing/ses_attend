@@ -106,13 +106,11 @@ class AttendanceHeaderController extends Controller
 
         try {
             DB::transaction(function () use ($request, $attendanceService, $date) {
-                // 勤怠ヘッダーを作成または取得
                 $attendanceHeader = AttendanceHeader::firstOrCreate([
                     'user_id' => $request->user_id,
                     'year_month' => $date
                 ]);
 
-                // 日次勤怠を作成または更新
                 $attendanceDaily = AttendanceDaily::updateOrCreate(
                     [
                         'attendance_header_id' => $attendanceHeader->id,
@@ -124,7 +122,6 @@ class AttendanceHeaderController extends Controller
                     ))
                 );
 
-                // 休憩時間を更新
                 BreakTime::where('attendance_daily_id', $attendanceDaily->id)->delete();
                 foreach ($request->input('break_times', []) as $breakTime) {
                     BreakTime::create([
@@ -134,7 +131,6 @@ class AttendanceHeaderController extends Controller
                     ]);
                 }
 
-                // 月次勤怠計算を更新
                 $company = Company::find(1);
                 $updateMonthParams = $company->rounding_scope == 0
                     ? $attendanceService->getUpdateMonthParamsWithGlobalRounding($attendanceHeader->id)
@@ -143,17 +139,15 @@ class AttendanceHeaderController extends Controller
                 $attendanceHeader->fill($updateMonthParams)->save();
             });
 
-            session()->flash('flash_message', '勤怠情報を更新しました');
-
+            return response()->json(['success' => true, 'message' => '勤怠情報を更新しました']);
         } catch (\Illuminate\Validation\ValidationException $e) {
-            // バリデーションエラー時の処理
-            return redirect()->back()->withErrors($e->errors())->withInput();
+            return response()->json(['success' => false, 'errors' => $e->errors()], 422);
         } catch (\Exception $e) {
             \Log::error('設定更新エラー: ' . $e->getMessage());
-            session()->flash('flash_message', '更新が失敗しました');
+            return response()->json(['success' => false, 'message' => '更新が失敗しました。'], 500);
         }
-        return redirect(route('admin.attendance_header.show', ['user_id' => $request->user_id, 'year_month' => $date]));
     }
+
 
     /**
      * 勤怠情報の日次データを削除するメソッド。
