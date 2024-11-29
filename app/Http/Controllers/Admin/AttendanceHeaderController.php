@@ -62,7 +62,12 @@ class AttendanceHeaderController extends Controller
         // 勤怠ヘッダーを取得または新規作成
         $attendance = AttendanceHeader::firstOrNew(['user_id' => $user_id, 'year_month' => $date]);
 
-        // 日次勤怠データを取得し、休憩時間をリレーションで取得
+        // 勤怠ヘッダーが存在するかどうかをチェック
+        $headerExists = AttendanceHeader::where('user_id', $user_id)
+            ->whereDate('year_month', '=', $date->startOfMonth())
+            ->exists();
+
+        // 日次勤怠データを取得
         $attendanceDaily = AttendanceDaily::where('attendance_header_id', $attendance->id)
              ->with('breakTimes') // リレーションにより休憩時間を含む
             ->get()
@@ -83,6 +88,7 @@ class AttendanceHeaderController extends Controller
             'date' => $date->format('Y-m'),
             'company' => $company,
             'confirmFlag' => $attendance->confirm_flag,
+            'headerExists' => $headerExists, // レコードの存在状態をビューに渡す
         ]);
     }
 

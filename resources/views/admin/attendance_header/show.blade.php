@@ -37,7 +37,8 @@
     <div class="month-button">
         <form method="POST" action="{{ route('admin.attendance_header.confirm', ['user_id' => $attendance->user_id, 'year_month' => $date]) }}">
             @csrf
-            <button type="submit" class="btn btn-success">
+            <button type="submit" class="btn btn-success"
+                    {{ !$headerExists ? 'disabled' : '' }}>
                 {{ $attendance->confirm_flag ? '確定を取り消す' : '勤怠を確定する' }}
             </button>
         </form>
