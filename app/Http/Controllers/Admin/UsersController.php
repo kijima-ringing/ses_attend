@@ -69,7 +69,7 @@ class UsersController extends Controller
         $query = $request->query();
         $res = User::find($query['user_id'])->toArray(); // admin_flagが正しく含まれているか確認
         $res['departments'] = DepartmentMember::getDepartments($query['user_id']);
-        \Log::info('User Data:', $res); // デバッグ用ログ出力
+
         return $res;
     }
 
