@@ -96,15 +96,15 @@
                                 <button class="btn btn-primary js-department-add-btn" type="button">+</button>
                             </div>
                         </div>
+                        <div class="form-group row js-added-list">
+                        </div>
                         <div class="form-group row">
                             <label for="admin_flag" class="col-sm-2 col-form-label">管理者権限</label>
                             <div class="col-sm-10">
                                 <input type="checkbox" id="admin_flag" name="admin_flag" value="1"
                                 {{ old('admin_flag', !empty($user) ? $user->admin_flag : 0) == 1 ? 'checked' : '' }}>
-                                <label for="admin_flag">管理者として登録</label>
+                                <label for="admin_flag" class="col-sm-2 col-form-label">管理者として登録</label>
                             </div>
-                        </div>
-                        <div class="form-group row js-added-list">
                         </div>
                         <div class="form-group row d-none">
 
