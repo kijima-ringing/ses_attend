@@ -150,13 +150,17 @@
 
                     <!-- 勤務区分 -->
                     <div class="form-group row">
-                        <label for="attendance_class" class="col-md-4 col-form-label text-right">区分</label>
+                        <label for="attendance_class" class="col-md-4 col-form-label text-right">
+                            区分
+                        </label>
                         <div class="col-md-8">
-                            <select name="attendance_class" class="form-control" id="attendance_class">
-                                <option value="0">通常勤務</option>
-                                <option value="1">有給休暇</option>
-                                <option value="2">欠勤</option>
-                            </select>
+                            <div class="form-inline">
+                                <select name="attendance_class" class="form-control" id="attendance_class" {{ $attendance->confirm ? 'disabled' : '' }}>
+                                    <option value="0">通常勤務</option>
+                                    <option value="1">有給休暇</option>
+                                    <option value="2">欠勤</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
 
@@ -195,7 +199,7 @@
                     <div class="form-group row">
                         <label for="memo" class="col-md-4 col-form-label text-right">メモ</label>
                         <div class="col-md-8">
-                            <textarea class="form-control" id="memo" name="memo"></textarea>
+                            <textarea class="field-textarea" id="memo" name="memo"></textarea>
                         </div>
                     </div>
                 </div><!-- /.modal-body -->
