@@ -139,15 +139,15 @@ class AttendanceHeaderController extends Controller
                 $attendanceHeader->fill($updateMonthParams)->save();
             });
 
+            session()->flash('flash_message', '勤怠情報を更新しました');
+
             return response()->json(['success' => true, 'message' => '勤怠情報を更新しました']);
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json(['success' => false, 'errors' => $e->errors()], 422);
         } catch (\Exception $e) {
-            \Log::error('設定更新エラー: ' . $e->getMessage());
             return response()->json(['success' => false, 'message' => '更新が失敗しました。'], 500);
         }
     }
-
 
     /**
      * 勤怠情報の日次データを削除するメソッド。

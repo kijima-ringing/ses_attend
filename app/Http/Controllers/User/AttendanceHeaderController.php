@@ -92,13 +92,12 @@ class AttendanceHeaderController extends Controller
 
             session()->flash('flash_message', '勤怠情報を更新しました');
 
+            return response()->json(['success' => true, 'message' => '勤怠情報を更新しました']);
         } catch (\Illuminate\Validation\ValidationException $e) {
-            // バリデーションエラー時の処理
-            return redirect()->back()->withErrors($e->errors())->withInput();
+            return response()->json(['success' => false, 'errors' => $e->errors()], 422);
         } catch (\Exception $e) {
-            session()->flash('flash_message', '更新が失敗しました');
+            return response()->json(['success' => false, 'message' => '更新が失敗しました。'], 500);
         }
-        return redirect(route('user.attendance_header.show', ['user_id' => $request->user_id, 'year_month' => $date]));
     }
 
     public function destroy($user_id, $year_month, $work_date)
