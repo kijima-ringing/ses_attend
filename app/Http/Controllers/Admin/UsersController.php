@@ -27,15 +27,30 @@ class UsersController extends Controller
         ]);
     }
 
-    public function update(UserRequest $request) {
+    public function update(UserRequest $request)
+    {
         try {
             DB::transaction(function () use ($request) {
+                // ログイン中のユーザーID
+                $currentUserId = Auth::id();
+
+                // 更新対象ユーザー
                 $existingUser = User::where('email', $request->email)->first();
 
                 if (!$existingUser || $existingUser->id == $request->id) {
-                    $res = User::createOrUpdate($request->merge(['admin_flag' => $request->has('admin_flag') ? 1 : 0]));
-                    DepartmentMember::where('user_id', $res->id)->delete();
+                    // 管理者権限の変更を禁止する条件を追加
+                    $adminFlag = $request->has('admin_flag') ? 1 : 0;
 
+                    if ($request->id == $currentUserId) {
+                        // ログイン中のユーザーの場合、admin_flag を変更させない
+                        $adminFlag = $existingUser ? $existingUser->admin_flag : 1;
+                    }
+
+                    // ユーザーを作成または更新
+                    $res = User::createOrUpdate($request->merge(['admin_flag' => $adminFlag]));
+
+                    // 部門関連情報を更新
+                    DepartmentMember::where('user_id', $res->id)->delete();
                     $userService = new UserService();
                     $userService->associateDepartment($request, $res);
                 } else {
