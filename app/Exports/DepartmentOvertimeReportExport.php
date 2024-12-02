@@ -30,7 +30,10 @@ class DepartmentOvertimeReportExport implements FromCollection
     {
         $departments = Department::all();
         $reportData = collect([
-            ['部門名', 'メンバー数', '基準超過人数'], // ヘッダー行
+            ['基準残業時間', $this->thresholdOvertimeHours], // 基準残業時間
+            ['抽出対象年月', $this->targetMonth],           // 抽出対象年月
+            [],                                             // 空行
+            ['部門名', 'メンバー数', '基準超過人数'],         // データヘッダー行
         ]);
 
         foreach ($departments as $department) {
