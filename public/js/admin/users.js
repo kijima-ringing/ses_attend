@@ -19,14 +19,25 @@ $(function() {
             data: { user_id: user_id }
         }).done(function(res) {
             console.log('Ajax Response:', res);
+
             $('.js-add-button').trigger('click', res);
+
+            // ログイン中のユーザーかどうかを判定
+            const currentUserId = $("meta[name='user-id']").attr("content"); // HTMLのmetaタグから現在のユーザーIDを取得
+            if (res.id == currentUserId) {
+                // 管理者権限チェックボックスを無効化
+                $('#admin_flag').prop('disabled', true).prop('checked', true);
+            } else {
+                // 他のユーザーの場合は有効化
+                $('#admin_flag').prop('disabled', false);
+            }
         }).fail(function(jqXHR, textStatus, errorThrown) {
             console.error('Ajax error:', textStatus, errorThrown);
             alert('ajax通信に失敗しました');
         });
     }
 
-    $('.js-add-button').on('click', function(event, data){
+    $('.js-add-button').on('click', function(event, data) {
         removeErrorElement();
         isSubmitting = false; // モーダルを開く時にフラグをリセット
 
@@ -43,6 +54,8 @@ $(function() {
         $('.js-department-checkbox').prop('checked', false);
         $('#admin_flag').prop('checked', false);
 
+        const currentUserId = $("meta[name='user-id']").attr("content"); // ログイン中のユーザーIDを取得
+
         if (typeof data !== 'undefined') {
             $.each(data, function(key, value) {
                 if (key === 'email') {
@@ -57,16 +70,14 @@ $(function() {
                 }
             });
 
-            var target_ids = [];
-            $.each(data.departments, function(index, value) {
-                target_ids.push(String(value.id));
-            });
-
-            $('.js-department-checkbox').each(function() {
-                if ($.inArray($(this).val(), target_ids) !== -1) {
-                    $(this).prop('checked', true);
-                }
-            });
+            // ログイン中のユーザーの場合、管理者権限を無効化
+            if (data.id == currentUserId) {
+                $('#admin_flag').prop('disabled', true).prop('checked', true);
+            } else {
+                $('#admin_flag').prop('disabled', false);
+            }
+        } else {
+            $('#admin_flag').prop('disabled', false);
         }
 
         changeDepartment();
