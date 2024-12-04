@@ -237,4 +237,76 @@ class AttendanceHeaderController extends Controller
         // 勤怠詳細画面にリダイレクト
         return redirect()->route('admin.attendance_header.show', ['user_id' => $user_id, 'year_month' => $year_month]);
     }
+
+    /**
+     * 勤怠データのロック状態を確認するメソッド。
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function checkLock(Request $request)
+    {
+        $attendanceDaily = AttendanceDaily::find($request->id);
+
+        if (!$attendanceDaily) {
+            return response()->json(['error' => 'データが見つかりません'], 404);
+        }
+
+        return response()->json(['locked_by' => $attendanceDaily->locked_by]);
+    }
+
+    /**
+     * 勤怠データをロックするメソッド。
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function lock(Request $request)
+    {
+        $attendanceDaily = AttendanceDaily::find($request->id);
+
+        if (!$attendanceDaily) {
+            return response()->json(['error' => 'データが見つかりません'], 404);
+        }
+
+        $userId = $request->user_id; // リクエストからユーザー ID を取得
+
+        if ($attendanceDaily->locked_by && $attendanceDaily->locked_by !== $userId) {
+            return response()->json(['error' => 'このデータは他のユーザーがロック中です'], 403);
+        }
+
+        $attendanceDaily->locked_by = $userId; // locked_by に保存
+        $attendanceDaily->locked_at = now(); // ロック日時を設定
+        $attendanceDaily->save();
+
+        return response()->json(['success' => true]);
+    }
+
+    /**
+     * 勤怠データのロックを解除するメソッド。
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function unlock(Request $request)
+    {
+        $attendanceDaily = AttendanceDaily::find($request->id);
+
+        if (!$attendanceDaily) {
+            return response()->json(['error' => 'データが見つかりません'], 404);
+        }
+
+        $currentUserId = auth()->id();
+
+        if ($attendanceDaily->locked_by !== $currentUserId) {
+            return response()->json(['error' => 'ロックを解除する権限がありません'], 403);
+        }
+
+        $attendanceDaily->locked_by = null;
+        $attendanceDaily->locked_at = null;
+        $attendanceDaily->save();
+
+        return response()->json(['success' => true]);
+    }
+
 }

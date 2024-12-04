@@ -56,6 +56,11 @@ Route::middleware('auth')->group(function () {
             Route::get('settings', 'SettingsController@edit')->name('settings.edit');
             Route::post('settings/update', 'SettingsController@update')->name('settings.update');
         });
+        Route::group(['prefix' => 'admin/attendance_daily', 'as' => 'attendance_daily.'], function () {
+            Route::get('check-lock', 'Admin\AttendanceHeaderController@checkLock');
+            Route::post('lock', 'Admin\AttendanceHeaderController@lock');
+            Route::post('unlock', 'Admin\AttendanceHeaderController@unlock');
+        });
     });
 
     Route::group(['prefix' => 'user', 'as' => 'user.', 'namespace' => 'User'], function () {

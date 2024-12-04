@@ -23,6 +23,76 @@ function formatTimeToHHMM(time) {
     return time.substring(0, 5); // HH:mm 部分だけを抽出
 }
 
+// ロック状態の確認
+function checkLockAndProceed(id, callback) {
+    $.ajax({
+        type: 'GET',
+        url: '/admin/attendance_daily/check-lock', // ロック状態確認エンドポイント
+        dataType: 'json',
+        data: { id: id },
+        success: function (response) {
+            const lockedBy = response.locked_by;
+            const currentUserId = $('meta[name="user-id"]').attr('content');
+
+            // 型を揃えて比較
+            if (lockedBy && Number(lockedBy) !== Number(currentUserId)) {
+                alert('この勤怠データは他のユーザーが編集中です。');
+            } else {
+                // ロックを設定
+                lockAttendanceData(id, callback);
+            }
+        },
+        error: function () {
+            alert('ロック状態の確認に失敗しました。もう一度お試しください。');
+        }
+    });
+}
+
+// 勤怠データをロック
+function lockAttendanceData(id, callback) {
+    const currentUserId = $('meta[name="user-id"]').attr('content'); // ユーザー ID を取得
+
+    $.ajax({
+        type: 'POST',
+        url: '/admin/attendance_daily/lock',
+        dataType: 'json',
+        data: {
+            id: id,
+            user_id: currentUserId, // ユーザー ID を送信
+            _token: $('meta[name="csrf-token"]').attr('content')
+        },
+        success: function () {
+            if (callback) callback();
+        },
+        error: function () {
+            alert('勤怠データのロックに失敗しました。');
+        }
+    });
+}
+
+// ドキュメント読み込み後のロック機能追加
+$(document).ready(function () {
+    $(".dialog").click(function (event, options) {
+        // `skipLock` フラグが設定されている場合はロック処理をスキップ
+        if (options && options.skipLock) return;
+
+        event.preventDefault(); // デフォルトのクリック動作を停止
+
+        const parent = $(this).parent();
+        const id = parent.find('.id').data('id');
+
+        if (id) {
+            checkLockAndProceed(id, () => {
+                // ロックが成功したら既存のクリック処理を呼び出す
+                $(this).trigger('click', { skipLock: true });
+            });
+        } else {
+            // IDがない場合はそのまま実行
+            $(this).trigger('click', { skipLock: true });
+        }
+    });
+});
+
 // ドキュメント読み込み後の処理
 $(function () {
     $(".dialog").click(function (event) {

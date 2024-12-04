@@ -24,8 +24,11 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')
-        //          ->hourly();
+        $schedule->call(function () {
+            AttendanceDaily::whereNotNull('locked_by')
+                ->where('locked_at', '<', now()->subMinutes(30))
+                ->update(['locked_by' => null, 'locked_at' => null]);
+        })->everyMinute();
     }
 
     /**
