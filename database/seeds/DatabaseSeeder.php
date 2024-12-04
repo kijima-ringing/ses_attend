@@ -92,31 +92,31 @@ class DatabaseSeeder extends Seeder
         DB::table('departments')->insert([
             [
                 'id' => 1,
-                'name' => '管理',
+                'name' => '管理部',
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now()
             ],
             [
                 'id' => 2,
-                'name' => '営業',
+                'name' => '営業部',
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now()
             ],
             [
                 'id' => 3,
-                'name' => '総務',
+                'name' => '総務部',
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now()
             ],
             [
                 'id' => 4,
-                'name' => '事業',
+                'name' => '事業部',
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now()
             ],
             [
                 'id' => 5,
-                'name' => '人事',
+                'name' => '人事部',
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now()
             ]
