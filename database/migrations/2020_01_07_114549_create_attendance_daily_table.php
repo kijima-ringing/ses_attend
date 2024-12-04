@@ -25,6 +25,8 @@ class CreateAttendanceDailyTable extends Migration
             $table->time('scheduled_working_hours');
             $table->time('overtime_hours');
             $table->time('working_hours');
+            $table->unsignedBigInteger('locked_by')->nullable();
+            $table->timestamp('locked_at')->nullable();
             $table->unsignedBigInteger('created_by')->nullable();
             $table->unsignedBigInteger('updated_by')->nullable();
             $table->timestamps();
