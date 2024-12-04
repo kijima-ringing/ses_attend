@@ -137,6 +137,11 @@ class AttendanceHeaderController extends Controller
                     : $attendanceService->getUpdateMonthParams($attendanceHeader->id);
 
                 $attendanceHeader->fill($updateMonthParams)->save();
+
+                // ロック解除処理を追加
+                $attendanceDaily->locked_by = null;
+                $attendanceDaily->locked_at = null;
+                $attendanceDaily->save();
             });
 
             session()->flash('flash_message', '勤怠情報を更新しました');
