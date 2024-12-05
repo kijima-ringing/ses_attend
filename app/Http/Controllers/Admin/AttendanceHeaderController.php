@@ -105,11 +105,24 @@ class AttendanceHeaderController extends Controller
         $date = $getDateService->createYearMonthFormat($request->year_month);
 
         try {
-            DB::transaction(function () use ($request, $attendanceService, $date) {
-                $attendanceHeader = AttendanceHeader::firstOrCreate([
-                    'user_id' => $request->user_id,
-                    'year_month' => $date
-                ]);
+            // 勤怠ヘッダーを取得
+            $attendanceHeader = AttendanceHeader::where([
+                'user_id' => $request->user_id,
+                'year_month' => $date
+            ])->first();
+
+            // 勤怠が確定済みかを確認
+            if ($attendanceHeader && $attendanceHeader->confirm_flag === 1) {
+                return response()->json(['success' => false, 'message' => '更新が失敗しました。'], 500);
+            }
+
+            DB::transaction(function () use ($request, $attendanceService, $date, $attendanceHeader) {
+                if (!$attendanceHeader) {
+                    $attendanceHeader = AttendanceHeader::firstOrCreate([
+                        'user_id' => $request->user_id,
+                        'year_month' => $date
+                    ]);
+                }
 
                 $attendanceDaily = AttendanceDaily::updateOrCreate(
                     [
