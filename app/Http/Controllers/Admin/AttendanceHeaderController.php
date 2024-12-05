@@ -285,16 +285,16 @@ class AttendanceHeaderController extends Controller
             return response()->json(['error' => 'データが見つかりません'], 404);
         }
 
-        $userId = $request->user_id; // リクエストからユーザー ID を取得
+        $userId = (int) $request->user_id; // 明示的に整数型に変換
 
-        // 既にロックされているが、他のユーザーによるロックの場合はエラーを返す
-        if ($attendanceDaily->locked_by && $attendanceDaily->locked_by !== $userId) {
+        // 他のユーザーによるロックチェック
+        if ($attendanceDaily->locked_by && (int) $attendanceDaily->locked_by !== $userId) {
             return response()->json(['error' => 'このデータは他のユーザーがロック中です'], 403);
         }
 
         // ロックを設定または更新
         $attendanceDaily->locked_by = $userId;
-        $attendanceDaily->locked_at = now(); // ロック日時を設定
+        $attendanceDaily->locked_at = now(); // ロック日時を更新
         $attendanceDaily->save();
 
         return response()->json(['success' => true]);
