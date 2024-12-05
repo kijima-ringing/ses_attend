@@ -54,12 +54,16 @@ function checkLockAndProceed(id, callback) {
 function disableModalFields() {
     // モーダル内のすべてのフォーム要素を非活性化
     $('#attendance-modal').find('input, select, textarea, button').prop('disabled', true);
+    // `<a>` タグを無効化する（クリックイベントを停止）
+    $('#attendance-modal').find('a').addClass('disabled').css('pointer-events', 'none');
 }
 
 // モーダル内のフォーム要素を有効化する関数（必要に応じて）
 function enableModalFields() {
     // モーダル内のすべてのフォーム要素を活性化
     $('#attendance-modal').find('input, select, textarea, button').prop('disabled', false);
+    // `<a>` タグを有効化する
+    $('#attendance-modal').find('a').removeClass('disabled').css('pointer-events', 'auto');
 }
 
 // モーダルを閉じる際にフォームを再度有効化
