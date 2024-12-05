@@ -38,7 +38,7 @@ function checkLockAndProceed(id, callback) {
                 alert('この勤怠データは他のユーザーが編集中です。');
 
                 // モーダル内のすべての要素を非活性化
-                disableModalFields();
+                setTimeout(disableModalFields, 0);
             } else {
                 // ロックを設定
                 lockAttendanceData(id, callback);
@@ -57,7 +57,7 @@ function disableModalFields() {
     // `<a>` タグを無効化する（クリックイベントを停止）
     $('#attendance-modal').find('a').addClass('disabled').css('pointer-events', 'none');
     // 動的に追加された休憩時間の削除ボタンを無効化
-    $('#break-times-container').find('input, button').prop('disabled', true);
+    $('#break-times-container').find('.break-time-entry input, .break-time-entry button').prop('disabled', true);
 }
 
 // モーダル内のフォーム要素を有効化する関数（必要に応じて）
@@ -67,7 +67,7 @@ function enableModalFields() {
     // `<a>` タグを有効化する
     $('#attendance-modal').find('a').removeClass('disabled').css('pointer-events', 'auto');
     // 動的に追加された休憩時間の削除ボタンを有効化
-    $('#break-times-container').find('input, button').prop('disabled', false);
+    $('#break-times-container').find('.break-time-entry input, .break-time-entry button').prop('disabled', false);
 }
 
 // モーダルを閉じる際にフォームを再度有効化
