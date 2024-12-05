@@ -65,7 +65,7 @@ function lockAttendanceData(id, callback) {
             if (callback) callback();
         },
         error: function () {
-            alert('勤怠データのロックに失敗しました。');
+            alert('勤怠データはすでにロックされています。');
         }
     });
 }

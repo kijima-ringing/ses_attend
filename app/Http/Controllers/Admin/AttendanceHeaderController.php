@@ -276,11 +276,13 @@ class AttendanceHeaderController extends Controller
 
         $userId = $request->user_id; // リクエストからユーザー ID を取得
 
+        // 既にロックされているが、他のユーザーによるロックの場合はエラーを返す
         if ($attendanceDaily->locked_by && $attendanceDaily->locked_by !== $userId) {
             return response()->json(['error' => 'このデータは他のユーザーがロック中です'], 403);
         }
 
-        $attendanceDaily->locked_by = $userId; // locked_by に保存
+        // ロックを設定または更新
+        $attendanceDaily->locked_by = $userId;
         $attendanceDaily->locked_at = now(); // ロック日時を設定
         $attendanceDaily->save();
 
