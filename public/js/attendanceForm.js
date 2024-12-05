@@ -23,6 +23,11 @@ function formatTimeToHHMM(time) {
     return time.substring(0, 5); // HH:mm 部分だけを抽出
 }
 
+// ページリロード時にdisableModalFieldsを実行
+$(document).ready(function () {
+    setTimeout(disableModalFields, 0);
+});
+
 // ロック状態の確認
 function checkLockAndProceed(id, callback) {
     $.ajax({
@@ -40,6 +45,8 @@ function checkLockAndProceed(id, callback) {
                 // モーダル内のすべての要素を非活性化
                 setTimeout(disableModalFields, 0);
             } else {
+                // モーダル内のすべての要素を有効化
+                setTimeout(enableModalFields, 0);
                 // ロックを設定
                 lockAttendanceData(id, callback);
             }
@@ -72,7 +79,7 @@ function enableModalFields() {
 
 // モーダルを閉じる際にフォームを再度有効化
 $('#attendance-modal').on('hidden.bs.modal', function () {
-    enableModalFields();
+    setTimeout(disableModalFields, 0);
 });
 
 // 勤怠データをロック
@@ -191,6 +198,7 @@ $(function () {
             });
         } else {
             resetModalFields(); // フィールドをリセット
+            setTimeout(enableModalFields, 0); // モーダル内を有効化
         }
 
         let dateInfo = parent.find('.date_info').data('date_info');
