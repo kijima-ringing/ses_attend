@@ -257,6 +257,17 @@ class AttendanceHeaderController extends Controller
             return response()->json(['error' => 'データが見つかりません'], 404);
         }
 
+        // ロック有効期限のチェック（例：5分）
+        $lockTimeout = now()->subMinutes(5);
+        if ($attendanceDaily->locked_at && $attendanceDaily->locked_at < $lockTimeout) {
+            // ロック解除
+            $attendanceDaily->locked_by = null;
+            $attendanceDaily->locked_at = null;
+            $attendanceDaily->save();
+
+            return response()->json(['locked_by' => null]); // ロックが解除されたことを通知
+        }
+
         return response()->json(['locked_by' => $attendanceDaily->locked_by]);
     }
 

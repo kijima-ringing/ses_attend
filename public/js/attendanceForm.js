@@ -32,7 +32,7 @@ $(document).ready(function () {
 function checkLockAndProceed(id, callback) {
     $.ajax({
         type: 'GET',
-        url: '/admin/attendance_daily/check-lock', // ロック状態確認エンドポイント
+        url: '/admin/attendance_daily/check-lock',
         dataType: 'json',
         data: { id: id },
         success: function (response) {
@@ -41,13 +41,13 @@ function checkLockAndProceed(id, callback) {
 
             if (lockedBy && Number(lockedBy) !== Number(currentUserId)) {
                 alert('この勤怠データは他のユーザーが編集中です。');
-
-                // モーダル内のすべての要素を非活性化
                 setTimeout(disableModalFields, 0);
-            } else {
-                // モーダル内のすべての要素を有効化
+            } else if (!lockedBy) {
+                alert('ロックが自動で解除されました。');
                 setTimeout(enableModalFields, 0);
-                // ロックを設定
+                lockAttendanceData(id, callback);
+            } else {
+                setTimeout(enableModalFields, 0);
                 lockAttendanceData(id, callback);
             }
         },
