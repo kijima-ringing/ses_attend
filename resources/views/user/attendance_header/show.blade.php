@@ -10,6 +10,7 @@
     data-base_time_from="{{ $company->base_time_from }}"
     data-base_time_to="{{ $company->base_time_to }}">
 
+    <meta name="base-lock-url" content="/user/attendance_daily/">
     <div class="row pb-3">
         <div class="col-2">
             <div data-action="{{ route('user.attendance_header.show', ['user_id' => $attendance->user_id, 'year_month' => 'year_month']) }}"
@@ -102,7 +103,7 @@
     </table>
 </div>
 
-<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+<div class="modal fade" id="attendance-modal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">

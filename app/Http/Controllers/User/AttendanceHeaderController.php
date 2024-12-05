@@ -13,6 +13,7 @@ use App\Services\AttendanceService;
 use App\Services\GetDateService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class AttendanceHeaderController extends Controller
 {
@@ -88,6 +89,11 @@ class AttendanceHeaderController extends Controller
                     : $attendanceService->getUpdateMonthParams($attendanceHeader->id);
 
                 $attendanceHeader->fill($updateMonthParams)->save();
+
+                // ロック解除処理を追加
+                $attendanceDaily->locked_by = null;
+                $attendanceDaily->locked_at = null;
+                $attendanceDaily->save();
             });
 
             session()->flash('flash_message', '勤怠情報を更新しました');
@@ -142,5 +148,89 @@ class AttendanceHeaderController extends Controller
                 }),
             ]
         ]);
+    }
+
+    /**
+     * 勤怠データのロック状態を確認するメソッド。
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function checkLock(Request $request)
+    {
+        $attendanceDaily = AttendanceDaily::find($request->id);
+
+        if (!$attendanceDaily) {
+            return response()->json(['error' => 'データが見つかりません'], 404);
+        }
+
+        // ロック有効期限のチェック（例：5分）
+        $lockTimeout = now()->subMinutes(5);
+        if ($attendanceDaily->locked_at && $attendanceDaily->locked_at < $lockTimeout) {
+            // ロック解除
+            $attendanceDaily->locked_by = null;
+            $attendanceDaily->locked_at = null;
+            $attendanceDaily->save();
+
+            return response()->json(['locked_by' => null]); // ロックが解除されたことを通知
+        }
+
+        return response()->json(['locked_by' => $attendanceDaily->locked_by]);
+    }
+
+    /**
+     * 勤怠データをロックするメソッド。
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function lock(Request $request)
+    {
+        $attendanceDaily = AttendanceDaily::find($request->id);
+
+        if (!$attendanceDaily) {
+            return response()->json(['error' => 'データが見つかりません'], 404);
+        }
+
+        $userId = (int) $request->user_id; // 明示的に整数型に変換
+
+        // 他のユーザーによるロックチェック
+        if ($attendanceDaily->locked_by && (int) $attendanceDaily->locked_by !== $userId) {
+            return response()->json(['error' => 'このデータは他のユーザーがロック中です'], 403);
+        }
+
+        // ロックを設定または更新
+        $attendanceDaily->locked_by = $userId;
+        $attendanceDaily->locked_at = now(); // ロック日時を更新
+        $attendanceDaily->save();
+
+        return response()->json(['success' => true]);
+    }
+
+    /**
+     * 勤怠データのロックを解除するメソッド。
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function unlock(Request $request)
+    {
+        $attendanceDaily = AttendanceDaily::find($request->id);
+
+        if (!$attendanceDaily) {
+            return response()->json(['error' => 'データが見つかりません'], 404);
+        }
+
+        $currentUserId = auth()->id();
+
+        if ($attendanceDaily->locked_by !== $currentUserId) {
+            return response()->json(['error' => 'ロックを解除する権限がありません'], 403);
+        }
+
+        $attendanceDaily->locked_by = null;
+        $attendanceDaily->locked_at = null;
+        $attendanceDaily->save();
+
+        return response()->json(['success' => true]);
     }
 }

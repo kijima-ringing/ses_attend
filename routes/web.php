@@ -73,4 +73,11 @@ Route::middleware('auth')->group(function () {
 
         Route::get('attendance_header/ajax_get_attendance_info', 'AttendanceHeaderController@ajaxGetAttendanceInfo')->name('attendance_header.ajax_get_attendance_info');
     });
+    Route::group(['prefix' => 'user/attendance_daily', 'as' => 'user.attendance_daily.', 'namespace' => 'User'], function () {
+        // ロック関連のルート
+        Route::get('check-lock', 'AttendanceHeaderController@checkLock')->name('check_lock');
+        Route::post('lock', 'AttendanceHeaderController@lock')->name('lock');
+        Route::post('unlock', 'AttendanceHeaderController@unlock')->name('unlock');
+    });
+
 });

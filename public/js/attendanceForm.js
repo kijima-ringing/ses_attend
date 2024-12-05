@@ -14,6 +14,9 @@ var companyBaseTimeTo = $('.company').data('base_time_to') || '';     // 勤務�
 // 勤怠情報を取得するためのURL（HTMLのdata属性から読み込む）
 var getAttendanceInfoUrl = $('#attendance-info-url').data('url');
 
+// ベースURLを動的に設定
+var baseLockUrl = $('meta[name="base-lock-url"]').attr('content') || '/admin/attendance_daily/';
+
 // 部門インデックスのデータ属性を削除
 $('#department-index').removeAttr('data-url');
 
@@ -32,7 +35,7 @@ $(document).ready(function () {
 function checkLockAndProceed(id, callback) {
     $.ajax({
         type: 'GET',
-        url: '/admin/attendance_daily/check-lock',
+        url: `${baseLockUrl}check-lock`,
         dataType: 'json',
         data: { id: id },
         success: function (response) {
@@ -88,7 +91,7 @@ function lockAttendanceData(id, callback) {
 
     $.ajax({
         type: 'POST',
-        url: '/admin/attendance_daily/lock',
+        url: `${baseLockUrl}lock`,
         dataType: 'json',
         data: {
             id: id,
