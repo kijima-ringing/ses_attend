@@ -113,7 +113,7 @@ class AttendanceHeaderController extends Controller
 
             // 勤怠が確定済みかを確認
             if ($attendanceHeader && $attendanceHeader->confirm_flag === 1) {
-                return response()->json(['success' => false, 'message' => '更新が失敗しました。'], 500);
+                return response()->json(['success' => false, 'message' => 'すでに勤怠は確定されています。'],403);
             }
 
             DB::transaction(function () use ($request, $attendanceService, $date, $attendanceHeader) {

@@ -255,6 +255,12 @@ $('#modal-form').on('submit', function (e) {
             if (xhr.status === 422) {
                 const errors = xhr.responseJSON.errors;
                 displayErrors(errors);
+            } else if (xhr.status === 403) {
+                // 403エラーの場合に、サーバーからのメッセージを表示
+                alert(xhr.responseJSON.message || 'この操作は許可されていません。');
+                setTimeout(() => {
+                    location.reload(); // ページリロードを遅らせて実行
+                }, 100); // 100ミリ秒後にリロード
             } else {
                 alert('サーバーエラーが発生しました。もう一度お試しください。');
             }
