@@ -340,3 +340,37 @@ $('#attendance-submit-button').click(function (e) {
     // 重複がなければサーバーに送信
     $('#attendance-form').submit();
 });
+
+// 削除ボタンのクリックイベント
+$('#delete-url').on('click', function (e) {
+    e.preventDefault();
+
+    const deleteUrl = $(this).attr('href');
+
+    if (confirm('この勤怠データを削除しますか？')) {
+        $.ajax({
+            type: 'DELETE', // HTTP メソッドを DELETE に変更
+            url: deleteUrl,
+            data: {
+                _token: $('meta[name="csrf-token"]').attr('content'), // CSRFトークン
+            },
+            success: function (response) {
+                if (response.success) {
+                    alert(response.message);
+                    location.reload(); // 正常時はページをリロード
+                }
+            },
+            error: function (xhr) {
+                if (xhr.status === 403) {
+                    // 確定済みデータの場合
+                    alert(xhr.responseJSON.message || 'この勤怠データは確定済みのため削除できません。');
+                    setTimeout(() => {
+                        location.reload(); // ページリロード
+                    }, 100);
+                } else {
+                    alert('削除中にエラーが発生しました。もう一度お試しください。');
+                }
+            },
+        });
+    }
+});
