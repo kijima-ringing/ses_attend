@@ -53,14 +53,25 @@ class AttendanceHeaderController extends Controller
         $date = $getDateService->createYearMonthFormat($request->year_month);
 
         try {
-            DB::transaction(function () use ($request, $attendanceService, $date) {
-                // 勤怠ヘッダーを作成または取得
-                $attendanceHeader = AttendanceHeader::firstOrCreate([
-                    'user_id' => $request->user_id,
-                    'year_month' => $date
-                ]);
+            // 勤怠ヘッダーを取得
+            $attendanceHeader = AttendanceHeader::where([
+                'user_id' => $request->user_id,
+                'year_month' => $date
+            ])->first();
 
-                // 日次勤怠を作成または更新
+            // 勤怠が確定済みかを確認
+            if ($attendanceHeader && $attendanceHeader->confirm_flag === 1) {
+                return response()->json(['success' => false, 'message' => 'すでに勤怠は確定されています。'],403);
+            }
+
+            DB::transaction(function () use ($request, $attendanceService, $date, $attendanceHeader) {
+                if (!$attendanceHeader) {
+                    $attendanceHeader = AttendanceHeader::firstOrCreate([
+                        'user_id' => $request->user_id,
+                        'year_month' => $date
+                    ]);
+                }
+
                 $attendanceDaily = AttendanceDaily::updateOrCreate(
                     [
                         'attendance_header_id' => $attendanceHeader->id,
@@ -72,7 +83,6 @@ class AttendanceHeaderController extends Controller
                     ))
                 );
 
-                // 休憩時間を更新
                 BreakTime::where('attendance_daily_id', $attendanceDaily->id)->delete();
                 foreach ($request->input('break_times', []) as $breakTime) {
                     BreakTime::create([
@@ -82,7 +92,6 @@ class AttendanceHeaderController extends Controller
                     ]);
                 }
 
-                // 月次勤怠計算を更新
                 $company = Company::find(1);
                 $updateMonthParams = $company->rounding_scope == 0
                     ? $attendanceService->getUpdateMonthParamsWithGlobalRounding($attendanceHeader->id)
@@ -106,26 +115,56 @@ class AttendanceHeaderController extends Controller
         }
     }
 
+    /**
+     * 勤怠情報の日次データを削除するメソッド。
+     *
+     * @param int $user_id
+     * @param string $year_month
+     * @param string $work_date
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function destroy($user_id, $year_month, $work_date)
     {
         $attendanceService = new AttendanceService();
 
-        // 勤怠ヘッダーを取得または作成
+        // 勤怠ヘッダーを取得
         $getDateService = new GetDateService();
         $date = $getDateService->createYearMonthFormat($year_month);
-        $attendanceHeader = AttendanceHeader::firstOrCreate(['user_id' => $user_id, 'year_month' => $date]);
+        $attendanceHeader = AttendanceHeader::where([
+            'user_id' => $user_id,
+            'year_month' => $date,
+        ])->first();
 
-        // 指定された日次勤怠データを削除
-        AttendanceDaily::where(['attendance_header_id' => $attendanceHeader->id, 'work_date' => $work_date])->delete();
+        // 勤怠が確定済みかを確認
+        if ($attendanceHeader && $attendanceHeader->confirm_flag === 1) {
+            return response()->json([
+                'success' => false,
+                'message' => 'この勤怠情報は確定済みのため削除できません。',
+            ], 403); // 403 Forbidden を返す
+        }
 
-        // 労働時間計算処理（月次）のパラメータを更新
-        $updateMonthParams = $attendanceService->getUpdateMonthParams($attendanceHeader->id);
+        try {
+            DB::transaction(function () use ($attendanceHeader, $work_date, $attendanceService) {
+                // 日次勤怠データを削除
+                AttendanceDaily::where([
+                    'attendance_header_id' => $attendanceHeader->id,
+                    'work_date' => $work_date,
+                ])->delete();
 
-        // 勤怠ヘッダー情報を更新
-        $attendanceHeader->fill($updateMonthParams)->saveOrFail();
+                // 労働時間計算処理（月次）のパラメータを更新
+                $updateMonthParams = $attendanceService->getUpdateMonthParams($attendanceHeader->id);
 
-        // 勤怠詳細画面にリダイレクト
-        return redirect(route('user.attendance_header.show', ['user_id' => $user_id, 'year_month' => $date]));
+                // 勤怠ヘッダー情報を更新
+                $attendanceHeader->fill($updateMonthParams)->save();
+            });
+
+            // フラッシュメッセージを設定
+            session()->flash('flash_message', '勤怠情報を削除しました。');
+
+            return response()->json(['success' => true, 'message' => '勤怠情報を削除しました。']);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => '削除に失敗しました。'], 500);
+        }
     }
 
     public function ajaxGetAttendanceInfo(Request $request)

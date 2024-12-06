@@ -191,7 +191,7 @@ class AttendanceHeaderController extends Controller
         if ($attendanceHeader && $attendanceHeader->confirm_flag === 1) {
             return response()->json([
                 'success' => false,
-                'message' => 'この勤怠データは確定済みのため削除できません。',
+                'message' => 'この勤怠情報は確定済みのため削除できません。',
             ], 403); // 403 Forbidden を返す
         }
 
@@ -211,9 +211,9 @@ class AttendanceHeaderController extends Controller
             });
 
             // フラッシュメッセージを設定
-            session()->flash('flash_message', '勤怠データを削除しました。');
+            session()->flash('flash_message', '勤怠情報を削除しました。');
 
-            return response()->json(['success' => true, 'message' => '勤怠データを削除しました。']);
+            return response()->json(['success' => true, 'message' => '勤怠情報を削除しました。']);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => '削除に失敗しました。'], 500);
         }

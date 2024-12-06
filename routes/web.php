@@ -68,7 +68,7 @@ Route::middleware('auth')->group(function () {
             // Attendance Header Routes for Users
             Route::get('attendance_header/{user_id}/{year_month}', 'AttendanceHeaderController@show')->name('attendance_header.show');
             Route::post('attendance_header/update', 'AttendanceHeaderController@update')->name('attendance_header.update');
-            Route::get('attendance_header/delete/{user_id}/{year_month}/{work_date}', 'AttendanceHeaderController@destroy')->name('attendance_header.delete');
+            Route::delete('attendance_header/delete/{user_id}/{year_month}/{work_date}', 'AttendanceHeaderController@destroy')->name('attendance_header.delete');
         });
 
         Route::get('attendance_header/ajax_get_attendance_info', 'AttendanceHeaderController@ajaxGetAttendanceInfo')->name('attendance_header.ajax_get_attendance_info');
