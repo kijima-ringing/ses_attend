@@ -31,36 +31,7 @@ $(document).ready(function () {
     setTimeout(disableModalFields, 0);
 });
 
-// ロック状態の確認
-function checkLockAndProceed(id, callback) {
-    $.ajax({
-        type: 'GET',
-        url: `${baseLockUrl}check-lock`,
-        dataType: 'json',
-        data: { id: id },
-        success: function (response) {
-            const lockedBy = response.locked_by;
-            const currentUserId = $('meta[name="user-id"]').attr('content');
-
-            if (lockedBy && Number(lockedBy) !== Number(currentUserId)) {
-                alert('この勤怠データは他のユーザーが編集中です。');
-                setTimeout(disableModalFields, 0);
-            } else if (!lockedBy) {
-                alert('ロックが自動で解除されました。');
-                setTimeout(enableModalFields, 0);
-                lockAttendanceData(id, callback);
-            } else {
-                setTimeout(enableModalFields, 0);
-                lockAttendanceData(id, callback);
-            }
-        },
-        error: function () {
-            alert('ロック状態の確認に失敗しました。もう一度お試しください。');
-        }
-    });
-}
-
-// モーダル内のフォーム要素を無効化する関数
+// ローダル内のフォーム要素を無効化する関数
 function disableModalFields() {
     // モーダル内のすべてのフォーム要素を非活性化
     $('#attendance-modal').find('input, select, textarea, button').prop('disabled', true);
@@ -83,137 +54,6 @@ function enableModalFields() {
 // モーダルを閉じる際にフォームを再度有効化
 $('#attendance-modal').on('hidden.bs.modal', function () {
     setTimeout(disableModalFields, 0);
-});
-
-// 勤怠データをロック
-function lockAttendanceData(id, callback) {
-    const currentUserId = $('meta[name="user-id"]').attr('content'); // ユーザー ID を取得
-
-    $.ajax({
-        type: 'POST',
-        url: `${baseLockUrl}lock`,
-        dataType: 'json',
-        data: {
-            id: id,
-            user_id: currentUserId, // ユーザー ID を送信
-            _token: $('meta[name="csrf-token"]').attr('content')
-        },
-        success: function () {
-            if (callback) callback();
-        },
-        error: function () {
-            alert('勤怠データのロックに失敗しました。');
-        }
-    });
-}
-
-// ドキュメント読み込み後のロック機能
-$(document).ready(function () {
-    $(".dialog").click(function (event, options) {
-        // `skipLock` フラグが設定されている場合はロック処理をスキップ
-        if (options && options.skipLock) return;
-
-        event.preventDefault(); // デフォルトのクリック動作を停止
-
-        const parent = $(this).parent();
-        const id = parent.find('.id').data('id');
-
-        if (id) {
-            checkLockAndProceed(id, () => {
-                // ロックが成功したら既存のクリック処理を呼び出す
-                $(this).trigger('click', { skipLock: true });
-            });
-        } else {
-            // IDがない場合はそのまま実行
-            $(this).trigger('click', { skipLock: true });
-        }
-    });
-});
-
-// ドキュメント読み込み後の処理
-$(function () {
-    $(".dialog").click(function (event) {
-        // 確定フラグを取得し、数値型で比較
-        let isConfirmed = Number($('#attendance-info-url').data('confirmed')) === 1;
-
-        // 確定済みの場合はクリックを無効化
-        if (isConfirmed) {
-            event.preventDefault();
-            alert('このデータは確定済みのため編集できません。');
-            return;
-        }
-
-        var parent = $(this).parent();
-        var id = parent.find('.id').data('id');
-
-        // 勤怠IDがある場合、AJAXで勤怠データを取得
-        if (id) {
-            $.ajax({
-                type: 'GET',
-                url: getAttendanceInfoUrl,
-                dataType: 'json',
-                data: { id: id }
-            }).done(function (res) {
-                let data = res.data;
-
-                // 勤怠データを取得またはデフォルト値を設定
-                var attendance_class = data.attendance_class || NORMAL_WORKING;
-                var working_time = formatTimeToHHMM(data.working_time) || companyBaseTimeFrom;
-                var leave_time = formatTimeToHHMM(data.leave_time) || companyBaseTimeTo;
-                var memo = data.memo || '';
-
-                // モーダル内の各フィールドに値をセット
-                $('#attendance_class').val(attendance_class);
-                $('#working_time').val(working_time);
-                $('#leave_time').val(leave_time);
-                $('#memo').val(memo);
-
-                // 休憩時間の表示処理
-                $('#break-times-container').empty();
-                if (data.break_times && data.break_times.length > 0) {
-                    data.break_times.forEach(function (breakTime, index) {
-                        var breakTimeFrom = formatTimeToHHMM(breakTime.break_time_from);
-                        var breakTimeTo = formatTimeToHHMM(breakTime.break_time_to);
-                        $('#break-times-container').append(`
-                            <div class="form-inline mb-2 break-time-entry">
-                                <input type="time" name="break_times[${index}][break_time_from]" value="${breakTimeFrom}" class="form-control">
-                                <span class="mx-2">〜</span>
-                                <input type="time" name="break_times[${index}][break_time_to]" value="${breakTimeTo}" class="form-control">
-                                <button type="button" class="btn btn-danger btn-sm ml-2 remove-break-time">削除</button>
-                            </div>
-                        `);
-                    });
-                } else {
-                    $('#break-times-container').append(`
-                        <div class="form-inline mb-2 break-time-entry">
-                            <input type="time" name="break_times[0][break_time_from]" value="${BASE_BREAK_TIME_FROM}" class="form-control">
-                            <span class="mx-2">〜</span>
-                            <input type="time" name="break_times[0][break_time_to]" value="${BASE_BREAK_TIME_TO}" class="form-control">
-                            <button type="button" class="btn btn-danger btn-sm ml-2 remove-break-time">削除</button>
-                        </div>
-                    `);
-                }
-                // エラー表示エリアを非表示
-                $('#error-messages').addClass('d-none');
-                $('#error-list').empty();
-            }).fail(function () {
-                alert('AJAX通信に失敗しました');
-            });
-        } else {
-            resetModalFields(); // フィールドをリセット
-            setTimeout(enableModalFields, 0); // モーダル内を有効化
-        }
-
-        let dateInfo = parent.find('.date_info').data('date_info');
-        let work_date = parent.find('.work_date').data('work_date');
-
-        let replace = $('#delete-url').data("url").replace('work_date', work_date);
-        $('#work_date').val(work_date);
-        $('#delete-url').attr("href", replace);
-
-        $('.modal-title').text(dateInfo);
-        $(".modal").modal("show");
-    });
 });
 
 // モーダル内のフィールドをリセットする関数
@@ -373,4 +213,139 @@ $('#delete-url').on('click', function (e) {
             },
         });
     }
+});
+
+// ドキュメント読み込み後の処理
+$(function () {
+    $(".dialog").click(function (event) {
+        event.preventDefault(); // デフォルトのクリック動作を停止
+
+        // 確定フラグを取得し、数値型で比較
+        let isConfirmed = Number($('#attendance-info-url').data('confirmed')) === 1;
+
+        // 確定済みの場合はクリックを無効化
+        if (isConfirmed) {
+            alert('このデータは確定済みのため編集できません。');
+            return;
+        }
+
+        var parent = $(this).parent();
+        var id = parent.find('.id').data('id');
+        let dateInfo = parent.find('.date_info').data('date_info');
+        let work_date = parent.find('.work_date').data('work_date');
+
+        // ロックチェックとモーダル表示の処理を関数化
+        const showModalWithData = () => {
+            // 勤怠IDがある場合、AJAXで勤怠データを取得
+            if (id) {
+                $.ajax({
+                    type: 'GET',
+                    url: getAttendanceInfoUrl,
+                    dataType: 'json',
+                    data: { id: id }
+                }).done(function (res) {
+                    let data = res.data;
+
+                    // 勤怠データを取得またはデフォルト値を設定
+                    var attendance_class = data.attendance_class || NORMAL_WORKING;
+                    var working_time = formatTimeToHHMM(data.working_time) || companyBaseTimeFrom;
+                    var leave_time = formatTimeToHHMM(data.leave_time) || companyBaseTimeTo;
+                    var memo = data.memo || '';
+
+                    // モーダル内の各フィールドに値をセット
+                    $('#attendance_class').val(attendance_class);
+                    $('#working_time').val(working_time);
+                    $('#leave_time').val(leave_time);
+                    $('#memo').val(memo);
+
+                    // 休憩時間の表示処理
+                    $('#break-times-container').empty();
+                    if (data.break_times && data.break_times.length > 0) {
+                        data.break_times.forEach(function (breakTime, index) {
+                            var breakTimeFrom = formatTimeToHHMM(breakTime.break_time_from);
+                            var breakTimeTo = formatTimeToHHMM(breakTime.break_time_to);
+                            $('#break-times-container').append(`
+                                <div class="form-inline mb-2 break-time-entry">
+                                    <input type="time" name="break_times[${index}][break_time_from]" value="${breakTimeFrom}" class="form-control">
+                                    <span class="mx-2">〜</span>
+                                    <input type="time" name="break_times[${index}][break_time_to]" value="${breakTimeTo}" class="form-control">
+                                    <button type="button" class="btn btn-danger btn-sm ml-2 remove-break-time">削除</button>
+                                </div>
+                            `);
+                        });
+                    } else {
+                        $('#break-times-container').append(`
+                            <div class="form-inline mb-2 break-time-entry">
+                                <input type="time" name="break_times[0][break_time_from]" value="${BASE_BREAK_TIME_FROM}" class="form-control">
+                                <span class="mx-2">〜</span>
+                                <input type="time" name="break_times[0][break_time_to]" value="${BASE_BREAK_TIME_TO}" class="form-control">
+                                <button type="button" class="btn btn-danger btn-sm ml-2 remove-break-time">削除</button>
+                            </div>
+                        `);
+                    }
+                    // エラー表示エリアを非表示
+                    $('#error-messages').addClass('d-none');
+                    $('#error-list').empty();
+
+                    // モーダルを表示
+                    let replace = $('#delete-url').data("url").replace('work_date', work_date);
+                    $('#work_date').val(work_date);
+                    $('#delete-url').attr("href", replace);
+                    $('.modal-title').text(dateInfo);
+                    $(".modal").modal("show");
+                    setTimeout(enableModalFields, 0);
+
+                }).fail(function () {
+                    alert('AJAX通信に失敗しました');
+                });
+            } else {
+                resetModalFields();
+                let replace = $('#delete-url').data("url").replace('work_date', work_date);
+                $('#work_date').val(work_date);
+                $('#delete-url').attr("href", replace);
+                $('.modal-title').text(dateInfo);
+                $(".modal").modal("show");
+                setTimeout(enableModalFields, 0);
+            }
+        };
+
+        // IDがある場合はロックチェックを行う
+        if (id) {
+            $.ajax({
+                type: 'GET',
+                url: `${baseLockUrl}check-lock`,
+                dataType: 'json',
+                data: { id: id }
+            }).done(function (response) {
+                const lockedBy = response.locked_by;
+                const currentUserId = $('meta[name="user-id"]').attr('content');
+
+                if (lockedBy && Number(lockedBy) !== Number(currentUserId)) {
+                    alert('この勤怠データは他のユーザーが編集中です。');
+                    return;
+                }
+
+                // ロックを取得してからモーダルを表示
+                $.ajax({
+                    type: 'POST',
+                    url: `${baseLockUrl}lock`,
+                    dataType: 'json',
+                    data: {
+                        id: id,
+                        user_id: currentUserId,
+                        _token: $('meta[name="csrf-token"]').attr('content')
+                    }
+                }).done(function () {
+                    showModalWithData();
+                }).fail(function () {
+                    alert('勤怠データのロックに失敗しました。');
+                });
+            }).fail(function () {
+                alert('ロック状態の確認に失敗しました。');
+            });
+        } else {
+            // IDがない場合は直接モーダルを表示
+            showModalWithData();
+        }
+    });
 });
