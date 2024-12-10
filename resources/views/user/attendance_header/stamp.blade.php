@@ -1,7 +1,6 @@
 @extends('layouts.app')
 
 @section('addCss')
-<link href="{{ asset('css/stamp.css') }}" rel="stylesheet">
 @endsection
 
 @section('content')
@@ -39,6 +38,7 @@
 </div>
 
 <meta name="csrf-token" content="{{ csrf_token() }}">
+<meta name="user-id" content="{{ $user_id }}">
 @endsection
 
 @section('addJs')
