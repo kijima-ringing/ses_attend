@@ -2,16 +2,16 @@ document.addEventListener('DOMContentLoaded', function() {
     // 現在時刻を表示する関数
     function updateDateTime() {
         const now = new Date();
-        
+
         // 日付のフォーマット
-        const dateOptions = { 
+        const dateOptions = {
             year: 'numeric',
             month: '2-digit',
             day: '2-digit',
             weekday: 'short'
         };
         const formattedDate = now.toLocaleDateString('ja-JP', dateOptions);
-        
+
         // 時刻のフォーマット
         const timeOptions = {
             hour: '2-digit',
@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', function() {
             hour12: false
         };
         const formattedTime = now.toLocaleTimeString('ja-JP', timeOptions);
-        
+
         // 画面に表示
         document.getElementById('current-date').textContent = formattedDate;
         document.getElementById('current-time').textContent = formattedTime;
@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 初回実行
     updateDateTime();
-    
+
     // より正確な時刻表示のために100ミリ秒ごとに更新
     setInterval(updateDateTime, 100);
 
@@ -73,25 +73,35 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 退勤ボタンのクリックイベント
     workEndBtn.addEventListener('click', function() {
-        if (confirm('退勤を記録しますか？')) {
-            fetch('/api/attendance/end', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                }
+        fetch('/api/attendance/end', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({
+                user_id: document.querySelector('meta[name="user-id"]').content
             })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('退勤を記録しました。');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('エラーが発生しました。');
-            });
-        }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                alert('退勤を記録しました。');
+                window.location.reload();
+            } else {
+                alert(data.message || 'エラーが発生しました。');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('エラーが発生しました。');
+        });
     });
 
     // 休憩開始ボタンのクリックイベント

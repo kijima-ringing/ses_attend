@@ -107,54 +107,46 @@ class AttendanceStampController extends Controller
         }
     }
 
-    /**
-     * 退勤打刻を処理
-     */
-    public function endWork(Request $request)
-    {
-        try {
-            $now = Carbon::now();
-            $user = Auth::user();
+/**
+ * 退勤打刻を処理
+ */
+public function endWork(Request $request)
+{
+    try {
+        $now = Carbon::now()->timezone('Asia/Tokyo');
+        $user = Auth::user();
 
-            DB::transaction(function () use ($now, $user) {
-                $header = AttendanceHeader::where('user_id', $user->id)
-                    ->where('year_month', $now->format('Y-m-01'))
-                    ->firstOrFail();
-
-                $daily = AttendanceDaily::where('attendance_header_id', $header->id)
-                    ->where('work_date', $now->format('Y-m-d'))
-                    ->firstOrFail();
-
-                if (empty($daily->working_time)) {
-                    throw new \Exception('出勤記録がありません。');
-                }
-
-                if (!empty($daily->leave_time)) {
-                    throw new \Exception('既に退勤済みです。');
-                }
-
-                // 休憩中の場合はエラー
-                $ongoingBreak = $daily->breakTimes()
-                    ->whereNull('break_time_to')
-                    ->first();
-                if ($ongoingBreak) {
-                    throw new \Exception('休憩中は退勤できません。');
-                }
-
-                $daily->update([
-                    'leave_time' => $now->format('H:i:s')
-                ]);
-
-                // 勤怠集計を更新
-                $updateMonthParams = $this->attendanceService->getUpdateMonthParams($header->id);
-                $header->fill($updateMonthParams)->save();
-            });
-
-            return response()->json(['success' => true]);
-        } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        if (!$user) {
+            return response()->json(['success' => false, 'message' => '認証エラーが発生しました。'], 401);
         }
+
+        DB::transaction(function () use ($now, $user) {
+            // 当月の勤怠ヘッダーを検索
+            $header = AttendanceHeader::where('user_id', $user->id)
+                ->where('year_month', $now->format('Y-m-01'))
+                ->firstOrFail();
+
+            // 本日の日次データを検索
+            $daily = AttendanceDaily::where('attendance_header_id', $header->id)
+                ->where('work_date', $now->format('Y-m-d'))
+                ->firstOrFail();
+
+            // 退勤時刻を更新
+            $daily->update([
+                'leave_time' => $now->format('H:i:s')
+            ]);
+
+            // 勤怠集計を更新
+            $updateMonthParams = $this->attendanceService->getUpdateMonthParams($header->id);
+            $header->fill($updateMonthParams)->save();
+        });
+
+        return response()->json(['success' => true, 'message' => '退勤を記録しました。']);
+    } catch (\Exception $e) {
+        \Log::error('Error in endWork: ' . $e->getMessage());
+        return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
     }
+}
 
     /**
      * 休憩開始を処理
