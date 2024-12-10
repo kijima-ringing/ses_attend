@@ -19,6 +19,11 @@
                 <input type="submit" class="d-none" id="year_month_submit">
             </div>
         </div>
+        <div class="col-2">
+            <a href="{{ route('stamp.index', ['user_id' => $attendance->user_id, 'year_month' => $date]) }}" class="btn btn-primary">
+                <i class="fas fa-clock mr-1"></i>打刻画面へ
+            </a>
+        </div>
     </div>
 
     <table class="table table-bordered">

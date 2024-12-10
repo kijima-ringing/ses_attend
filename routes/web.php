@@ -43,7 +43,7 @@ Route::middleware('auth')->group(function () {
             Route::get('department/delete/{department}', 'DepartmentController@destroy')->name('department.delete');
             Route::get('department/ajax_get_department_info', 'DepartmentController@ajaxGetDepartmentInfo')->name('department.ajax_get_department_info');
 
-            // 部門別残業時間超過人数のエクセル出力
+            // 部門別残業時間超過人数Excel出力
             Route::get('department/overtime-report/export', 'DepartmentController@exportOvertimeReport')->name('department.overtime_report.export');
 
             // Users Routes
@@ -78,6 +78,15 @@ Route::middleware('auth')->group(function () {
         Route::get('check-lock', 'AttendanceHeaderController@checkLock')->name('check_lock');
         Route::post('lock', 'AttendanceHeaderController@lock')->name('lock');
         Route::post('unlock', 'AttendanceHeaderController@unlock')->name('unlock');
+    });
+
+    // 打刻関連のルート
+    Route::group(['middleware' => ['auth', 'loginUserCheck']], function () {
+        Route::get('/user/stamp/{user_id}/{year_month}', 'User\AttendanceStampController@index')->name('stamp.index');
+        Route::post('/api/attendance/start', 'User\AttendanceStampController@startWork');
+        Route::post('/api/attendance/end', 'User\AttendanceStampController@endWork');
+        Route::post('/api/break/start', 'User\AttendanceStampController@startBreak');
+        Route::post('/api/break/end', 'User\AttendanceStampController@endBreak');
     });
 
 });
