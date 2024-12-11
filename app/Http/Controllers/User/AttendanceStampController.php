@@ -168,27 +168,22 @@ class AttendanceStampController extends Controller
             $user = Auth::user();
 
             if (!$user) {
-                \Log::error('User not authenticated');
                 return response()->json(['success' => false, 'message' => '認証エラーが発生しました。'], 401);
             }
 
             DB::transaction(function () use ($now, $user) {
-                \Log::info('Transaction started for user: ' . $user->id);
 
                 $header = AttendanceHeader::where('user_id', $user->id)
                     ->where('year_month', $now->format('Y-m-01'))
                     ->firstOrFail();
-                \Log::info('AttendanceHeader found: ' . $header->id);
 
                 $daily = AttendanceDaily::where('attendance_header_id', $header->id)
                     ->where('work_date', $now->format('Y-m-d'))
                     ->firstOrFail();
-                \Log::info('AttendanceDaily found: ' . $daily->id);
 
                 DB::table('break_times')
                     ->where('attendance_daily_id', $daily->id)
                     ->delete();
-                \Log::info('Existing break times deleted for daily ID: ' . $daily->id);
 
                 BreakTime::create([
                     'attendance_daily_id' => $daily->id,
@@ -196,12 +191,10 @@ class AttendanceStampController extends Controller
                     'created_by' => $user->id,
                     'updated_by' => $user->id
                 ]);
-                \Log::info('New break time created for daily ID: ' . $daily->id);
             });
 
             return response()->json(['success' => true, 'message' => '休憩開始を記録しました。']);
         } catch (\Exception $e) {
-            \Log::error('Error in startBreak: ' . $e->getMessage());
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }
