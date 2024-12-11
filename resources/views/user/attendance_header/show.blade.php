@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('addCss')
+<link rel="stylesheet" href="{{ asset('/css/stamp.css') }}">
 @endsection
 
 @section('content')
@@ -11,7 +12,7 @@
     data-base_time_to="{{ $company->base_time_to }}">
 
     <meta name="base-lock-url" content="/user/attendance_daily/">
-    <div class="row pb-3">
+    <div class="row pb-3 d-flex">
         <div class="col-2">
             <div data-action="{{ route('user.attendance_header.show', ['user_id' => $attendance->user_id, 'year_month' => 'year_month']) }}"
                 id="year_month_url">
@@ -19,8 +20,8 @@
                 <input type="submit" class="d-none" id="year_month_submit">
             </div>
         </div>
-        <div class="col-2">
-            <a href="{{ route('stamp.index', ['user_id' => $attendance->user_id, 'year_month' => $date]) }}" class="btn btn-primary">
+        <div class="col-2 ml-auto">
+            <a href="{{ route('stamp.index', ['user_id' => $attendance->user_id, 'year_month' => $date]) }}" class="nav-link text-right">
                 <i class="fas fa-clock mr-1"></i>打刻画面へ
             </a>
         </div>

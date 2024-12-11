@@ -1,19 +1,22 @@
 @extends('layouts.app')
 
 @section('addCss')
+<link rel="stylesheet" href="{{ asset('/css/stamp.css') }}">
 @endsection
 
 @section('content')
 <div class="stamp-container">
-    <div class="mb-4">
-        <a href="{{ route('user.attendance_header.show', ['user_id' => $user_id, 'year_month' => $date]) }}" class="btn btn-secondary">
-            <i class="fas fa-arrow-left mr-1"></i>勤怠一覧へ戻る
-        </a>
+    <div class="flex_box container">
+        <div class="date-display">
+            <span id="current-date"></span>
+        </div>
+        <div class="mb-4">
+            <a href="{{ route('user.attendance_header.show', ['user_id' => $user_id, 'year_month' => $date]) }}" class="nav-link">
+                <i class="fas fa-arrow-left mr-1"></i>勤怠一覧へ
+            </a>
+        </div>
     </div>
 
-    <div class="date-display">
-        <span id="current-date"></span>
-    </div>
     <div class="time-display">
         <span id="current-time"></span>
     </div>

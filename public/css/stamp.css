@@ -1,0 +1,61 @@
+.stamp-container {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.date-display {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.time-display {
+    font-size: 48px;
+    margin-bottom: 30px;
+}
+
+.stamp-buttons, .break-buttons {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.stamp-button, .break-button {
+    background-color: #e9ecef;
+    border: 1px solid #ccc;
+    padding: 20px 40px;
+    margin: 15px;
+    font-size: 18px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    width: 300px;
+    height: 120px;
+    font-size: 30px;
+}
+
+.stamp-button:hover, .break-button:hover {
+    background-color: #e2e6ea;
+}
+
+.flex_box {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 0 20px;
+}
+
+.date-display {
+    font-size: 24px;
+}
+
+.btn-secondary {
+    margin-left: auto;
+}
+
+span#current-date {
+    font-size: 30px;
+}
+
+.left-auto {
+    margin-left: auto;
+}
