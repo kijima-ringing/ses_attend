@@ -164,45 +164,44 @@ class AttendanceStampController extends Controller
     public function startBreak(Request $request)
     {
         try {
-            $now = Carbon::now();
+            $now = Carbon::now('Asia/Tokyo');
             $user = Auth::user();
 
+            if (!$user) {
+                \Log::error('User not authenticated');
+                return response()->json(['success' => false, 'message' => '認証エラーが発生しました。'], 401);
+            }
+
             DB::transaction(function () use ($now, $user) {
+                \Log::info('Transaction started for user: ' . $user->id);
+
                 $header = AttendanceHeader::where('user_id', $user->id)
                     ->where('year_month', $now->format('Y-m-01'))
                     ->firstOrFail();
+                \Log::info('AttendanceHeader found: ' . $header->id);
 
                 $daily = AttendanceDaily::where('attendance_header_id', $header->id)
                     ->where('work_date', $now->format('Y-m-d'))
                     ->firstOrFail();
+                \Log::info('AttendanceDaily found: ' . $daily->id);
 
-                if (empty($daily->working_time)) {
-                    throw new \Exception('出勤記録がありません。');
-                }
+                DB::table('break_times')
+                    ->where('attendance_daily_id', $daily->id)
+                    ->delete();
+                \Log::info('Existing break times deleted for daily ID: ' . $daily->id);
 
-                if (!empty($daily->leave_time)) {
-                    throw new \Exception('既に退勤済みです。');
-                }
-
-                // 既に休憩中かチェック
-                $ongoingBreak = $daily->breakTimes()
-                    ->whereNull('break_time_to')
-                    ->first();
-                if ($ongoingBreak) {
-                    throw new \Exception('既に休憩中です。');
-                }
-
-                $daily->breakTimes()->create([
-                    'break_time_from' => $now->format('H:i:s')
+                BreakTime::create([
+                    'attendance_daily_id' => $daily->id,
+                    'break_time_from' => $now->format('H:i:s'),
+                    'created_by' => $user->id,
+                    'updated_by' => $user->id
                 ]);
-
-                // 勤怠集計を更新
-                $updateMonthParams = $this->attendanceService->getUpdateMonthParams($header->id);
-                $header->fill($updateMonthParams)->save();
+                \Log::info('New break time created for daily ID: ' . $daily->id);
             });
 
-            return response()->json(['success' => true]);
+            return response()->json(['success' => true, 'message' => '休憩開始を記録しました。']);
         } catch (\Exception $e) {
+            \Log::error('Error in startBreak: ' . $e->getMessage());
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }
@@ -212,48 +211,5 @@ class AttendanceStampController extends Controller
      */
     public function endBreak(Request $request)
     {
-        try {
-            $now = Carbon::now();
-            $user = Auth::user();
-
-            DB::transaction(function () use ($now, $user) {
-                $header = AttendanceHeader::where('user_id', $user->id)
-                    ->where('year_month', $now->format('Y-m-01'))
-                    ->firstOrFail();
-
-                $daily = AttendanceDaily::where('attendance_header_id', $header->id)
-                    ->where('work_date', $now->format('Y-m-d'))
-                    ->firstOrFail();
-
-                if (empty($daily->working_time)) {
-                    throw new \Exception('出勤記録がありません。');
-                }
-
-                if (!empty($daily->leave_time)) {
-                    throw new \Exception('既に退勤済みです。');
-                }
-
-                $lastBreak = $daily->breakTimes()
-                    ->whereNull('break_time_to')
-                    ->latest()
-                    ->first();
-
-                if (!$lastBreak) {
-                    throw new \Exception('休憩開始記録がありません。');
-                }
-
-                $lastBreak->update([
-                    'break_time_to' => $now->format('H:i:s')
-                ]);
-
-                // 勤怠集計を更新
-                $updateMonthParams = $this->attendanceService->getUpdateMonthParams($header->id);
-                $header->fill($updateMonthParams)->save();
-            });
-
-            return response()->json(['success' => true]);
-        } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
-        }
     }
 }
