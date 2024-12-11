@@ -204,5 +204,40 @@ class AttendanceStampController extends Controller
      */
     public function endBreak(Request $request)
     {
+        try {
+            $now = Carbon::now('Asia/Tokyo');
+            $user = Auth::user();
+
+            if (!$user) {
+                return response()->json(['success' => false, 'message' => '認証エラーが発生しました。'], 401);
+            }
+
+            DB::transaction(function () use ($now, $user) {
+                // 当月の勤怠ヘッダーを検索
+                $header = AttendanceHeader::where('user_id', $user->id)
+                    ->where('year_month', $now->format('Y-m-01'))
+                    ->firstOrFail();
+
+                // 本日の日次データを検索
+                $daily = AttendanceDaily::where('attendance_header_id', $header->id)
+                    ->where('work_date', $now->format('Y-m-d'))
+                    ->firstOrFail();
+
+                // 最新の休憩データを取得
+                $breakTime = BreakTime::where('attendance_daily_id', $daily->id)
+                    ->orderBy('break_time_from', 'desc')
+                    ->firstOrFail();
+
+                // 休憩終了時刻を更新
+                $breakTime->update([
+                    'break_time_to' => $now->format('H:i:s'),
+                    'updated_by' => $user->id
+                ]);
+            });
+
+            return response()->json(['success' => true, 'message' => '休憩終了を記録しました。']);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
     }
 }

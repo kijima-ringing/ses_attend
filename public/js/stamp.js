@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(data => {
             if (data.success) {
-                alert('出勤を記録しました。');
+                alert('出勤時間を記録しました。');
                 window.location.reload();
             } else {
                 alert(data.message || 'エラーが発生しました。');
@@ -92,7 +92,7 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(data => {
             if (data.success) {
-                alert('退勤を記録しました。');
+                alert('退勤時間を記録しました。');
                 window.location.reload();
             } else {
                 alert(data.message || 'エラーが発生しました。');
@@ -143,13 +143,25 @@ document.addEventListener('DOMContentLoaded', function() {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-            }
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({
+                user_id: document.querySelector('meta[name="user-id"]').content
+            })
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
         .then(data => {
             if (data.success) {
-                alert('休憩終了を記録しました。');
+                alert('休憩終了時間を記録しました。');
+                window.location.reload();
+            } else {
+                alert(data.message || 'エラーが発生しました。');
             }
         })
         .catch(error => {
