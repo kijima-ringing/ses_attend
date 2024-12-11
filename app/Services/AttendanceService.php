@@ -59,6 +59,11 @@ class AttendanceService
         // 残業時間を計算
         $overtimeHours = $this->getOvertimeHours($workingHours, $scheduledWorkingHours, $breakTimeOutsideBase);
 
+        // scheduled_working_hours > working_hours の場合、working_hours を scheduled_working_hours に保存
+        if (strtotime($scheduledWorkingHours) > strtotime($workingHours)) {
+            $scheduledWorkingHours = $workingHours;
+        }
+
         return [
             'scheduled_working_hours' => $scheduledWorkingHours,
             'working_hours' => $workingHours,
@@ -74,6 +79,11 @@ class AttendanceService
 
         $overtimeHours = date(self::TIME_FORMAT, 0);
 
+        // scheduled_working_hours > working_hours の場合、working_hours を scheduled_working_hours に保存
+        if (strtotime($scheduledWorkingHours) > strtotime($workingHours)) {
+            $scheduledWorkingHours = $workingHours;
+        }
+
         return [
             'scheduled_working_hours' => $scheduledWorkingHours,
             'working_hours' => $workingHours,
@@ -88,6 +98,11 @@ class AttendanceService
         $workingHours = date(self::TIME_FORMAT, 0);
 
         $overtimeHours = date(self::TIME_FORMAT, 0);;
+
+        // scheduled_working_hours > working_hours の場合、working_hours を scheduled_working_hours に保存
+        if (strtotime($scheduledWorkingHours) > strtotime($workingHours)) {
+            $scheduledWorkingHours = $workingHours;
+        }
 
         return [
             'scheduled_working_hours' => $scheduledWorkingHours,
