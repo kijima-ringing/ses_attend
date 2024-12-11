@@ -101,7 +101,9 @@ class AttendanceStampController extends Controller
                 }
             });
 
-            return response()->json(['success' => true, 'message' => '出勤を記録しました。']);
+            session()->flash('flash_message', '出勤時間を記録しました。');
+
+            return response()->json(['success' => true, 'message' => '出勤時間を記録しました。']);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
@@ -152,7 +154,9 @@ class AttendanceStampController extends Controller
                 $header->fill($updateMonthParams)->save();
             });
 
-            return response()->json(['success' => true, 'message' => '退勤を記録しました。']);
+            session()->flash('flash_message', '退勤時間を記録しました。');
+
+            return response()->json(['success' => true, 'message' => '退勤時間を記録しました。']);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
@@ -192,6 +196,8 @@ class AttendanceStampController extends Controller
                     'updated_by' => $user->id
                 ]);
             });
+
+            session()->flash('flash_message', '休憩開始を記録しました。');
 
             return response()->json(['success' => true, 'message' => '休憩開始を記録しました。']);
         } catch (\Exception $e) {
@@ -234,6 +240,8 @@ class AttendanceStampController extends Controller
                     'updated_by' => $user->id
                 ]);
             });
+
+            session()->flash('flash_message', '休憩終了を記録しました。');
 
             return response()->json(['success' => true, 'message' => '休憩終了を記録しました。']);
         } catch (\Exception $e) {
