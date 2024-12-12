@@ -60,14 +60,15 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(data => {
             if (data.success) {
                 alert('出勤時間を記録しました。');
-                window.location.reload();
             } else {
                 alert(data.message || 'エラーが発生しました。');
             }
+            window.location.reload();
         })
         .catch(error => {
             console.error('Error:', error);
             alert('エラーが発生しました。');
+            window.location.reload();
         });
     });
 
@@ -93,14 +94,15 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(data => {
             if (data.success) {
                 alert('退勤時間を記録しました。');
-                window.location.reload();
             } else {
                 alert(data.message || 'エラーが発生しました。');
             }
+            window.location.reload();
         })
         .catch(error => {
             console.error('Error:', error);
             alert('エラーが発生しました。');
+            window.location.reload();
         });
     });
 
@@ -126,14 +128,15 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(data => {
             if (data.success) {
                 alert('休憩開始時間を記録しました。');
-                window.location.reload();
             } else {
                 alert(data.message || 'エラーが発生しました。');
             }
+            window.location.reload();
         })
         .catch(error => {
             console.error('Error:', error);
             alert('エラーが発生しました。');
+            window.location.reload();
         });
     });
 
@@ -159,14 +162,15 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(data => {
             if (data.success) {
                 alert('休憩終了時間を記録しました。');
-                window.location.reload();
             } else {
                 alert(data.message || 'エラーが発生しました。');
             }
+            window.location.reload();
         })
         .catch(error => {
             console.error('Error:', error);
             alert('エラーが発生しました。');
+            window.location.reload();
         });
     });
 });

@@ -66,46 +66,43 @@ class AttendanceStampController extends Controller
                 return response()->json(['success' => false, 'message' => '認証エラーが発生しました。'], 401);
             }
 
+            $header = AttendanceHeader::where('user_id', $user->id)
+                ->where('year_month', $now->format('Y-m-01'))
+                ->first();
+
+            if ($header && $header->confirm_flag == 1) {
+                return response()->json(['success' => false, 'message' => '勤怠が確定されています。'], 400);
+            }
+
             DB::transaction(function () use ($now, $user) {
-                try {
-                    // 当月の勤怠ヘッダーを取得または作成
-                    $header = AttendanceHeader::firstOrCreate([
-                        'user_id' => $user->id,
-                        'year_month' => $now->format('Y-m-01')
-                    ]);
+                // 既存の日次データをチェック
+                $existingDaily = AttendanceDaily::where('attendance_header_id', $header->id)
+                    ->where('work_date', $now->format('Y-m-d'))
+                    ->first();
 
-                    // 既存の日次データをチェック
-                    $existingDaily = AttendanceDaily::where('attendance_header_id', $header->id)
-                        ->where('work_date', $now->format('Y-m-d'))
-                        ->first();
+                if ($existingDaily) {
+                    // 関連する休憩時間を削除
+                    DB::table('break_times')
+                        ->where('attendance_daily_id', $existingDaily->id)
+                        ->delete();
 
-                    if ($existingDaily) {
-                        // 関連する休憩時間を削除
-                        DB::table('break_times')
-                            ->where('attendance_daily_id', $existingDaily->id)
-                            ->delete();
-
-                        // ��次データを削除
-                        DB::table('attendance_daily')
-                            ->where('id', $existingDaily->id)
-                            ->delete();
-                    }
-
-                    // 新規の日次データを作成
-                    $daily = AttendanceDaily::create([
-                        'attendance_header_id' => $header->id,
-                        'work_date' => $now->format('Y-m-d'),
-                        'working_time' => $now->format('H:i:s'),
-                        'attendance_class' => 0
-                    ]);
-
-                    // 勤怠集計を更新
-                    $updateMonthParams = $this->attendanceService->getUpdateMonthParams($header->id);
-                    $header->fill($updateMonthParams)->save();
-
-                } catch (\Exception $e) {
-                    throw $e;
+                    // 日次データを削除
+                    DB::table('attendance_daily')
+                        ->where('id', $existingDaily->id)
+                        ->delete();
                 }
+
+                // 新規の日次データを作成
+                $daily = AttendanceDaily::create([
+                    'attendance_header_id' => $header->id,
+                    'work_date' => $now->format('Y-m-d'),
+                    'working_time' => $now->format('H:i:s'),
+                    'attendance_class' => 0
+                ]);
+
+                // 勤怠集計を更新
+                $updateMonthParams = $this->attendanceService->getUpdateMonthParams($header->id);
+                $header->fill($updateMonthParams)->save();
             });
 
             session()->flash('flash_message', '出勤時間を記録しました。');
