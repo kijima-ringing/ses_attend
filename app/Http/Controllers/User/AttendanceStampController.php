@@ -29,7 +29,6 @@ class AttendanceStampController extends Controller
      */
     public function index($user_id, $year_month)
     {
-        // ログインユーザーと異なるユーザーIDの場合はリダイレクト
         if (Auth::id() != $user_id) {
             return redirect()->route('stamp.index', [
                 'user_id' => Auth::id(),
@@ -40,9 +39,17 @@ class AttendanceStampController extends Controller
         $getDateService = new GetDateService();
         $date = $getDateService->createYearMonthFormat($year_month);
 
+        // 勤怠ヘッダーを取得して確定状態を確認
+        $header = AttendanceHeader::where('user_id', $user_id)
+            ->where('year_month', $date->format('Y-m-01'))
+            ->first();
+
+        $confirm_flag = $header ? $header->confirm_flag : 0;
+
         return view('user.attendance_header.stamp', [
             'user_id' => $user_id,
-            'date' => $date->format('Y-m')
+            'date' => $date->format('Y-m'),
+            'confirm_flag' => $confirm_flag
         ]);
     }
 
@@ -78,7 +85,7 @@ class AttendanceStampController extends Controller
                             ->where('attendance_daily_id', $existingDaily->id)
                             ->delete();
 
-                        // 日次データを削除
+                        // ��次データを削除
                         DB::table('attendance_daily')
                             ->where('id', $existingDaily->id)
                             ->delete();

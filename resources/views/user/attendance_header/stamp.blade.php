@@ -12,7 +12,7 @@
         </div>
         <div class="mb-4">
             <a href="{{ route('user.attendance_header.show', ['user_id' => $user_id, 'year_month' => $date]) }}" class="nav-link">
-                <i class="fas fa-arrow-left mr-1"></i>勤怠一覧へ
+                <i class="fas fa-arrow-left mr-1"></i>勤怠一覧
             </a>
         </div>
     </div>
@@ -22,19 +22,19 @@
     </div>
 
     <div class="stamp-buttons">
-        <button class="stamp-button" id="work-start">
+        <button class="stamp-button" id="work-start" {{ $confirm_flag == 1 ? 'disabled' : '' }}>
             出勤
         </button>
-        <button class="stamp-button" id="work-end">
+        <button class="stamp-button" id="work-end" {{ $confirm_flag == 1 ? 'disabled' : '' }}>
             退勤
         </button>
     </div>
 
     <div class="break-buttons">
-        <button class="break-button" id="break-start">
+        <button class="break-button" id="break-start" {{ $confirm_flag == 1 ? 'disabled' : '' }}>
             休憩開始
         </button>
-        <button class="break-button" id="break-end">
+        <button class="break-button" id="break-end" {{ $confirm_flag == 1 ? 'disabled' : '' }}>
             休憩終了
         </button>
     </div>
