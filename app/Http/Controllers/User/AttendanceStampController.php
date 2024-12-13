@@ -71,6 +71,7 @@ class AttendanceStampController extends Controller
                 ->first();
 
             if ($header && $header->confirm_flag == 1) {
+                session()->flash('error_message', '勤怠が確定されています。');
                 return response()->json(['success' => false, 'message' => '勤怠が確定されています。'], 400);
             }
 
@@ -131,6 +132,7 @@ class AttendanceStampController extends Controller
                 ->first();
 
             if ($header && $header->confirm_flag == 1) {
+                session()->flash('error_message', '勤怠が確定されています。');
                 return response()->json(['success' => false, 'message' => '勤怠が確定されています。'], 400);
             }
 
@@ -182,6 +184,7 @@ class AttendanceStampController extends Controller
                 ->first();
 
             if ($header && $header->confirm_flag == 1) {
+                session()->flash('error_message', '勤怠が確定されています。');
                 return response()->json(['success' => false, 'message' => '勤怠が確定されています。'], 400);
             }
 
@@ -228,6 +231,7 @@ class AttendanceStampController extends Controller
                 ->first();
 
             if ($header && $header->confirm_flag == 1) {
+                session()->flash('error_message', '勤怠が確定されています。');
                 return response()->json(['success' => false, 'message' => '勤怠が確定されています。'], 400);
             }
 
