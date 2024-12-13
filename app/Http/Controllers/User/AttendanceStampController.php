@@ -136,11 +136,25 @@ class AttendanceStampController extends Controller
                 return response()->json(['success' => false, 'message' => '勤怠が確定されています。'], 400);
             }
 
-            DB::transaction(function () use ($now, $user, $header) {
-                $daily = AttendanceDaily::where('attendance_header_id', $header->id)
-                    ->where('work_date', $now->format('Y-m-d'))
-                    ->firstOrFail();
+            $daily = AttendanceDaily::where('attendance_header_id', $header->id)
+                ->where('work_date', $now->format('Y-m-d'))
+                ->first();
 
+            if (!$daily || !$daily->working_time) {
+                session()->flash('error_message', '出勤時間が記録されていないため、退勤できません。');
+                return response()->json(['success' => false, 'message' => '出勤時間が記録されていないため、退勤できません。'], 400);
+            }
+
+            $breakTimes = BreakTime::where('attendance_daily_id', $daily->id)->get();
+
+            foreach ($breakTimes as $breakTime) {
+                if (!$breakTime->break_time_from || !$breakTime->break_time_to) {
+                    session()->flash('error_message', '休憩時間が正しく記録されていないため、退勤できません。');
+                    return response()->json(['success' => false, 'message' => '休憩時間が正しく記録されていないため、退勤できません。'], 400);
+                }
+            }
+
+            DB::transaction(function () use ($now, $daily, $header) {
                 $daily->update([
                     'leave_time' => $now->format('H:i:s')
                 ]);
@@ -154,7 +168,7 @@ class AttendanceStampController extends Controller
 
                 $daily->fill($updateDailyParams)->save();
 
-                $updateMonthParams = $this->attendanceService->getUpdateMonthParams($header->id);
+                $updateMonthParams = $this->attendanceService->getUpdateMonthParams($daily->attendance_header_id);
                 $header->fill($updateMonthParams)->save();
             });
 
@@ -188,11 +202,16 @@ class AttendanceStampController extends Controller
                 return response()->json(['success' => false, 'message' => '勤怠が確定されています。'], 400);
             }
 
-            DB::transaction(function () use ($now, $user, $header) {
-                $daily = AttendanceDaily::where('attendance_header_id', $header->id)
-                    ->where('work_date', $now->format('Y-m-d'))
-                    ->firstOrFail();
+            $daily = AttendanceDaily::where('attendance_header_id', $header->id)
+                ->where('work_date', $now->format('Y-m-d'))
+                ->first();
 
+            if (!$daily || !$daily->working_time) {
+                session()->flash('error_message', '出勤時間が記録されていないため、休憩を開始できません。');
+                return response()->json(['success' => false, 'message' => '出勤時間が記録されていないため、休憩を開始できません。'], 400);
+            }
+
+            DB::transaction(function () use ($now, $user, $daily) {
                 DB::table('break_times')
                     ->where('attendance_daily_id', $daily->id)
                     ->delete();
