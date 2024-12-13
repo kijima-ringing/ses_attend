@@ -52,10 +52,12 @@ document.addEventListener('DOMContentLoaded', function() {
             })
         })
         .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
+            return response.json().then(data => {
+                if (!response.ok) {
+                    throw new Error(data.message || 'エラーが発生しました。');
+                }
+                return data;
+            });
         })
         .then(data => {
             if (data.success) {
@@ -67,7 +69,7 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('エラーが発生しました。');
+            alert(error.message || 'エラーが発生しました。');
             window.location.reload();
         });
     }
