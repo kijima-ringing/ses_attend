@@ -254,15 +254,25 @@ class AttendanceStampController extends Controller
                 return response()->json(['success' => false, 'message' => '勤怠が確定されています。'], 400);
             }
 
-            DB::transaction(function () use ($now, $user, $header) {
-                $daily = AttendanceDaily::where('attendance_header_id', $header->id)
-                    ->where('work_date', $now->format('Y-m-d'))
-                    ->firstOrFail();
+            $daily = AttendanceDaily::where('attendance_header_id', $header->id)
+                ->where('work_date', $now->format('Y-m-d'))
+                ->first();
 
-                $breakTime = BreakTime::where('attendance_daily_id', $daily->id)
-                    ->orderBy('break_time_from', 'desc')
-                    ->firstOrFail();
+            if (!$daily) {
+                session()->flash('error_message', '出勤記録が見つかりません。');
+                return response()->json(['success' => false, 'message' => '出勤記録が見つかりません。'], 400);
+            }
 
+            $breakTime = BreakTime::where('attendance_daily_id', $daily->id)
+                ->orderBy('break_time_from', 'desc')
+                ->first();
+
+            if (!$breakTime || !$breakTime->break_time_from) {
+                session()->flash('error_message', '休憩開始時間が記録されていないため、休憩を終了できません。');
+                return response()->json(['success' => false, 'message' => '休憩開始時間が記録されていないため、休憩を終了できません。'], 400);
+            }
+
+            DB::transaction(function () use ($now, $breakTime, $user) {
                 $breakTime->update([
                     'break_time_to' => $now->format('H:i:s'),
                     'updated_by' => $user->id
