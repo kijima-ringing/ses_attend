@@ -38,9 +38,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const breakStartBtn = document.getElementById('break-start');
     const breakEndBtn = document.getElementById('break-end');
 
-    // 出勤ボタンのクリックイベント
-    workStartBtn.addEventListener('click', function() {
-        fetch('/api/attendance/start', {
+    // ボタンのクリックイベントを共通化
+    function handleButtonClick(url, successMessage) {
+        fetch(url, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(data => {
             if (data.success) {
-                alert('出勤時間を記録しました。');
+                alert(successMessage);
             } else {
                 alert(data.message || 'エラーが発生しました。');
             }
@@ -70,107 +70,25 @@ document.addEventListener('DOMContentLoaded', function() {
             alert('エラーが発生しました。');
             window.location.reload();
         });
+    }
+
+    // 出勤ボタンのクリックイベント
+    workStartBtn.addEventListener('click', function() {
+        handleButtonClick('/api/attendance/start', '出勤時間を記録しました。');
     });
 
     // 退勤ボタンのクリックイベント
     workEndBtn.addEventListener('click', function() {
-        fetch('/api/attendance/end', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                'Accept': 'application/json'
-            },
-            body: JSON.stringify({
-                user_id: document.querySelector('meta[name="user-id"]').content
-            })
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then(data => {
-            if (data.success) {
-                alert('退勤時間を記録しました。');
-            } else {
-                alert(data.message || 'エラーが発生しました。');
-            }
-            window.location.reload();
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('エラーが発生しました。');
-            window.location.reload();
-        });
+        handleButtonClick('/api/attendance/end', '退勤時間を記録しました。');
     });
 
     // 休憩開始ボタンのクリックイベント
     breakStartBtn.addEventListener('click', function() {
-        fetch('/api/break/start', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                'Accept': 'application/json'
-            },
-            body: JSON.stringify({
-                user_id: document.querySelector('meta[name="user-id"]').content
-            })
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then(data => {
-            if (data.success) {
-                alert('休憩開始時間を記録しました。');
-            } else {
-                alert(data.message || 'エラーが発生しました。');
-            }
-            window.location.reload();
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('エラーが発生しました。');
-            window.location.reload();
-        });
+        handleButtonClick('/api/break/start', '休憩開始時間を記録しました。');
     });
 
     // 休憩終了ボタンのクリックイベント
     breakEndBtn.addEventListener('click', function() {
-        fetch('/api/break/end', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                'Accept': 'application/json'
-            },
-            body: JSON.stringify({
-                user_id: document.querySelector('meta[name="user-id"]').content
-            })
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then(data => {
-            if (data.success) {
-                alert('休憩終了時間を記録しました。');
-            } else {
-                alert(data.message || 'エラーが発生しました。');
-            }
-            window.location.reload();
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('エラーが発生しました。');
-            window.location.reload();
-        });
+        handleButtonClick('/api/break/end', '休憩終了時間を記録しました。');
     });
 });

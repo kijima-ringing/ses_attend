@@ -74,7 +74,7 @@ class AttendanceStampController extends Controller
                 return response()->json(['success' => false, 'message' => '勤怠が確定されています。'], 400);
             }
 
-            DB::transaction(function () use ($now, $user) {
+            DB::transaction(function () use ($now, $user, $header) {
                 // 既存の日次データをチェック
                 $existingDaily = AttendanceDaily::where('attendance_header_id', $header->id)
                     ->where('work_date', $now->format('Y-m-d'))
@@ -126,23 +126,23 @@ class AttendanceStampController extends Controller
                 return response()->json(['success' => false, 'message' => '認証エラーが発生しました。'], 401);
             }
 
-            DB::transaction(function () use ($now, $user) {
-                // 当月の勤怠ヘッダーを検索
-                $header = AttendanceHeader::where('user_id', $user->id)
-                    ->where('year_month', $now->format('Y-m-01'))
-                    ->firstOrFail();
+            $header = AttendanceHeader::where('user_id', $user->id)
+                ->where('year_month', $now->format('Y-m-01'))
+                ->first();
 
-                // 本日の日次データを検索
+            if ($header && $header->confirm_flag == 1) {
+                return response()->json(['success' => false, 'message' => '勤怠が確定されています。'], 400);
+            }
+
+            DB::transaction(function () use ($now, $user, $header) {
                 $daily = AttendanceDaily::where('attendance_header_id', $header->id)
                     ->where('work_date', $now->format('Y-m-d'))
                     ->firstOrFail();
 
-                // 退勤時刻を更新
                 $daily->update([
                     'leave_time' => $now->format('H:i:s')
                 ]);
 
-                // 日次データの計算パラメータを取得
                 $updateDailyParams = $this->attendanceService->getUpdateDailyParams([
                     'working_time' => $daily->working_time,
                     'leave_time' => $daily->leave_time,
@@ -150,10 +150,8 @@ class AttendanceStampController extends Controller
                     'attendance_class' => $daily->attendance_class
                 ]);
 
-                // 日次データを更新
                 $daily->fill($updateDailyParams)->save();
 
-                // 勤怠集計を更新
                 $updateMonthParams = $this->attendanceService->getUpdateMonthParams($header->id);
                 $header->fill($updateMonthParams)->save();
             });
@@ -179,12 +177,15 @@ class AttendanceStampController extends Controller
                 return response()->json(['success' => false, 'message' => '認証エラーが発生しました。'], 401);
             }
 
-            DB::transaction(function () use ($now, $user) {
+            $header = AttendanceHeader::where('user_id', $user->id)
+                ->where('year_month', $now->format('Y-m-01'))
+                ->first();
 
-                $header = AttendanceHeader::where('user_id', $user->id)
-                    ->where('year_month', $now->format('Y-m-01'))
-                    ->firstOrFail();
+            if ($header && $header->confirm_flag == 1) {
+                return response()->json(['success' => false, 'message' => '勤怠が確定されています。'], 400);
+            }
 
+            DB::transaction(function () use ($now, $user, $header) {
                 $daily = AttendanceDaily::where('attendance_header_id', $header->id)
                     ->where('work_date', $now->format('Y-m-d'))
                     ->firstOrFail();
@@ -222,23 +223,23 @@ class AttendanceStampController extends Controller
                 return response()->json(['success' => false, 'message' => '認証エラーが発生しました。'], 401);
             }
 
-            DB::transaction(function () use ($now, $user) {
-                // 当月の勤怠ヘッダーを検索
-                $header = AttendanceHeader::where('user_id', $user->id)
-                    ->where('year_month', $now->format('Y-m-01'))
-                    ->firstOrFail();
+            $header = AttendanceHeader::where('user_id', $user->id)
+                ->where('year_month', $now->format('Y-m-01'))
+                ->first();
 
-                // 本日の日次データを検索
+            if ($header && $header->confirm_flag == 1) {
+                return response()->json(['success' => false, 'message' => '勤怠が確定されています。'], 400);
+            }
+
+            DB::transaction(function () use ($now, $user, $header) {
                 $daily = AttendanceDaily::where('attendance_header_id', $header->id)
                     ->where('work_date', $now->format('Y-m-d'))
                     ->firstOrFail();
 
-                // 最新の休憩データを取得
                 $breakTime = BreakTime::where('attendance_daily_id', $daily->id)
                     ->orderBy('break_time_from', 'desc')
                     ->firstOrFail();
 
-                // 休憩終了時刻を更新
                 $breakTime->update([
                     'break_time_to' => $now->format('H:i:s'),
                     'updated_by' => $user->id
