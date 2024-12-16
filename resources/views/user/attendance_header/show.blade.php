@@ -21,7 +21,7 @@
             </div>
         </div>
         <div class="col-2 ml-auto">
-            <a href="{{ route('stamp.index', ['user_id' => $attendance->user_id, 'year_month' => $date]) }}" class="nav-link text-right">
+            <a href="{{ route('stamp.index', ['user_id' => $attendance->user_id, 'year_month' => now()->format('Y-m')]) }}" class="nav-link text-right">
                 <i class="fas fa-clock mr-1"></i>打刻画面
             </a>
         </div>
