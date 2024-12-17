@@ -55,20 +55,23 @@ class AttendanceStampController extends Controller
             ->orderBy('break_time_from', 'desc')
             ->first() : null;
 
+        // 出勤ボタンの非活性化条件
+        $workStartDisabled = $daily && $daily->working_time ? true : false;
+
         // 退勤ボタンの非活性化条件
-        $workEndDisabled = ($daily && $daily->leave_time) || !$daily || ($daily && $daily->working_time && !$daily->leave_time && $breakTime && $breakTime->break_time_from && !$breakTime->break_time_to) ? true : false;
+        $workEndDisabled = $daily && $daily->leave_time ? true : false;
 
         // 休憩開始ボタンの非活性化条件
-        $breakStartDisabled = ($breakTime && $breakTime->break_time_from) || ($daily && $daily->working_time && $daily->leave_time) || !$daily ? true : false;
+        $breakStartDisabled = ($breakTime && $breakTime->break_time_from) || ($daily && $daily->working_time && $daily->leave_time) ? true : false;
 
         // 休憩終了ボタンの非活性化条件
-        $breakEndDisabled = ($breakTime && $breakTime->break_time_to) || ($daily && $daily->working_time && $daily->leave_time) || !$daily || ($daily && $daily->working_time && !$daily->leave_time && !$breakTime) ? true : false;
+        $breakEndDisabled = ($breakTime && $breakTime->break_time_to) || ($daily && $daily->working_time && $daily->leave_time) ? true : false;
 
         return view('user.attendance_header.stamp', [
             'user_id' => $user_id,
             'date' => $date->format('Y-m'),
             'confirm_flag' => $confirm_flag,
-            'workStartDisabled' => $daily ? true : false,
+            'workStartDisabled' => $workStartDisabled,
             'workEndDisabled' => $workEndDisabled,
             'breakStartDisabled' => $breakStartDisabled,
             'breakEndDisabled' => $breakEndDisabled
@@ -282,8 +285,8 @@ class AttendanceStampController extends Controller
                 ->first();
 
             if (!$header) {
-                session()->flash('error_message', '出勤記録が見つかりません。');
-                return response()->json(['success' => false, 'message' => '出勤記録が見つかりません。'], 400);
+                session()->flash('error_message', '休憩開始時間が記録されていないため、休憩を終了できません。');
+                return response()->json(['success' => false, 'message' => '休憩開始時間が記録されていないため、休憩を終了できません。'], 400);
             }
 
             if ($header->confirm_flag == 1) {
@@ -296,8 +299,8 @@ class AttendanceStampController extends Controller
                 ->first();
 
             if (!$daily) {
-                session()->flash('error_message', '出勤記録が見つかりません。');
-                return response()->json(['success' => false, 'message' => '出勤記録が見つかりません。'], 400);
+                session()->flash('error_message', '休憩開始時間が記録されていないため、休憩を終了できません。');
+                return response()->json(['success' => false, 'message' => '休憩開始時間が記録されていないため、休憩を終了できません。'], 400);
             }
 
             $breakTime = BreakTime::where('attendance_daily_id', $daily->id)
