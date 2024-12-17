@@ -57,8 +57,12 @@ class AttendanceStampController extends Controller
 
         $workStartDisabled = $daily ? true : false;
         $workEndDisabled = $daily && $daily->leave_time ? true : false;
-        $breakStartDisabled = $breakTime && $breakTime->break_time_from ? true : false;
-        $breakEndDisabled = $breakTime && $breakTime->break_time_to ? true : false;
+
+        // 休憩開始ボタンの非活性化条件
+        $breakStartDisabled = ($breakTime && $breakTime->break_time_from) || ($daily && $daily->working_time && $daily->leave_time) ? true : false;
+
+        // 休憩終了ボタンの非活性化条件
+        $breakEndDisabled = ($breakTime && $breakTime->break_time_to) || ($daily && $daily->working_time && $daily->leave_time) ? true : false;
 
         return view('user.attendance_header.stamp', [
             'user_id' => $user_id,
