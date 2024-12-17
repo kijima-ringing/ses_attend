@@ -46,10 +46,28 @@ class AttendanceStampController extends Controller
 
         $confirm_flag = $header ? $header->confirm_flag : 0;
 
+        $today = Carbon::now('Asia/Tokyo')->format('Y-m-d');
+        $daily = $header ? AttendanceDaily::where('attendance_header_id', $header->id)
+            ->where('work_date', $today)
+            ->first() : null;
+
+        $breakTime = $daily ? BreakTime::where('attendance_daily_id', $daily->id)
+            ->orderBy('break_time_from', 'desc')
+            ->first() : null;
+
+        $workStartDisabled = $daily ? true : false;
+        $workEndDisabled = $daily && $daily->leave_time ? true : false;
+        $breakStartDisabled = $breakTime && $breakTime->break_time_from ? true : false;
+        $breakEndDisabled = $breakTime && $breakTime->break_time_to ? true : false;
+
         return view('user.attendance_header.stamp', [
             'user_id' => $user_id,
             'date' => $date->format('Y-m'),
-            'confirm_flag' => $confirm_flag
+            'confirm_flag' => $confirm_flag,
+            'workStartDisabled' => $workStartDisabled,
+            'workEndDisabled' => $workEndDisabled,
+            'breakStartDisabled' => $breakStartDisabled,
+            'breakEndDisabled' => $breakEndDisabled
         ]);
     }
 
@@ -66,11 +84,18 @@ class AttendanceStampController extends Controller
                 return response()->json(['success' => false, 'message' => '認証エラーが発生しました。'], 401);
             }
 
-            $header = AttendanceHeader::where('user_id', $user->id)
-                ->where('year_month', $now->format('Y-m-01'))
-                ->first();
+            // 勤怠ヘッダーを取得または作成
+            $header = AttendanceHeader::firstOrCreate(
+                [
+                    'user_id' => $user->id,
+                    'year_month' => $now->format('Y-m-01')
+                ],
+                [
+                    'confirm_flag' => 0 // 初期値を設定
+                ]
+            );
 
-            if ($header && $header->confirm_flag == 1) {
+            if ($header->confirm_flag == 1) {
                 session()->flash('error_message', '勤怠が確定されています。');
                 return response()->json(['success' => false, 'message' => '勤怠が確定されています。'], 400);
             }

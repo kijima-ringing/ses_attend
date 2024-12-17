@@ -22,19 +22,19 @@
     </div>
 
     <div class="stamp-buttons">
-        <button class="stamp-button" id="work-start" {{ $confirm_flag == 1 ? 'disabled' : '' }}>
+        <button class="stamp-button" id="work-start" {{ $workStartDisabled || $confirm_flag == 1 ? 'disabled' : '' }}>
             出勤
         </button>
-        <button class="stamp-button" id="work-end" {{ $confirm_flag == 1 ? 'disabled' : '' }}>
+        <button class="stamp-button" id="work-end" {{ $workEndDisabled || $confirm_flag == 1 ? 'disabled' : '' }}>
             退勤
         </button>
     </div>
 
     <div class="break-buttons">
-        <button class="break-button" id="break-start" {{ $confirm_flag == 1 ? 'disabled' : '' }}>
+        <button class="break-button" id="break-start" {{ $breakStartDisabled || $confirm_flag == 1 ? 'disabled' : '' }}>
             休憩開始
         </button>
-        <button class="break-button" id="break-end" {{ $confirm_flag == 1 ? 'disabled' : '' }}>
+        <button class="break-button" id="break-end" {{ $breakEndDisabled || $confirm_flag == 1 ? 'disabled' : '' }}>
             休憩終了
         </button>
     </div>
