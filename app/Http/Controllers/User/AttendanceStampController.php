@@ -153,7 +153,12 @@ class AttendanceStampController extends Controller
                 ->where('year_month', $now->format('Y-m-01'))
                 ->first();
 
-            if ($header && $header->confirm_flag == 1) {
+            if (!$header) {
+                session()->flash('error_message', '出勤時間が記録されていないため、退勤できません。');
+                return response()->json(['success' => false, 'message' => '出勤時間が記録されていないため、退勤できません。'], 400);
+            }
+
+            if ($header->confirm_flag == 1) {
                 session()->flash('error_message', '勤怠が確定されています。');
                 return response()->json(['success' => false, 'message' => '勤怠が確定されています。'], 400);
             }
@@ -219,7 +224,12 @@ class AttendanceStampController extends Controller
                 ->where('year_month', $now->format('Y-m-01'))
                 ->first();
 
-            if ($header && $header->confirm_flag == 1) {
+            if (!$header) {
+                session()->flash('error_message', '出勤時間が記録されていないため、休憩を開始できません。');
+                return response()->json(['success' => false, 'message' => '出勤時間が記録されていないため、休憩を開始できません。'], 400);
+            }
+
+            if ($header->confirm_flag == 1) {
                 session()->flash('error_message', '勤怠が確定されています。');
                 return response()->json(['success' => false, 'message' => '勤怠が確定されています。'], 400);
             }
@@ -271,7 +281,12 @@ class AttendanceStampController extends Controller
                 ->where('year_month', $now->format('Y-m-01'))
                 ->first();
 
-            if ($header && $header->confirm_flag == 1) {
+            if (!$header) {
+                session()->flash('error_message', '出勤記録が見つかりません。');
+                return response()->json(['success' => false, 'message' => '出勤記録が見つかりません。'], 400);
+            }
+
+            if ($header->confirm_flag == 1) {
                 session()->flash('error_message', '勤怠が確定されています。');
                 return response()->json(['success' => false, 'message' => '勤怠が確定されています。'], 400);
             }
