@@ -75,24 +75,17 @@ class AttendanceStampController extends Controller
                 return response()->json(['success' => false, 'message' => '勤怠が確定されています。'], 400);
             }
 
+            // 既存の日次データをチェック
+            $existingDaily = AttendanceDaily::where('attendance_header_id', $header->id)
+                ->where('work_date', $now->format('Y-m-d'))
+                ->first();
+
+            if ($existingDaily) {
+                session()->flash('error_message', '既に出勤記録があります。');
+                return response()->json(['success' => false, 'message' => '既に出勤記録があります。'], 400);
+            }
+
             DB::transaction(function () use ($now, $user, $header) {
-                // 既存の日次データをチェック
-                $existingDaily = AttendanceDaily::where('attendance_header_id', $header->id)
-                    ->where('work_date', $now->format('Y-m-d'))
-                    ->first();
-
-                if ($existingDaily) {
-                    // 関連する休憩時間を削除
-                    DB::table('break_times')
-                        ->where('attendance_daily_id', $existingDaily->id)
-                        ->delete();
-
-                    // 日次データを削除
-                    DB::table('attendance_daily')
-                        ->where('id', $existingDaily->id)
-                        ->delete();
-                }
-
                 // 新規の日次データを作成
                 $daily = AttendanceDaily::create([
                     'attendance_header_id' => $header->id,
