@@ -60,7 +60,9 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         })
         .then(data => {
-            if (data.success) {
+            if (data.locked) {
+                alert('この操作は現在ロックされています。しばらくしてから再試行してください。');
+            } else if (data.success) {
                 alert(successMessage);
             } else {
                 alert(data.message || 'エラーが発生しました。');

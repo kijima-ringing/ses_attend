@@ -123,7 +123,9 @@ class AttendanceStampController extends Controller
                     'attendance_header_id' => $header->id,
                     'work_date' => $now->format('Y-m-d'),
                     'working_time' => $now->format('H:i:s'),
-                    'attendance_class' => 0
+                    'attendance_class' => 0,
+                    'locked_by' => null, // ロック解除
+                    'locked_at' => null  // ロック解除
                 ]);
 
                 // 勤怠集計を更新
@@ -161,14 +163,22 @@ class AttendanceStampController extends Controller
                 return response()->json(['success' => false, 'message' => '出勤時間が記録されていないため、退勤できません。'], 400);
             }
 
+            $daily = AttendanceDaily::where('attendance_header_id', $header->id)
+                ->where('work_date', $now->format('Y-m-d'))
+                ->first();
+
+            if ($daily && $daily->locked_at && $daily->locked_by !== $user->id) {
+                $lockedAt = Carbon::parse($daily->locked_at);
+                if ($lockedAt->diffInMinutes($now) < 5) {
+                    session()->flash('error_message', '勤怠データは現在ロックされています。しばらくしてから再試行してください。');
+                    return response()->json(['locked' => true, 'message' => '勤怠データは現在ロックされています。しばらくしてから再試行してください。'], 423);
+                }
+            }
+
             if ($header->confirm_flag == 1) {
                 session()->flash('error_message', '勤怠が確定されています。');
                 return response()->json(['success' => false, 'message' => '勤怠が確定されています。'], 400);
             }
-
-            $daily = AttendanceDaily::where('attendance_header_id', $header->id)
-                ->where('work_date', $now->format('Y-m-d'))
-                ->first();
 
             if (!$daily || !$daily->working_time) {
                 session()->flash('error_message', '出勤時間が記録されていないため、退勤できません。');
@@ -186,7 +196,9 @@ class AttendanceStampController extends Controller
 
             DB::transaction(function () use ($now, $daily, $header) {
                 $daily->update([
-                    'leave_time' => $now->format('H:i:s')
+                    'leave_time' => $now->format('H:i:s'),
+                    'locked_by' => null, // ロック解除
+                    'locked_at' => null  // ロック解除
                 ]);
 
                 $updateDailyParams = $this->attendanceService->getUpdateDailyParams([
@@ -232,14 +244,22 @@ class AttendanceStampController extends Controller
                 return response()->json(['success' => false, 'message' => '出勤時間が記録されていないため、休憩を開始できません。'], 400);
             }
 
+            $daily = AttendanceDaily::where('attendance_header_id', $header->id)
+                ->where('work_date', $now->format('Y-m-d'))
+                ->first();
+
+            if ($daily && $daily->locked_at && $daily->locked_by !== $user->id) {
+                $lockedAt = Carbon::parse($daily->locked_at);
+                if ($lockedAt->diffInMinutes($now) < 5) {
+                    session()->flash('error_message', '勤怠データは現在ロックされています。しばらくしてから再試行してください。');
+                    return response()->json(['locked' => true, 'message' => '勤怠データは現在ロックされています。しばらくしてから再試行してください。'], 423);
+                }
+            }
+
             if ($header->confirm_flag == 1) {
                 session()->flash('error_message', '勤怠が確定されています。');
                 return response()->json(['success' => false, 'message' => '勤怠が確定されています。'], 400);
             }
-
-            $daily = AttendanceDaily::where('attendance_header_id', $header->id)
-                ->where('work_date', $now->format('Y-m-d'))
-                ->first();
 
             if (!$daily || !$daily->working_time) {
                 session()->flash('error_message', '出勤時間が記録されていないため、休憩を開始できません。');
@@ -256,6 +276,12 @@ class AttendanceStampController extends Controller
                     'break_time_from' => $now->format('H:i:s'),
                     'created_by' => $user->id,
                     'updated_by' => $user->id
+                ]);
+
+                // ロック解除
+                $daily->update([
+                    'locked_by' => null,
+                    'locked_at' => null
                 ]);
             });
 
@@ -289,18 +315,21 @@ class AttendanceStampController extends Controller
                 return response()->json(['success' => false, 'message' => '休憩開始時間が記録されていないため、休憩を終了できません。'], 400);
             }
 
-            if ($header->confirm_flag == 1) {
-                session()->flash('error_message', '勤怠が確定されています。');
-                return response()->json(['success' => false, 'message' => '勤怠が確定されています。'], 400);
-            }
-
             $daily = AttendanceDaily::where('attendance_header_id', $header->id)
                 ->where('work_date', $now->format('Y-m-d'))
                 ->first();
 
-            if (!$daily) {
-                session()->flash('error_message', '休憩開始時間が記録されていないため、休憩を終了できません。');
-                return response()->json(['success' => false, 'message' => '休憩開始時間が記録されていないため、休憩を終了できません。'], 400);
+            if ($daily && $daily->locked_at && $daily->locked_by !== $user->id) {
+                $lockedAt = Carbon::parse($daily->locked_at);
+                if ($lockedAt->diffInMinutes($now) < 5) {
+                    session()->flash('error_message', '勤怠データは現在ロックされています。しばらくしてから再試行してください。');
+                    return response()->json(['locked' => true, 'message' => '勤怠データは現在ロックされています。しばらくしてから再試行してください。'], 423);
+                }
+            }
+
+            if ($header->confirm_flag == 1) {
+                session()->flash('error_message', '勤怠が確定されています。');
+                return response()->json(['success' => false, 'message' => '勤怠が確定されています。'], 400);
             }
 
             $breakTime = BreakTime::where('attendance_daily_id', $daily->id)
@@ -312,10 +341,16 @@ class AttendanceStampController extends Controller
                 return response()->json(['success' => false, 'message' => '休憩開始時間が記録されていないため、休憩を終了できません。'], 400);
             }
 
-            DB::transaction(function () use ($now, $breakTime, $user) {
+            DB::transaction(function () use ($now, $breakTime, $user, $daily) {
                 $breakTime->update([
                     'break_time_to' => $now->format('H:i:s'),
                     'updated_by' => $user->id
+                ]);
+
+                // ロック解除
+                $daily->update([
+                    'locked_by' => null,
+                    'locked_at' => null
                 ]);
             });
 
