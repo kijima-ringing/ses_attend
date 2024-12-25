@@ -171,5 +171,20 @@ class DatabaseSeeder extends Seeder
                 'updated_at' => Carbon::now()
             ]
         ]);
+
+        $users = DB::table('users')->pluck('id');
+        $now = Carbon::now();
+
+        foreach ($users as $userId) {
+            DB::table('paid_leave_defaults')->insert([
+                'user_id' => $userId,
+                'default_days' => 10,
+                'remaining_days' => 10,
+                'created_at' => $now,
+                'updated_at' => $now,
+                'created_by' => 1,
+                'updated_by' => 1
+            ]);
+        }
     }
 }
