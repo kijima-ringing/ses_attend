@@ -401,9 +401,73 @@ function toggleTimeInputs(attendanceClass) {
 function toggleModalElements(attendanceClass) {
     const isHidden = attendanceClass === PAID_HOLIDAYS;
 
-    // メモ欄の親要素を非表示
+    // 通常の入力要素の表示制御
     $('.form-group.row').has('#memo').toggle(!isHidden);
-
-    // モーダルのフッター（ボタン類）を非表示
     $('.modal-footer').toggle(!isHidden);
+
+    // 有給休暇申請用の要素の表示制御
+    $('#paid-leave-section').toggle(isHidden);
 }
+
+// モーダルの初期表示時に有給休暇申請セクションを追加
+$('#attendance-modal').on('show.bs.modal', function() {
+    // 有給休暇申請セクションがまだ存在しない場合のみ追加
+    if ($('#paid-leave-section').length === 0) {
+        const paidLeaveHtml = `
+            <div id="paid-leave-section" style="display: none;">
+                <div class="form-group row">
+                    <label for="paid-leave-reason" class="col-md-4 col-form-label text-right">申請理由</label>
+                    <div class="col-md-8">
+                        <textarea class="field-textarea" id="paid-leave-reason" name="paid_leave_reason" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="text-center mt-3">
+                    <button type="button" class="btn btn-primary" id="paid-leave-submit">有給休暇を申請</button>
+                </div>
+            </div>
+        `;
+
+        // モーダルボディの最後に追加
+        $(this).find('.modal-body').append(paidLeaveHtml);
+    }
+});
+
+// 有給休暇申請ボタンのクリックイベント
+$(document).on('click', '#paid-leave-submit', function() {
+    const reason = $('#paid-leave-reason').val();
+
+    if (!reason) {
+        alert('申請理由を入力してください。');
+        return;
+    }
+
+    // フォームデータの準備
+    const formData = {
+        work_date: $('#work_date').val(),
+        attendance_class: PAID_HOLIDAYS,
+        paid_leave_reason: reason,
+        _token: $('meta[name="csrf-token"]').attr('content')
+    };
+
+    // AJAX送信
+    $.ajax({
+        type: 'POST',
+        url: $('#modal-form').attr('action'),
+        data: formData,
+        success: function(response) {
+            if (response.success) {
+                alert('有給休暇の申請が完了しました。');
+                $('#attendance-modal').modal('hide');
+                location.reload();
+            }
+        },
+        error: function(xhr) {
+            if (xhr.status === 422) {
+                const errors = xhr.responseJSON.errors;
+                displayErrors(errors);
+            } else {
+                alert('申請処理中にエラーが発生しました。');
+            }
+        }
+    });
+});
