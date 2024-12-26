@@ -146,7 +146,7 @@ $(document).ready(function () {
     });
 });
 
-// 休憩時間の重複を検���
+// 休憩時間の重複を検出
 function hasDuplicateBreakTimes(breakTimes) {
     const seen = new Set();
     for (const breakTime of breakTimes) {
@@ -352,14 +352,33 @@ $(function () {
 
 // 勤務区分の変更を監視
 $('#attendance_class').on('change', function() {
-    // 勤務区分の値に応じて入力フィールドの活性/非活性を切り替える
-    toggleTimeInputs($(this).val());
-    toggleModalElements($(this).val());
+    const attendanceClass = $(this).val();
+    
+    // 有給休暇が選択された場合、デフォルト値をセット
+    if (attendanceClass === PAID_HOLIDAYS) {
+        // 出勤時間をデフォルト値にセット
+        $('#working_time').val(companyBaseTimeFrom);
+        $('#leave_time').val(companyBaseTimeTo);
+        
+        // 休憩時間をデフォルト値にセット
+        $('#break-times-container').empty().append(`
+            <div class="form-inline mb-2 break-time-entry">
+                <input type="time" name="break_times[0][break_time_from]" value="${BASE_BREAK_TIME_FROM}" class="form-control">
+                <span class="mx-2">〜</span>
+                <input type="time" name="break_times[0][break_time_to]" value="${BASE_BREAK_TIME_TO}" class="form-control">
+                <button type="button" class="btn btn-danger btn-sm ml-2 remove-break-time">削除</button>
+            </div>
+        `);
+    }
+
+    // 入力フィールドの活性/非活性と表示/非表示を切り替え
+    toggleTimeInputs(attendanceClass);
+    toggleModalElements(attendanceClass);
 });
 
 // 入力フィールドの活性/非活性を切り替える関数
 function toggleTimeInputs(attendanceClass) {
-    const isDisabled = attendanceClass === PAID_HOLIDAYS; // 有給休暇の場合のみ非活性化
+    const isDisabled = attendanceClass === PAID_HOLIDAYS;
     
     // 出勤時間フィールド
     $('#working_time, #leave_time').prop('disabled', isDisabled);
