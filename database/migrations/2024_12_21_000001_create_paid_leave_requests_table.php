@@ -10,8 +10,8 @@ class CreatePaidLeaveRequestsTable extends Migration
     {
         Schema::create('paid_leave_requests', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->unsignedBigInteger('paid_leave_defaults_id');
-            $table->foreign('paid_leave_defaults_id')->references('id')->on('paid_leave_defaults')->onDelete('cascade');
+            $table->unsignedBigInteger('paid_leave_default_id');
+            $table->foreign('paid_leave_default_id')->references('id')->on('paid_leave_defaults')->onDelete('cascade');
             $table->unsignedBigInteger('attendance_daily_id');
             $table->foreign('attendance_daily_id')->references('id')->on('attendance_daily')->onDelete('cascade');
             $table->unsignedBigInteger('break_time_id');

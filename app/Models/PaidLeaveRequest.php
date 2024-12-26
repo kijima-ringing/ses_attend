@@ -14,7 +14,7 @@ class PaidLeaveRequest extends Model
     const STATUS_RETURNED = 2;   // 差し戻し
 
     protected $fillable = [
-        'paid_leave_defaults_id',
+        'paid_leave_default_id',
         'attendance_daily_id',
         'break_time_id',
         'status',
@@ -24,7 +24,7 @@ class PaidLeaveRequest extends Model
 
     public function paidLeaveDefault()
     {
-        return $this->belongsTo(PaidLeaveDefault::class, 'paid_leave_defaults_id');
+        return $this->belongsTo(PaidLeaveDefault::class, 'paid_leave_default_id');
     }
 
     public function attendanceDaily()
