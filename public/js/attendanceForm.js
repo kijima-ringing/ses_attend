@@ -349,3 +349,47 @@ $(function () {
         }
     });
 });
+
+// 勤務区分の変更を監視
+$('#attendance_class').on('change', function() {
+    // 勤務区分の値に応じて入力フィールドの活性/非活性を切り替える
+    toggleTimeInputs($(this).val());
+
+    if ($(this).val() === PAID_HOLIDAYS) {
+        // 現在の日付情報と選択された勤務区分を保存
+        const currentWorkDate = $('#work_date').val();
+        const currentDateInfo = $('.modal-title').text();
+        const currentId = $('.dateInfo').find(`[data-work_date="${currentWorkDate}"]`).closest('tr').find('.id').data('id');
+        const selectedAttendanceClass = $(this).val();
+
+        // モーダルを閉じる
+        $('#attendance-modal').modal('hide');
+
+        // モーダルが完全に閉じた後に再度開く
+        $('#attendance-modal').on('hidden.bs.modal', function() {
+            $(this).off('hidden.bs.modal');
+            $('.dateInfo').find(`[data-work_date="${currentWorkDate}"]`).trigger('click');
+
+            // モーダルが表示された後に勤務区分を設定
+            $('#attendance-modal').on('shown.bs.modal', function() {
+                $(this).off('shown.bs.modal');
+                $('#attendance_class').val(selectedAttendanceClass);
+                // 入力フィールドの活性/非活性を設定
+                toggleTimeInputs(selectedAttendanceClass);
+            });
+        });
+    }
+});
+
+// 入力フィールドの活性/非活性を切り替える関数
+function toggleTimeInputs(attendanceClass) {
+    const isDisabled = attendanceClass === PAID_HOLIDAYS; // 有給休暇の場合のみ非活性化
+    
+    // 出勤時間フィールド
+    $('#working_time, #leave_time').prop('disabled', isDisabled);
+    
+    // 休憩時間関連
+    $('#break-times-container input').prop('disabled', isDisabled);
+    $('#add-break-time').prop('disabled', isDisabled);
+    $('.remove-break-time').prop('disabled', isDisabled);
+}
