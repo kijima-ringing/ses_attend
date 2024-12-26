@@ -380,11 +380,11 @@ $('#attendance_class').on('change', function() {
 function toggleTimeInputs(attendanceClass) {
     const isDisabled = attendanceClass === PAID_HOLIDAYS;
     
-    // 出勤時間フィールド
-    $('#working_time, #leave_time').prop('disabled', isDisabled);
+    // 出勤時間フィールドと休憩時間関連を非活性化するが、値は保持
+    $('#working_time, #leave_time').prop('readonly', isDisabled);
+    $('#break-times-container input').prop('readonly', isDisabled);
     
-    // 休憩時間関連
-    $('#break-times-container input').prop('disabled', isDisabled);
+    // ボタン類の非活性化
     $('#add-break-time').prop('disabled', isDisabled);
     $('.remove-break-time').prop('disabled', isDisabled);
 }
