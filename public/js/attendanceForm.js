@@ -354,6 +354,7 @@ $(function () {
 $('#attendance_class').on('change', function() {
     // 勤務区分の値に応じて入力フィールドの活性/非活性を切り替える
     toggleTimeInputs($(this).val());
+    toggleModalElements($(this).val());
 
     if ($(this).val() === PAID_HOLIDAYS) {
         // 現在の日付情報と選択された勤務区分を保存
@@ -376,6 +377,8 @@ $('#attendance_class').on('change', function() {
                 $('#attendance_class').val(selectedAttendanceClass);
                 // 入力フィールドの活性/非活性を設定
                 toggleTimeInputs(selectedAttendanceClass);
+                // メモ欄とボタン類の表示/非表示を設定
+                toggleModalElements(selectedAttendanceClass);
             });
         });
     }
@@ -384,12 +387,23 @@ $('#attendance_class').on('change', function() {
 // 入力フィールドの活性/非活性を切り替える関数
 function toggleTimeInputs(attendanceClass) {
     const isDisabled = attendanceClass === PAID_HOLIDAYS; // 有給休暇の場合のみ非活性化
-    
+
     // 出勤時間フィールド
     $('#working_time, #leave_time').prop('disabled', isDisabled);
-    
+
     // 休憩時間関連
     $('#break-times-container input').prop('disabled', isDisabled);
     $('#add-break-time').prop('disabled', isDisabled);
     $('.remove-break-time').prop('disabled', isDisabled);
+}
+
+// メモ欄とボタン類の表示/非表示を切り替える関数
+function toggleModalElements(attendanceClass) {
+    const isHidden = attendanceClass === PAID_HOLIDAYS;
+
+    // メモ欄の親要素を非表示
+    $('.form-group.row').has('#memo').toggle(!isHidden);
+
+    // モーダルのフッター（ボタン類）を非表示
+    $('.modal-footer').toggle(!isHidden);
 }
