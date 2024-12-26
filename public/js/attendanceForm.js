@@ -146,7 +146,7 @@ $(document).ready(function () {
     });
 });
 
-// 休憩時間の重複を検出
+// 休憩時間の重複を検���
 function hasDuplicateBreakTimes(breakTimes) {
     const seen = new Set();
     for (const breakTime of breakTimes) {
@@ -356,7 +356,7 @@ $('#attendance_class').on('change', function() {
     
     // 有給休暇が選択された場合、デフォルト値をセット
     if (attendanceClass === PAID_HOLIDAYS) {
-        // 出勤時間をデフォルト値にセット
+        // 出勤��間をデフォルト値にセット
         $('#working_time').val(companyBaseTimeFrom);
         $('#leave_time').val(companyBaseTimeTo);
         
@@ -399,8 +399,12 @@ function toggleModalElements(attendanceClass) {
     // 「未入力に戻す」ボタンのみ非表示
     $('#delete-url').toggle(!isHidden);
 
+    // 「変更を保存」ボタンを非表示
+    $('.modal-footer .btn-primary').toggle(!isHidden);
+
     // 有給休暇申請用の要素の表示制御
     $('#paid-leave-section').toggle(isHidden);
+    $('#paid-leave-submit').toggle(isHidden);
 }
 
 // モーダルの初期表示時に有給休暇申請セクションを追加
@@ -420,6 +424,10 @@ $('#attendance-modal').on('show.bs.modal', function() {
 
         // モーダルボディの最後に追加
         $(this).find('.modal-body').append(paidLeaveHtml);
+
+        // 申請ボタンをmodal-footerに追加
+        const submitButtonHtml = `<button type="submit" class="btn btn-primary" id="paid-leave-submit" style="display: none;">申請する</button>`;
+        $(this).find('.modal-footer').append(submitButtonHtml);
     }
 });
 
