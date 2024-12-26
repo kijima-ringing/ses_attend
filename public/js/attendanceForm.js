@@ -395,7 +395,9 @@ function toggleModalElements(attendanceClass) {
     
     // 通常の入力要素の表示制御
     $('.form-group.row').has('#memo').toggle(!isHidden);
-    $('.modal-footer').toggle(!isHidden);
+    
+    // 「未入力に戻す」ボタンのみ非表示
+    $('#delete-url').toggle(!isHidden);
 
     // 有給休暇申請用の要素の表示制御
     $('#paid-leave-section').toggle(isHidden);
@@ -412,9 +414,6 @@ $('#attendance-modal').on('show.bs.modal', function() {
                     <div class="col-md-8">
                         <textarea class="field-textarea" id="paid-leave-reason" name="paid_leave_reason" rows="3"></textarea>
                     </div>
-                </div>
-                <div class="text-center mt-3">
-                    <button type="button" class="btn btn-primary" id="paid-leave-submit">有給休暇を申請</button>
                 </div>
             </div>
         `;
