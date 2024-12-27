@@ -231,7 +231,7 @@
 </div><!-- /.modal -->
 
 <!-- 有給休暇申請モーダル -->
-<div class="modal fade" id="paid-leave-modal" tabindex="-1" role="dialog" aria-hidden="true">
+<div class="modal2 fade" id="paid-leave-modal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
