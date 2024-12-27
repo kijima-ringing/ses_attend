@@ -220,7 +220,7 @@ $(function () {
     $(".dialog").click(function (event) {
         event.preventDefault(); // デフォルトのクリック動作を停止
 
-        // 確定フラグを取得し、数値型で比較
+        // 確定フ��グを取得し、数値型で比較
         let isConfirmed = Number($('#attendance-info-url').data('confirmed')) === 1;
 
         // 確定済みの場合はクリックを無効化
@@ -356,7 +356,7 @@ $('#attendance_class').on('change', function() {
     
     // 有給休暇が選択された場合、デフォルト値をセット
     if (attendanceClass === PAID_HOLIDAYS) {
-        // 出勤��間をデフォルト値にセット
+        // 出勤時間をデフォルト値にセット
         $('#working_time').val(companyBaseTimeFrom);
         $('#leave_time').val(companyBaseTimeTo);
         
@@ -396,40 +396,13 @@ function toggleModalElements(attendanceClass) {
     // 通常の入力要素の表示制御
     $('.form-group.row').has('#memo').toggle(!isHidden);
     
-    // 「未入力に戻す」ボタンのみ非表示
+    // 「未入力に戻す」ボタンの表示制御
     $('#delete-url').toggle(!isHidden);
 
-    // 「変更を保存」ボタンを非表示
-    $('.modal-footer .btn-primary').toggle(!isHidden);
-
-    // 有給休暇申請用の要素の表示制御
-    $('#paid-leave-section').toggle(isHidden);
-    $('#paid-leave-submit').toggle(isHidden);
+    // 通常の保存ボタンと有給休暇申請ボタンの切り替え
+    $('#normal-submit').toggle(!isHidden);
+    $('#paid-leave-submit, #paid-leave-section').toggle(isHidden);
 }
-
-// モーダルの初期表示時に有給休暇申請セクションを追加
-$('#attendance-modal').on('show.bs.modal', function() {
-    // 有給休暇申請セクションがまだ存在しない場合のみ追加
-    if ($('#paid-leave-section').length === 0) {
-        const paidLeaveHtml = `
-            <div id="paid-leave-section" style="display: none;">
-                <div class="form-group row">
-                    <label for="paid-leave-reason" class="col-md-4 col-form-label text-right">申請理由</label>
-                    <div class="col-md-8">
-                        <textarea class="field-textarea" id="paid-leave-reason" name="paid_leave_reason" rows="3"></textarea>
-                    </div>
-                </div>
-            </div>
-        `;
-
-        // モーダルボディの最後に追加
-        $(this).find('.modal-body').append(paidLeaveHtml);
-
-        // 申請ボタンをmodal-footerに追加
-        const submitButtonHtml = `<button type="submit" class="btn btn-primary" id="paid-leave-submit" style="display: none;">申請する</button>`;
-        $(this).find('.modal-footer').append(submitButtonHtml);
-    }
-});
 
 // 有給休暇申請ボタンのクリックイベント
 $(document).on('click', '#paid-leave-submit', function() {

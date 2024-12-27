@@ -208,11 +208,22 @@
                             <textarea class="field-textarea" id="memo" name="memo"></textarea>
                         </div>
                     </div>
+
+                    <!-- 申請理由欄（デフォルトで非表示） -->
+                    <div id="paid-leave-section" style="display: none;">
+                        <div class="form-group row">
+                            <label for="paid-leave-reason" class="col-md-4 col-form-label text-right">申請理由</label>
+                            <div class="col-md-8">
+                                <textarea class="field-textarea" id="paid-leave-reason" name="paid_leave_reason" rows="3"></textarea>
+                            </div>
+                        </div>
+                    </div>
                 </div><!-- /.modal-body -->
                 <div class="modal-footer">
                     <a data-url="{{ route('admin.attendance_header.delete', ['user_id' => $attendance->user_id, 'year_month' => $date, 'work_date' => 'work_date']) }}"
                         class="btn btn-secondary" id="delete-url">未入力に戻す</a>
-                    <button type="submit" class="btn btn-primary">変更を保存</button>
+                    <button type="submit" class="btn btn-primary" id="normal-submit">変更を保存</button>
+                    <button type="submit" class="btn btn-primary" id="paid-leave-submit" style="display: none;">申請する</button>
                 </div><!-- /.modal-footer -->
             </form>
         </div><!-- /.modal-content -->
