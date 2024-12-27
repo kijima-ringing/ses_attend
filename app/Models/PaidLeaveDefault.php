@@ -9,6 +9,8 @@ class PaidLeaveDefault extends Model
 {
     use AuthorObservable;
 
+    protected $table = 'paid_leave_defaults';
+
     protected $fillable = [
         'user_id',
         'default_days',
@@ -17,11 +19,11 @@ class PaidLeaveDefault extends Model
 
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo('App\Models\User');
     }
 
     public function paidLeaveRequests()
     {
-        return $this->hasMany(PaidLeaveRequest::class, 'paid_leave_defaults_id');
+        return $this->hasMany(PaidLeaveRequest::class, 'paid_leave_default_id');
     }
-} 
+}

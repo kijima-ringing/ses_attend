@@ -13,10 +13,11 @@ class PaidLeaveRequest extends Model
     const STATUS_APPROVED = 1;   // 承認済
     const STATUS_RETURNED = 2;   // 差し戻し
 
+    protected $table = 'paid_leave_requests';
+
     protected $fillable = [
         'paid_leave_default_id',
         'attendance_daily_id',
-        'break_time_id',
         'status',
         'request_reason',
         'return_reason',
@@ -29,11 +30,6 @@ class PaidLeaveRequest extends Model
 
     public function attendanceDaily()
     {
-        return $this->belongsTo(AttendanceDaily::class);
-    }
-
-    public function breakTime()
-    {
-        return $this->belongsTo(BreakTime::class);
+        return $this->belongsTo(AttendanceDaily::class, 'attendance_daily_id');
     }
 }
