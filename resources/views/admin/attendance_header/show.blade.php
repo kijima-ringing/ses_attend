@@ -2,6 +2,7 @@
 
 @section('addCss')
 <link rel="stylesheet" href="{{ asset('/css/admin/show.css') }}">
+<link rel="stylesheet" href="{{ asset('/css/modal2.css') }}">
 @endsection
 
 @section('content')
@@ -78,9 +79,12 @@
         <tbody>
             @foreach($daysOfMonth as $day)
             <tr class="bg-white dateInfo">
-            <th class="text-right dialog date_info work_date click-text"
+            <th class="text-right {{ isset($attendanceDaily[$day['work_date']]) && $attendanceDaily[$day['work_date']]['attendance_class'] == 1 ? 'paid-leave-dialog' : 'dialog' }} date_info work_date click-text"
                     data-date_info="{{ $date . '-' . $day['day'] . '(' . $day['dayOfWeek'] . ')' }}"
                     data-work_date="{{ $day['work_date'] }}"
+                    @if(isset($attendanceDaily[$day['work_date']]) && $attendanceDaily[$day['work_date']]['attendance_class'] == 1)
+                        data-paid-leave-reason="{{ $attendanceDaily[$day['work_date']]['memo'] ?? '' }}"
+                    @endif
                     @if($attendance->confirm_flag) style="pointer-events: none; color: gray;" @endif>
                     {{ $day['day'] }}日
                 </th>

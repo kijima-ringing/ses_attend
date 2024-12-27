@@ -446,3 +446,18 @@ $(document).on('click', '#paid-leave-submit', function(e) {
         }
     });
 });
+
+// 有給休暇の日付クリック時の処理
+$(document).on('click', '.paid-leave-dialog', function(event) {
+    event.preventDefault();
+    
+    const dateInfo = $(this).data('date_info');
+    const paidLeaveReason = $(this).data('paid-leave-reason');
+    
+    // 有給休暇詳細モーダルの内容を設定
+    $('#paid-leave-date').text(dateInfo);
+    $('#paid-leave-reason-display').text(paidLeaveReason || '理由が登録されていません');
+    
+    // 有給休暇詳細モーダルを表示
+    $('#paid-leave-modal').modal('show');
+});
