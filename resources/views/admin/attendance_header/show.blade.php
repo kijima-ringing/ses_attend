@@ -229,7 +229,40 @@
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
+
+<!-- 有給休暇申請モーダル -->
+<div class="modal fade" id="paid-leave-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">有給休暇申請詳細</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="閉じる">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group row">
+                    <label class="col-md-4 col-form-label text-right">申請日</label>
+                    <div class="col-md-8">
+                        <p class="form-control-plaintext" id="paid-leave-date"></p>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-md-4 col-form-label text-right">申請理由</label>
+                    <div class="col-md-8">
+                        <p class="form-control-plaintext" id="paid-leave-reason-display"></p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">閉じる</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @endsection
+
 @section('addJs')
 <script src="{{ asset('/js/attendanceForm.js') }}"></script>
 @endsection

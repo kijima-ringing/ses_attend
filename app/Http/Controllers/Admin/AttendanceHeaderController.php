@@ -391,4 +391,19 @@ class AttendanceHeaderController extends Controller
         return response()->json(['success' => true]);
     }
 
+    public function getRequest(Request $request)
+    {
+        $paidLeave = PaidLeaveRequest::whereHas('attendanceDaily', function($query) use ($request) {
+            $query->where('work_date', $request->work_date);
+        })->with('attendanceDaily')
+            ->whereHas('paidLeaveDefault', function($query) use ($request) {
+                $query->where('user_id', $request->user_id);
+            })
+        ->first();
+
+        return response()->json([
+            'reason' => $paidLeave ? $paidLeave->request_reason : null,
+            'status' => $paidLeave ? $paidLeave->status : null
+        ]);
+    }
 }
