@@ -21,6 +21,7 @@ class PaidLeaveRequest extends Model
         'status',
         'request_reason',
         'return_reason',
+        'break_time_id'
     ];
 
     public function paidLeaveDefault()

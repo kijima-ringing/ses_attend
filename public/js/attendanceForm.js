@@ -146,7 +146,7 @@ $(document).ready(function () {
     });
 });
 
-// 休憩時間の重複を検���
+// 休憩時間の重複を検出
 function hasDuplicateBreakTimes(breakTimes) {
     const seen = new Set();
     for (const breakTime of breakTimes) {
@@ -220,7 +220,7 @@ $(function () {
     $(".dialog").click(function (event) {
         event.preventDefault(); // デフォルトのクリック動作を停止
 
-        // 確定フ��グを取得し、数値型で比較
+        // 確定フラグを取得し、数値型で比較
         let isConfirmed = Number($('#attendance-info-url').data('confirmed')) === 1;
 
         // 確定済みの場合はクリックを無効化
@@ -405,7 +405,8 @@ function toggleModalElements(attendanceClass) {
 }
 
 // 有給休暇申請ボタンのクリックイベント
-$(document).on('click', '#paid-leave-submit', function() {
+$(document).on('click', '#paid-leave-submit', function(e) {
+    e.preventDefault();
     const reason = $('#paid-leave-reason').val();
 
     if (!reason) {
@@ -413,19 +414,21 @@ $(document).on('click', '#paid-leave-submit', function() {
         return;
     }
 
-    // フォームデータの準備
-    const formData = {
-        work_date: $('#work_date').val(),
-        attendance_class: PAID_HOLIDAYS,
-        paid_leave_reason: reason,
-        _token: $('meta[name="csrf-token"]').attr('content')
-    };
+    // フォームデータの取得
+    const form = $('#modal-form');
+    const formData = new FormData(form[0]);
+    
+    // 追加のデータをセット
+    formData.set('attendance_class', PAID_HOLIDAYS);
+    formData.set('paid_leave_reason', reason);
 
     // AJAX送信
     $.ajax({
         type: 'POST',
-        url: $('#modal-form').attr('action'),
+        url: form.attr('action'),
         data: formData,
+        processData: false,
+        contentType: false,
         success: function(response) {
             if (response.success) {
                 alert('有給休暇の申請が完了しました。');

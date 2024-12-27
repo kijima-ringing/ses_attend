@@ -14,6 +14,8 @@ use App\Services\AttendanceService;
 use App\Services\GetDateService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Models\PaidLeaveDefault;
+use App\Models\PaidLeaveRequest;
 
 class AttendanceHeaderController extends Controller
 {
@@ -142,6 +144,33 @@ class AttendanceHeaderController extends Controller
                         'break_time_from' => $breakTime['break_time_from'],
                         'break_time_to' => $breakTime['break_time_to'],
                     ]);
+                }
+
+                // 有給休暇申請の場合
+                if ($request->attendance_class == '1' && $request->has('paid_leave_reason')) {
+                    // ユーザーの有給休暇デフォルト情報を取得
+                    $paidLeaveDefault = PaidLeaveDefault::where('user_id', $request->user_id)->first();
+
+                    if ($paidLeaveDefault) {
+                        // 休憩時間の取得（最初の休憩時間を使用）
+                        $breakTimeId = null;
+                        if (!empty($request->input('break_times'))) {
+                            $breakTime = BreakTime::where('attendance_daily_id', $attendanceDaily->id)
+                                ->first();
+                            if ($breakTime) {
+                                $breakTimeId = $breakTime->id;
+                            }
+                        }
+
+                        // 有給休暇申請を作成
+                        PaidLeaveRequest::create([
+                            'paid_leave_default_id' => $paidLeaveDefault->id,
+                            'attendance_daily_id' => $attendanceDaily->id,
+                            'status' => PaidLeaveRequest::STATUS_PENDING,
+                            'request_reason' => $request->paid_leave_reason,
+                            'break_time_id' => $breakTimeId  // null を許容するように設定が必要
+                        ]);
+                    }
                 }
 
                 $company = Company::find(1);
