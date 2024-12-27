@@ -21,23 +21,35 @@ class AttendanceDaily extends Model
         'attendance_class',
         'working_time',
         'leave_time',
-        'memo',
         'scheduled_working_hours',
         'overtime_hours',
         'working_hours',
+        'memo',
+        'locked_by',
+        'locked_at'
     ];
 
     public static function monthOfDailies($attendance_header_id)
-{
-    return self::where('attendance_header_id', $attendance_header_id)
-        ->with('breakTimes') // リレーションで休憩時間も取得
-        ->get()
-        ->keyBy('work_date')
-        ->toArray();
+    {
+        return self::where('attendance_header_id', $attendance_header_id)
+            ->with('breakTimes') // リレーションで休憩時間も取得
+            ->get()
+            ->keyBy('work_date')
+            ->toArray();
+    }
+
+    public function attendanceHeader()
+    {
+        return $this->belongsTo(AttendanceHeader::class);
     }
 
     public function breakTimes()
     {
-        return $this->hasMany(BreakTime::class, 'attendance_daily_id');
+        return $this->hasMany(BreakTime::class);
+    }
+
+    public function paidLeaveRequest()
+    {
+        return $this->hasOne(PaidLeaveRequest::class);
     }
 }

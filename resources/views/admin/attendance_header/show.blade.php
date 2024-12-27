@@ -252,6 +252,12 @@
                     </div>
                 </div>
                 <div class="form-group row">
+                    <label class="col-md-4 col-form-label text-right">ステータス</label>
+                    <div class="col-md-8">
+                        <p class="form-control-plaintext" id="paid-leave-status"></p>
+                    </div>
+                </div>
+                <div class="form-group row">
                     <label class="col-md-4 col-form-label text-right">申請理由</label>
                     <div class="col-md-8">
                         <p class="form-control-plaintext" id="paid-leave-reason-display"></p>

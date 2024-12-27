@@ -36,6 +36,7 @@ Route::middleware('auth')->group(function () {
             Route::delete('attendance_header/delete/{user_id}/{year_month}/{work_date}', 'AttendanceHeaderController@destroy')->name('attendance_header.delete');
             Route::get('attendance_header/ajax_get_attendance_info', 'AttendanceHeaderController@ajaxGetAttendanceInfo')->name('attendance_header.ajax_get_attendance_info');
             Route::post('attendance_header/confirm/{user_id}/{year_month}', 'AttendanceHeaderController@confirm')->name('attendance_header.confirm');
+            Route::get('attendance_header/get-request', 'AttendanceHeaderController@getRequest')->name('attendance_header.get_request');
 
             // Department Routes
             Route::resource('department', 'DepartmentController', ['except' => ['show', 'edit', 'create', 'update', 'delete']]);

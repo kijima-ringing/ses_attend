@@ -220,7 +220,7 @@ $(function () {
     $(".dialog").click(function (event) {
         event.preventDefault(); // デフォルトのクリック動作を停止
 
-        // 確定フラグを取得し、数値型で比較
+        // 確定フラグを取得し、数値型���比較
         let isConfirmed = Number($('#attendance-info-url').data('confirmed')) === 1;
 
         // 確定済みの場合はクリックを無効化
@@ -447,17 +447,58 @@ $(document).on('click', '#paid-leave-submit', function(e) {
     });
 });
 
-// 有給休暇の日付クリック時の処理
+// 有給休暇の日付クリック時の処理を修正
 $(document).on('click', '.paid-leave-dialog', function(event) {
     event.preventDefault();
     
     const dateInfo = $(this).data('date_info');
-    const paidLeaveReason = $(this).data('paid-leave-reason');
-    
-    // 有給休暇詳細モーダルの内容を設定
-    $('#paid-leave-date').text(dateInfo);
-    $('#paid-leave-reason-display').text(paidLeaveReason || '理由が登録されていません');
-    
-    // 有給休暇詳細モーダルを表示
-    $('#paid-leave-modal').modal('show');
+    const workDate = $(this).data('work_date');
+    const userId = $('meta[name="user-id"]').attr('content');
+
+    console.log('Request params:', { workDate, userId }); // デバッグ用
+
+    // 有給休暇申請情報を取得
+    $.ajax({
+        type: 'GET',
+        url: '/admin/attendance_header/get-request',
+        data: {
+            work_date: workDate,
+            user_id: userId
+        },
+        success: function(response) {
+            console.log('Response:', response); // デバッグ用
+
+            // ステータスを日本語に変換
+            let statusText = '';
+            switch(response.status) {
+                case 0:
+                    statusText = '申請中';
+                    break;
+                case 1:
+                    statusText = '承認済み';
+                    break;
+                case 2:
+                    statusText = '否認';
+                    break;
+                default:
+                    statusText = '未申請';
+            }
+            
+            // モーダルの内容を設定
+            $('#paid-leave-date').text(dateInfo);
+            $('#paid-leave-status').text(statusText);
+            $('#paid-leave-reason-display').text(response.reason || '理由が登録されていません');
+            
+            // モーダルを表示
+            $('#paid-leave-modal').modal('show');
+        },
+        error: function(xhr, status, error) {
+            console.error('Error details:', {
+                status: status,
+                error: error,
+                response: xhr.responseText
+            });
+            alert('申請情報の取得に失敗しました');
+        }
+    });
 });

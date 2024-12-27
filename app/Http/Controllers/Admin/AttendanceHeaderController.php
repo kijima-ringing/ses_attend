@@ -33,7 +33,7 @@ class AttendanceHeaderController extends Controller
         // フォーマットされた年-月データを取得
         $date = $getDateService->createYearMonthFormat($request->year_month);
 
-        // 検索用に年-月の最初の日付を取得
+        // 検索用に年-月の最初の日付を取
         $dateForSearch = $date->format('Y-m-d');
 
         // ユーザーを ID 順に取得するクエリを構築
@@ -69,7 +69,7 @@ class AttendanceHeaderController extends Controller
             ->whereDate('year_month', '=', $date->startOfMonth())
             ->exists();
 
-        // 日次勤怠データを取得
+        // 日次勤怠デー��を取得
         $attendanceDaily = AttendanceDaily::where('attendance_header_id', $attendance->id)
              ->with('breakTimes') // リレーションにより休憩時間を含む
             ->get()
@@ -188,7 +188,7 @@ class AttendanceHeaderController extends Controller
 
             session()->flash('flash_message', '勤怠情報を更新しました');
 
-            return response()->json(['success' => true, 'message' => '勤怠情報を更新しました']);
+            return response()->json(['success' => true, 'message' => '勤怠情報を更���しました']);
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json(['success' => false, 'errors' => $e->errors()], 422);
         } catch (\Exception $e) {
@@ -256,7 +256,7 @@ class AttendanceHeaderController extends Controller
      */
     public function ajaxGetAttendanceInfo(Request $request)
     {
-        // 指定された ID の日次勤怠データを取得または新規作成
+        // 指定さ��た ID の日次勤怠データを取得または新規作成
         $attendanceDaily = AttendanceDaily::with('breakTimes')->findOrNew($request->id);
 
         // 勤怠データと休憩時間を JSON で返却
@@ -393,17 +393,59 @@ class AttendanceHeaderController extends Controller
 
     public function getRequest(Request $request)
     {
-        $paidLeave = PaidLeaveRequest::whereHas('attendanceDaily', function($query) use ($request) {
-            $query->where('work_date', $request->work_date);
-        })->with('attendanceDaily')
-            ->whereHas('paidLeaveDefault', function($query) use ($request) {
+        try {
+            \Log::info('Request params:', [
+                'work_date' => $request->work_date,
+                'user_id' => $request->user_id
+            ]);
+
+            // AttendanceDailyを取得
+            $attendanceDaily = AttendanceDaily::whereHas('attendanceHeader', function($query) use ($request) {
                 $query->where('user_id', $request->user_id);
             })
-        ->first();
+            ->where('work_date', $request->work_date)
+            ->first();
 
-        return response()->json([
-            'reason' => $paidLeave ? $paidLeave->request_reason : null,
-            'status' => $paidLeave ? $paidLeave->status : null
-        ]);
+            \Log::info('AttendanceDaily:', [
+                'found' => $attendanceDaily ? 'yes' : 'no',
+                'id' => $attendanceDaily ? $attendanceDaily->id : null
+            ]);
+
+            if (!$attendanceDaily) {
+                return response()->json([
+                    'status' => null,
+                    'reason' => null
+                ]);
+            }
+
+            // PaidLeaveRequestを取得
+            $paidLeave = PaidLeaveRequest::where('attendance_daily_id', $attendanceDaily->id)
+                ->first();
+
+            \Log::info('PaidLeaveRequest:', [
+                'found' => $paidLeave ? 'yes' : 'no',
+                'status' => $paidLeave ? $paidLeave->status : null,
+                'reason' => $paidLeave ? $paidLeave->request_reason : null
+            ]);
+
+            if (!$paidLeave) {
+                return response()->json([
+                    'status' => null,
+                    'reason' => null
+                ]);
+            }
+
+            return response()->json([
+                'status' => $paidLeave->status,
+                'reason' => $paidLeave->request_reason
+            ]);
+
+        } catch (\Exception $e) {
+            \Log::error('有給休暇申請情報の取得に失敗: ' . $e->getMessage());
+            return response()->json([
+                'error' => true,
+                'message' => '有給休暇申請情報の取得に失敗しました'
+            ], 500);
+        }
     }
 }
