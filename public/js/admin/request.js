@@ -2,7 +2,7 @@ $(document).ready(function() {
     let currentRequestId = null;
 
     // 承認モーダルを開く時の処理
-    $('.approve-request').click(function(e) {
+    $('.status-link').click(function(e) {
         e.preventDefault();
         currentRequestId = $(this).data('request-id');
     });

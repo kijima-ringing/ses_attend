@@ -17,7 +17,14 @@ class RequestController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return view('admin.request.request', compact('requests'));
+        // ステータス定数をビューに渡す
+        $statuses = [
+            'STATUS_PENDING' => PaidLeaveRequest::STATUS_PENDING,
+            'STATUS_APPROVED' => PaidLeaveRequest::STATUS_APPROVED,
+            'STATUS_RETURNED' => PaidLeaveRequest::STATUS_RETURNED,
+        ];
+
+        return view('admin.request.request', compact('requests', 'statuses'));
     }
 
     public function approve(Request $request, $id)

@@ -56,6 +56,11 @@ Route::middleware('auth')->group(function () {
             // Settings Routes
             Route::get('settings', 'SettingsController@edit')->name('settings.edit');
             Route::post('settings/update', 'SettingsController@update')->name('settings.update');
+
+            // 有給休暇申請関連のルート
+            Route::get('request', 'RequestController@index')->name('request.index');
+            Route::post('request/{id}/approve', 'RequestController@approve')->name('request.approve');
+            Route::post('request/{id}/return', 'RequestController@return')->name('request.return');
         });
         Route::group(['prefix' => 'admin/attendance_daily', 'as' => 'attendance_daily.'], function () {
             Route::get('check-lock', 'Admin\AttendanceHeaderController@checkLock');
