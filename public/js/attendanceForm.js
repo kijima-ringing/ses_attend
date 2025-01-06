@@ -521,6 +521,7 @@ $(document).on('click', '.paid-leave-dialog', function(event) {
 $(document).on('click', '#reapply-button', function() {
     const newReason = $('#paid-leave-reason-edit').val();
     const workDate = $('#paid-leave-date').text().split('(')[0]; // 日付部分を抽出
+    const userId = $('meta[name="user-id"]').attr('content');
     
     if (!newReason) {
         alert('申請理由を入力してください。');
@@ -530,11 +531,13 @@ $(document).on('click', '#reapply-button', function() {
     // 再申請のAJAXリクエスト
     $.ajax({
         type: 'POST',
-        url: $('#modal-form').attr('action'),
+        url: '/admin/attendance_header/reapply',
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
         data: {
-            _token: $('meta[name="csrf-token"]').attr('content'),
             work_date: workDate,
-            attendance_class: '1', // 有給休暇
+            user_id: userId,
             paid_leave_reason: newReason
         },
         success: function(response) {
@@ -542,12 +545,14 @@ $(document).on('click', '#reapply-button', function() {
                 alert('有給休暇の再申請が完了しました。');
                 $('#paid-leave-modal').modal('hide');
                 location.reload();
+            } else {
+                alert(response.message || '再申請処理に失敗しました。');
             }
         },
         error: function(xhr) {
             if (xhr.status === 422) {
                 const errors = xhr.responseJSON.errors;
-                displayErrors(errors);
+                alert(Object.values(errors).flat().join('\n'));
             } else {
                 alert('再申請処理中にエラーが発生しました。');
             }

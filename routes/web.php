@@ -37,6 +37,7 @@ Route::middleware('auth')->group(function () {
             Route::get('attendance_header/ajax_get_attendance_info', 'AttendanceHeaderController@ajaxGetAttendanceInfo')->name('attendance_header.ajax_get_attendance_info');
             Route::post('attendance_header/confirm/{user_id}/{year_month}', 'AttendanceHeaderController@confirm')->name('attendance_header.confirm');
             Route::get('attendance_header/get-request', 'AttendanceHeaderController@getRequest')->name('attendance_header.get_request');
+            Route::post('attendance_header/reapply', 'AttendanceHeaderController@reapply')->name('attendance_header.reapply');
 
             // Department Routes
             Route::resource('department', 'DepartmentController', ['except' => ['show', 'edit', 'create', 'update', 'delete']]);
