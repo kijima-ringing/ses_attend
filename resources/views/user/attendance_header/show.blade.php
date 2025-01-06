@@ -2,9 +2,11 @@
 
 @section('addCss')
 <link rel="stylesheet" href="{{ asset('/css/stamp.css') }}">
+<link rel="stylesheet" href="{{ asset('/css/modal2.css') }}">
 @endsection
 
 @section('content')
+<meta name="is-admin" content="0">
 <div class="container company validation-url" id="attendance-info-url"
     data-url="{{ route('user.attendance_header.ajax_get_attendance_info') }}"
     data-confirmed="{{ $attendance->confirm_flag }}"
@@ -61,9 +63,12 @@
         <tbody>
             @foreach($daysOfMonth as $day)
             <tr class="bg-white dateInfo">
-                <th class="text-right dialog date_info work_date click-text"
+                <th class="text-right {{ isset($attendanceDaily[$day['work_date']]) && $attendanceDaily[$day['work_date']]['attendance_class'] == 1 ? 'paid-leave-dialog' : 'dialog' }} date_info work_date click-text"
                     data-date_info="{{ $date . '-' . $day['day'] . '(' . $day['dayOfWeek'] . ')' }}"
                     data-work_date="{{ $day['work_date'] }}"
+                    @if(isset($attendanceDaily[$day['work_date']]) && $attendanceDaily[$day['work_date']]['attendance_class'] == 1)
+                        data-paid-leave-reason="{{ $attendanceDaily[$day['work_date']]['memo'] ?? '' }}"
+                    @endif
                     @if($attendance->confirm_flag) style="pointer-events: none; color: gray;" @endif>
                     {{ $day['day'] }}日
                 </th>
@@ -71,7 +76,12 @@
                 </th>
                 @if (count($attendanceDaily) > 0 && isset($attendanceDaily[$day['work_date']]))
                 <th class="text-center attendance_class memo id"
-                    data-id="{{ $attendanceDaily[$day['work_date']]['id'] }}">
+                    data-id="{{ $attendanceDaily[$day['work_date']]['id'] }}"
+                    @if($attendanceDaily[$day['work_date']]['attendance_class'] == 1)
+                    class="paid-leave-dialog"
+                    data-date_info="{{ $date . '-' . $day['day'] . '(' . $day['dayOfWeek'] . ')' }}"
+                    data-work_date="{{ $day['work_date'] }}"
+                    @endif>
                     {{ AttendanceHelper::attendanceClass($attendanceDaily[$day['work_date']]['attendance_class']) }}
                 </th>
                 <th class="text-center working_time leave_time">
@@ -183,16 +193,64 @@
                             <textarea class="field-textarea" id="memo" name="memo"></textarea>
                         </div>
                     </div>
+
+                    <!-- 申請理由欄（デフォルトで非表示） -->
+                    <div id="paid-leave-section" style="display: none;">
+                        <div class="form-group row">
+                            <label for="paid-leave-reason" class="col-md-4 col-form-label text-right">申請理由</label>
+                            <div class="col-md-8">
+                                <textarea class="field-textarea" id="paid-leave-reason" name="paid_leave_reason" rows="3"></textarea>
+                            </div>
+                        </div>
+                    </div>
                 </div><!-- /.modal-body -->
                 <div class="modal-footer">
                     <a data-url="{{ route('user.attendance_header.delete', ['user_id' => $attendance->user_id, 'year_month' => $date, 'work_date' => 'work_date']) }}"
                         class="btn btn-secondary" id="delete-url">未入力に戻す</a>
-                    <button type="submit" class="btn btn-primary">変更を保存</button>
-                </div><!-- /.modal-footer -->
+                    <button type="submit" class="btn btn-primary" id="normal-submit">変更を保存</button>
+                    <button type="submit" class="btn btn-primary" id="paid-leave-submit" style="display: none;">申請する</button>
+                </div>
             </form>
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
+
+<!-- 有給休暇申請モーダル -->
+<div class="modal2 fade" id="paid-leave-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5>有給申請詳細</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="閉じる">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group row">
+                    <label class="col-md-4 col-form-label text-right">申請日</label>
+                    <div class="col-md-8">
+                        <p class="form-control-plaintext" id="paid-leave-date"></p>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-md-4 col-form-label text-right">ステータス</label>
+                    <div class="col-md-8">
+                        <p class="form-control-plaintext" id="paid-leave-status"></p>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-md-4 col-form-label text-right">申請理由</label>
+                    <div class="col-md-8">
+                        <p class="form-control-plaintext" id="paid-leave-reason-display"></p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">閉じる</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 @endsection
 

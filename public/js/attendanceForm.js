@@ -220,7 +220,7 @@ $(function () {
     $(".dialog").click(function (event) {
         event.preventDefault(); // デフォルトのクリック動作を停止
 
-        // 確定フラグを取得し、数値型���比較
+        // 確定フラグを取得し、数値型比較
         let isConfirmed = Number($('#attendance-info-url').data('confirmed')) === 1;
 
         // 確定済みの場合はクリックを無効化
@@ -454,13 +454,14 @@ $(document).on('click', '.paid-leave-dialog', function(event) {
     const dateInfo = $(this).data('date_info');
     const workDate = $(this).data('work_date');
     const userId = $('meta[name="user-id"]').attr('content');
+    const isAdmin = $('meta[name="is-admin"]').attr('content') === '1'; // 管理者かどうかを判定
 
     console.log('Request params:', { workDate, userId }); // デバッグ用
 
     // 有給休暇申請情報を取得
     $.ajax({
         type: 'GET',
-        url: '/admin/attendance_header/get-request',
+        url: isAdmin ? '/admin/attendance_header/get-request' : '/user/attendance_header/get-request', // URLを動的に切り替え
         data: {
             work_date: workDate,
             user_id: userId
@@ -496,7 +497,9 @@ $(document).on('click', '.paid-leave-dialog', function(event) {
             console.error('Error details:', {
                 status: status,
                 error: error,
-                response: xhr.responseText
+                response: xhr.responseText,
+                url: this.url,  // リクエストURLを追加
+                requestData: this.data  // リクエストデータを追加
             });
             alert('申請情報の取得に失敗しました');
         }

@@ -14,6 +14,8 @@ use App\Services\GetDateService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use App\Models\PaidLeaveRequest;
+use App\Models\PaidLeaveDefault;
 
 class AttendanceHeaderController extends Controller
 {
@@ -103,6 +105,33 @@ class AttendanceHeaderController extends Controller
                 $attendanceDaily->locked_by = null;
                 $attendanceDaily->locked_at = null;
                 $attendanceDaily->save();
+
+                // 有給休暇申請の場合
+                if ($request->attendance_class == '1' && $request->has('paid_leave_reason')) {
+                    // ユーザーの有給休暇デフォルト情報を取得
+                    $paidLeaveDefault = PaidLeaveDefault::where('user_id', $request->user_id)->first();
+
+                    if ($paidLeaveDefault) {
+                        // 休憩時間の取得（最初の休憩時間を使用）
+                        $breakTimeId = null;
+                        if (!empty($request->input('break_times'))) {
+                            $breakTime = BreakTime::where('attendance_daily_id', $attendanceDaily->id)
+                                ->first();
+                            if ($breakTime) {
+                                $breakTimeId = $breakTime->id;
+                            }
+                        }
+
+                        // 有給休暇申請を作成
+                        PaidLeaveRequest::create([
+                            'paid_leave_default_id' => $paidLeaveDefault->id,
+                            'attendance_daily_id' => $attendanceDaily->id,
+                            'status' => PaidLeaveRequest::STATUS_PENDING,
+                            'request_reason' => $request->paid_leave_reason,
+                            'break_time_id' => $breakTimeId
+                        ]);
+                    }
+                }
             });
 
             session()->flash('flash_message', '勤怠情報を更新しました');
@@ -271,5 +300,63 @@ class AttendanceHeaderController extends Controller
         $attendanceDaily->save();
 
         return response()->json(['success' => true]);
+    }
+
+    public function getRequest(Request $request)
+    {
+        try {
+            \Log::info('Request params:', [
+                'work_date' => $request->work_date,
+                'user_id' => $request->user_id
+            ]);
+
+            // AttendanceDailyを取得
+            $attendanceDaily = AttendanceDaily::whereHas('attendanceHeader', function($query) use ($request) {
+                $query->where('user_id', $request->user_id);
+            })
+            ->where('work_date', $request->work_date)
+            ->first();
+
+            \Log::info('AttendanceDaily:', [
+                'found' => $attendanceDaily ? 'yes' : 'no',
+                'id' => $attendanceDaily ? $attendanceDaily->id : null
+            ]);
+
+            if (!$attendanceDaily) {
+                return response()->json([
+                    'status' => null,
+                    'reason' => null
+                ]);
+            }
+
+            // PaidLeaveRequestを取得
+            $paidLeave = PaidLeaveRequest::where('attendance_daily_id', $attendanceDaily->id)
+                ->first();
+
+            \Log::info('PaidLeaveRequest:', [
+                'found' => $paidLeave ? 'yes' : 'no',
+                'status' => $paidLeave ? $paidLeave->status : null,
+                'reason' => $paidLeave ? $paidLeave->request_reason : null
+            ]);
+
+            if (!$paidLeave) {
+                return response()->json([
+                    'status' => null,
+                    'reason' => null
+                ]);
+            }
+
+            return response()->json([
+                'status' => $paidLeave->status,
+                'reason' => $paidLeave->request_reason
+            ]);
+
+        } catch (\Exception $e) {
+            \Log::error('有給休暇申請情報の取得に失敗: ' . $e->getMessage());
+            return response()->json([
+                'error' => true,
+                'message' => '有給休暇申請情報の取得に失敗しました'
+            ], 500);
+        }
     }
 }
