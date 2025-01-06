@@ -69,7 +69,7 @@ class AttendanceHeaderController extends Controller
             ->whereDate('year_month', '=', $date->startOfMonth())
             ->exists();
 
-        // 日次勤怠デー��を取得
+        // 日次勤怠データを取得
         $attendanceDaily = AttendanceDaily::where('attendance_header_id', $attendance->id)
              ->with('breakTimes') // リレーションにより休憩時間を含む
             ->get()
@@ -188,7 +188,7 @@ class AttendanceHeaderController extends Controller
 
             session()->flash('flash_message', '勤怠情報を更新しました');
 
-            return response()->json(['success' => true, 'message' => '勤怠情報を更���しました']);
+            return response()->json(['success' => true, 'message' => '勤怠情報を更新しました']);
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json(['success' => false, 'errors' => $e->errors()], 422);
         } catch (\Exception $e) {
@@ -256,7 +256,7 @@ class AttendanceHeaderController extends Controller
      */
     public function ajaxGetAttendanceInfo(Request $request)
     {
-        // 指定さ��た ID の日次勤怠データを取得または新規作成
+        // 指定された ID の日次勤怠データを取得または新規作成
         $attendanceDaily = AttendanceDaily::with('breakTimes')->findOrNew($request->id);
 
         // 勤怠データと休憩時間を JSON で返却
@@ -414,7 +414,8 @@ class AttendanceHeaderController extends Controller
             if (!$attendanceDaily) {
                 return response()->json([
                     'status' => null,
-                    'reason' => null
+                    'reason' => null,
+                    'return_reason' => null
                 ]);
             }
 
@@ -425,19 +426,22 @@ class AttendanceHeaderController extends Controller
             \Log::info('PaidLeaveRequest:', [
                 'found' => $paidLeave ? 'yes' : 'no',
                 'status' => $paidLeave ? $paidLeave->status : null,
-                'reason' => $paidLeave ? $paidLeave->request_reason : null
+                'reason' => $paidLeave ? $paidLeave->request_reason : null,
+                'return_reason' => $paidLeave ? $paidLeave->return_reason : null
             ]);
 
             if (!$paidLeave) {
                 return response()->json([
                     'status' => null,
-                    'reason' => null
+                    'reason' => null,
+                    'return_reason' => null
                 ]);
             }
 
             return response()->json([
                 'status' => $paidLeave->status,
-                'reason' => $paidLeave->request_reason
+                'reason' => $paidLeave->request_reason,
+                'return_reason' => $paidLeave->return_reason
             ]);
 
         } catch (\Exception $e) {

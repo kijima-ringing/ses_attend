@@ -454,21 +454,21 @@ $(document).on('click', '.paid-leave-dialog', function(event) {
     const dateInfo = $(this).data('date_info');
     const workDate = $(this).data('work_date');
     const userId = $('meta[name="user-id"]').attr('content');
-    const isAdmin = $('meta[name="is-admin"]').attr('content') === '1'; // 管理者かどうかを判定
+    
+    // 現在のURLパスから管理者ページかどうかを判定
+    const isAdminPage = window.location.pathname.startsWith('/admin/');
+    const requestUrl = isAdminPage 
+        ? '/admin/attendance_header/get-request'
+        : '/user/attendance_header/get-request';
 
-    console.log('Request params:', { workDate, userId }); // デバッグ用
-
-    // 有給休暇申請情報を取得
     $.ajax({
         type: 'GET',
-        url: isAdmin ? '/admin/attendance_header/get-request' : '/user/attendance_header/get-request', // URLを動的に切り替え
+        url: requestUrl,
         data: {
             work_date: workDate,
             user_id: userId
         },
         success: function(response) {
-            console.log('Response:', response); // デバッグ用
-
             // ステータスを日本語に変換
             let statusText = '';
             switch(response.status) {
@@ -479,7 +479,7 @@ $(document).on('click', '.paid-leave-dialog', function(event) {
                     statusText = '承認済み';
                     break;
                 case 2:
-                    statusText = '否認';
+                    statusText = '差し戻し';
                     break;
                 default:
                     statusText = '未申請';
@@ -488,7 +488,20 @@ $(document).on('click', '.paid-leave-dialog', function(event) {
             // モーダルの内容を設定
             $('#paid-leave-date').text(dateInfo);
             $('#paid-leave-status').text(statusText);
-            $('#paid-leave-reason-display').text(response.reason || '理由が登録されていません');
+            
+            // 差し戻しの場合の特別処理
+            if (response.status === 2) {
+                $('.return-reason-section').show();
+                $('#paid-leave-return-reason').text(response.return_reason || '理由が記録されていません');
+                $('#paid-leave-reason-display').hide();
+                $('#paid-leave-reason-edit').show().val(response.reason);
+                $('#reapply-button').show();
+            } else {
+                $('.return-reason-section').hide();
+                $('#paid-leave-reason-display').show().text(response.reason || '理由が登録されていません');
+                $('#paid-leave-reason-edit').hide();
+                $('#reapply-button').hide();
+            }
             
             // モーダルを表示
             $('#paid-leave-modal').modal('show');
@@ -497,11 +510,47 @@ $(document).on('click', '.paid-leave-dialog', function(event) {
             console.error('Error details:', {
                 status: status,
                 error: error,
-                response: xhr.responseText,
-                url: this.url,  // リクエストURLを追加
-                requestData: this.data  // リクエストデータを追加
+                response: xhr.responseText
             });
             alert('申請情報の取得に失敗しました');
+        }
+    });
+});
+
+// 再申請ボタンのクリックイベント
+$(document).on('click', '#reapply-button', function() {
+    const newReason = $('#paid-leave-reason-edit').val();
+    const workDate = $('#paid-leave-date').text().split('(')[0]; // 日付部分を抽出
+    
+    if (!newReason) {
+        alert('申請理由を入力してください。');
+        return;
+    }
+
+    // 再申請のAJAXリクエスト
+    $.ajax({
+        type: 'POST',
+        url: $('#modal-form').attr('action'),
+        data: {
+            _token: $('meta[name="csrf-token"]').attr('content'),
+            work_date: workDate,
+            attendance_class: '1', // 有給休暇
+            paid_leave_reason: newReason
+        },
+        success: function(response) {
+            if (response.success) {
+                alert('有給休暇の再申請が完了しました。');
+                $('#paid-leave-modal').modal('hide');
+                location.reload();
+            }
+        },
+        error: function(xhr) {
+            if (xhr.status === 422) {
+                const errors = xhr.responseJSON.errors;
+                displayErrors(errors);
+            } else {
+                alert('再申請処理中にエラーが発生しました。');
+            }
         }
     });
 });
