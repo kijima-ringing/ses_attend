@@ -41,15 +41,20 @@ $(document).ready(function() {
                 alert('承認処理に失敗しました。');
             }
         });
+
+        // モーダルを閉じる
+        $('#approveModal').modal('hide');
     });
 
-    // 差戻ボタンクリック時の処理
+    // 差し戻しボタンクリック時の処理
     $('#submitReturn').click(function() {
         if (!currentRequestId) return;
 
-        const returnReason = $('#returnReason').val();
+        const returnReason = $('#returnReason').val().trim();
+        
+        // 差し戻し理由の入力チェック
         if (!returnReason) {
-            alert('差戻理由を入力してください。');
+            alert('差し戻し理由を入力してください。');
             return;
         }
 
@@ -69,8 +74,11 @@ $(document).ready(function() {
                 }
             },
             error: function() {
-                alert('差戻処理に失敗しました。');
+                alert('差し戻し処理に失敗しました。');
             }
         });
+
+        // モーダルを閉じる
+        $('#approveModal').modal('hide');
     });
 });

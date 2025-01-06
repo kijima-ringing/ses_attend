@@ -13,7 +13,11 @@ class RequestController extends Controller
     public function index()
     {
         $requests = PaidLeaveRequest::with(['paidLeaveDefault.user', 'attendanceDaily'])
-            ->where('status', PaidLeaveRequest::STATUS_PENDING)
+            ->whereIn('status', [
+                PaidLeaveRequest::STATUS_PENDING,
+                PaidLeaveRequest::STATUS_APPROVED,
+                PaidLeaveRequest::STATUS_RETURNED
+            ])
             ->orderBy('created_at', 'desc')
             ->get();
 

@@ -21,24 +21,25 @@
                     <td>{{ $request->attendanceDaily->work_date }}</td>
                     <td>{{ $request->request_reason }}</td>
                     <td>
-                        <a href="#" class="status-link"
-                            data-request-id="{{ $request->id }}"
-                            data-toggle="modal"
-                            data-target="#approveModal">
+                        @if($request->status === $statuses['STATUS_PENDING'])
+                            <a href="#" class="status-link"
+                                data-request-id="{{ $request->id }}"
+                                data-toggle="modal"
+                                data-target="#approveModal">
+                                <span class="badge badge-warning">申請中</span>
+                            </a>
+                        @else
                             @switch($request->status)
-                                @case($statuses['STATUS_PENDING'])
-                                    <span class="badge badge-warning">申請中</span>
-                                    @break
                                 @case($statuses['STATUS_APPROVED'])
-                                    <span class="badge badge-success">承認済</span>
+                                    <span class="badge badge-success">承認済み</span>
                                     @break
                                 @case($statuses['STATUS_RETURNED'])
-                                    <span class="badge badge-danger">差戻</span>
+                                    <span class="badge badge-danger">差し戻し</span>
                                     @break
                                 @default
                                     <span class="badge badge-secondary">不明</span>
                             @endswitch
-                        </a>
+                        @endif
                     </td>
                 </tr>
                 @endforeach
@@ -51,7 +52,7 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">有給休暇申請の承認・差戻</h5>
+                    <h5 class="modal-title">有給休暇申請の承認・差し戻し</h5>
                     <button type="button" class="close" data-dismiss="modal">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -62,19 +63,18 @@
                             <label>処理区分</label>
                             <select class="form-control" id="approveType">
                                 <option value="approve">承認</option>
-                                <option value="return">差戻</option>
+                                <option value="return">差し戻し</option>
                             </select>
                         </div>
                         <div class="form-group" id="returnReasonGroup" style="display: none;">
-                            <label>差戻理由</label>
+                            <label>差し戻し理由</label>
                             <textarea class="form-control" id="returnReason" rows="3"></textarea>
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">閉じる</button>
                     <button type="button" class="btn btn-primary" id="submitApprove">承認</button>
-                    <button type="button" class="btn btn-warning" id="submitReturn" style="display: none;">差戻</button>
+                    <button type="button" class="btn btn-primary" id="submitReturn" style="display: none;">差し戻す</button>
                 </div>
             </div>
         </div>
