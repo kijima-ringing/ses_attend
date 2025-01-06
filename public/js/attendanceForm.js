@@ -453,15 +453,20 @@ $(document).on('click', '.paid-leave-dialog', function(event) {
     
     const dateInfo = $(this).data('date_info');
     const workDate = $(this).data('work_date');
-    const userId = $('meta[name="user-id"]').attr('content');
-    const isAdmin = $('meta[name="is-admin"]').attr('content') === '1';
-
-    // 管理者ページか一般社員ページかに応じてURLを設定
-    const baseUrl = isAdmin ? '/admin/attendance_header' : '/user/attendance_header';
     
+    // URLから user_id を取得
+    const pathSegments = window.location.pathname.split('/');
+    const userIdIndex = pathSegments.indexOf('attendance_header') + 1;
+    const userId = pathSegments[userIdIndex];
+    
+    const isAdmin = $('meta[name="is-admin"]').attr('content') === '1';
+    
+    // URLをデータ属性から取得
+    const requestUrl = $('#attendance-info-url').data('request-url');
+
     $.ajax({
         type: 'GET',
-        url: `${baseUrl}/get-request`,
+        url: requestUrl,
         data: {
             work_date: workDate,
             user_id: userId

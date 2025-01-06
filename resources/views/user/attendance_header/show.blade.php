@@ -6,9 +6,11 @@
 @endsection
 
 @section('content')
+<meta name="user-id" content="{{ $attendance->user_id }}">
 <meta name="is-admin" content="0">
 <div class="container company validation-url" id="attendance-info-url"
     data-url="{{ route('user.attendance_header.ajax_get_attendance_info') }}"
+    data-request-url="{{ route('user.attendance_header.get_request') }}"
     data-confirmed="{{ $attendance->confirm_flag }}"
     data-base_time_from="{{ $company->base_time_from }}"
     data-base_time_to="{{ $company->base_time_to }}">

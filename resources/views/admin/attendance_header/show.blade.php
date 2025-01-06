@@ -6,9 +6,14 @@
 @endsection
 
 @section('content')
+<meta name="user-id" content="{{ $attendance->user_id }}">
+<meta name="is-admin" content="1">
 <div class="container company validation-url" id="attendance-info-url"
     data-url="{{ route('admin.attendance_header.ajax_get_attendance_info') }}"
-    data-base_time_from="{{ $company->base_time_from }}" data-base_time_to="{{ $company->base_time_to }}">
+    data-request-url="{{ route('admin.attendance_header.get_request') }}"
+    data-confirmed="{{ $attendance->confirm_flag }}"
+    data-base_time_from="{{ $company->base_time_from }}"
+    data-base_time_to="{{ $company->base_time_to }}">
     <meta name="base-lock-url" content="/admin/attendance_daily/">
     <div class="row pb-3">
         <form method="GET" action="{{ route('admin.attendance_header.index') }}">
