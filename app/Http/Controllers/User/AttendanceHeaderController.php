@@ -27,6 +27,9 @@ class AttendanceHeaderController extends Controller
 
         $attendance = AttendanceHeader::firstOrNew(['user_id' => $user_id, 'year_month' => $date]);
 
+        // 有給休暇情報を取得
+        $paidLeaveDefault = PaidLeaveDefault::where('user_id', $user_id)->first();
+
         // 日次勤怠データを取得し、休憩時間をリレーションで取得
         $attendanceDaily = AttendanceDaily::where('attendance_header_id', $attendance->id)
              ->with('breakTimes') // リレーションにより休憩時間を含む
@@ -45,6 +48,7 @@ class AttendanceHeaderController extends Controller
             'date' => $date->format('Y-m'),
             'company' => $company,
             'confirmFlag' => $attendance->confirm_flag,
+            'paidLeaveDefault' => $paidLeaveDefault,
         ]);
     }
 

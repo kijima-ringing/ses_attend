@@ -64,6 +64,9 @@ class AttendanceHeaderController extends Controller
         // 勤怠ヘッダーを取得または新規作成
         $attendance = AttendanceHeader::firstOrNew(['user_id' => $user_id, 'year_month' => $date]);
 
+        // 有給休暇情報を取得
+        $paidLeaveDefault = PaidLeaveDefault::where('user_id', $user_id)->first();
+
         // 勤怠ヘッダーが存在するかどうかをチェック
         $headerExists = AttendanceHeader::where('user_id', $user_id)
             ->whereDate('year_month', '=', $date->startOfMonth())
@@ -91,6 +94,7 @@ class AttendanceHeaderController extends Controller
             'company' => $company,
             'confirmFlag' => $attendance->confirm_flag,
             'headerExists' => $headerExists, // レコードの存在状態をビューに渡す
+            'paidLeaveDefault' => $paidLeaveDefault,
         ]);
     }
 

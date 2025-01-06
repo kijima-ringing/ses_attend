@@ -57,6 +57,7 @@
                 <th>所定内労働時間</th>
                 <th>残業時間</th>
                 <th>総労働時間</th>
+                <th>有給残日数</th>
             </tr>
         </thead>
         <tbody>
@@ -65,6 +66,7 @@
                 <th class="text-center">{{ AttendanceHelper::timeFormat($attendance->scheduled_working_hours) }}</th>
                 <th class="text-center">{{ AttendanceHelper::timeFormat($attendance->overtime_hours) }}</th>
                 <th class="text-center">{{ AttendanceHelper::timeFormat($attendance->working_hours) }}</th>
+                <th class="text-center">{{ $paidLeaveDefault ? $paidLeaveDefault->remaining_days : 0 }}日</th>
             </tr>
         </tbody>
     </table>
