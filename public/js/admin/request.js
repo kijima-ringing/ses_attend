@@ -5,6 +5,18 @@ $(document).ready(function() {
     $('.status-link').click(function(e) {
         e.preventDefault();
         currentRequestId = $(this).data('request-id');
+        
+        // return_reasonが存在する場合、テキストエリアに設定
+        const returnReason = $(this).data('return-reason');
+        if (returnReason) {
+            $('#returnReason').val(returnReason);
+            // 差し戻し用の表示に切り替え
+            $('#approveType').val('return').trigger('change');
+        } else {
+            // return_reasonがない場合は承認用の表示にリセット
+            $('#returnReason').val('');
+            $('#approveType').val('approve').trigger('change');
+        }
     });
 
     // 処理区分の変更時の処理

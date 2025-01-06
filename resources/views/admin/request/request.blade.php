@@ -24,6 +24,7 @@
                         @if($request->status === $statuses['STATUS_PENDING'])
                             <a href="#" class="status-link"
                                 data-request-id="{{ $request->id }}"
+                                data-return-reason="{{ $request->return_reason }}"
                                 data-toggle="modal"
                                 data-target="#approveModal">
                                 <span class="badge badge-warning">申請中</span>
