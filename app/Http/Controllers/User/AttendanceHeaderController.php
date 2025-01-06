@@ -325,7 +325,8 @@ class AttendanceHeaderController extends Controller
             if (!$attendanceDaily) {
                 return response()->json([
                     'status' => null,
-                    'reason' => null
+                    'reason' => null,
+                    'return_reason' => null
                 ]);
             }
 
@@ -336,19 +337,22 @@ class AttendanceHeaderController extends Controller
             \Log::info('PaidLeaveRequest:', [
                 'found' => $paidLeave ? 'yes' : 'no',
                 'status' => $paidLeave ? $paidLeave->status : null,
-                'reason' => $paidLeave ? $paidLeave->request_reason : null
+                'reason' => $paidLeave ? $paidLeave->request_reason : null,
+                'return_reason' => $paidLeave ? $paidLeave->return_reason : null
             ]);
 
             if (!$paidLeave) {
                 return response()->json([
                     'status' => null,
-                    'reason' => null
+                    'reason' => null,
+                    'return_reason' => null
                 ]);
             }
 
             return response()->json([
                 'status' => $paidLeave->status,
-                'reason' => $paidLeave->request_reason
+                'reason' => $paidLeave->request_reason,
+                'return_reason' => $paidLeave->return_reason
             ]);
 
         } catch (\Exception $e) {
@@ -356,6 +360,47 @@ class AttendanceHeaderController extends Controller
             return response()->json([
                 'error' => true,
                 'message' => '有給休暇申請情報の取得に失敗しました'
+            ], 500);
+        }
+    }
+
+    public function reapply(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'work_date' => 'required|date',
+                'user_id' => 'required|exists:users,id',
+                'paid_leave_reason' => 'required|string|max:1000',
+            ]);
+
+            DB::transaction(function () use ($validated) {
+                // AttendanceDailyを取得
+                $attendanceDaily = AttendanceDaily::whereHas('attendanceHeader', function($query) use ($validated) {
+                    $query->where('user_id', $validated['user_id']);
+                })
+                ->where('work_date', $validated['work_date'])
+                ->firstOrFail();
+
+                // PaidLeaveRequestを取得して更新
+                $paidLeaveRequest = PaidLeaveRequest::where('attendance_daily_id', $attendanceDaily->id)
+                    ->firstOrFail();
+
+                $paidLeaveRequest->update([
+                    'status' => PaidLeaveRequest::STATUS_PENDING,
+                    'request_reason' => $validated['paid_leave_reason']
+                ]);
+            });
+
+            return response()->json([
+                'success' => true,
+                'message' => '有給休暇を再申請しました。'
+            ]);
+
+        } catch (\Exception $e) {
+            \Log::error('有給休暇再申請処理でエラー発生: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => '再申請処理に失敗しました。'
             ], 500);
         }
     }

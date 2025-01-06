@@ -454,16 +454,14 @@ $(document).on('click', '.paid-leave-dialog', function(event) {
     const dateInfo = $(this).data('date_info');
     const workDate = $(this).data('work_date');
     const userId = $('meta[name="user-id"]').attr('content');
-    
-    // 現在のURLパスから管理者ページかどうかを判定
-    const isAdminPage = window.location.pathname.startsWith('/admin/');
-    const requestUrl = isAdminPage 
-        ? '/admin/attendance_header/get-request'
-        : '/user/attendance_header/get-request';
+    const isAdmin = $('meta[name="is-admin"]').attr('content') === '1';
 
+    // 管理者ページか一般社員ページかに応じてURLを設定
+    const baseUrl = isAdmin ? '/admin/attendance_header' : '/user/attendance_header';
+    
     $.ajax({
         type: 'GET',
-        url: requestUrl,
+        url: `${baseUrl}/get-request`,
         data: {
             work_date: workDate,
             user_id: userId
@@ -476,7 +474,7 @@ $(document).on('click', '.paid-leave-dialog', function(event) {
                     statusText = '申請中';
                     break;
                 case 1:
-                    statusText = '承認済み';
+                    statusText = '承認済';
                     break;
                 case 2:
                     statusText = '差し戻し';
@@ -484,11 +482,12 @@ $(document).on('click', '.paid-leave-dialog', function(event) {
                 default:
                     statusText = '未申請';
             }
-            
+
             // モーダルの内容を設定
             $('#paid-leave-date').text(dateInfo);
             $('#paid-leave-status').text(statusText);
-            
+            $('#paid-leave-reason-display').text(response.reason || '');
+
             // 差し戻しの場合の特別処理
             if (response.status === 2) {
                 $('.return-reason-section').show();
@@ -498,7 +497,7 @@ $(document).on('click', '.paid-leave-dialog', function(event) {
                 $('#reapply-button').show();
             } else {
                 $('.return-reason-section').hide();
-                $('#paid-leave-reason-display').show().text(response.reason || '理由が登録されていません');
+                $('#paid-leave-reason-display').show();
                 $('#paid-leave-reason-edit').hide();
                 $('#reapply-button').hide();
             }
@@ -522,7 +521,11 @@ $(document).on('click', '#reapply-button', function() {
     const newReason = $('#paid-leave-reason-edit').val();
     const workDate = $('#paid-leave-date').text().split('(')[0]; // 日付部分を抽出
     const userId = $('meta[name="user-id"]').attr('content');
+    const isAdmin = $('meta[name="is-admin"]').attr('content') === '1';
     
+    // 管理者ページか一般社員ページかに応じてURLを設定
+    const baseUrl = isAdmin ? '/admin/attendance_header' : '/user/attendance_header';
+
     if (!newReason) {
         alert('申請理由を入力してください。');
         return;
@@ -531,7 +534,7 @@ $(document).on('click', '#reapply-button', function() {
     // 再申請のAJAXリクエスト
     $.ajax({
         type: 'POST',
-        url: '/admin/attendance_header/reapply',
+        url: `${baseUrl}/reapply`,
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         },

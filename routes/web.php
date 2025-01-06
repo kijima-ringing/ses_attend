@@ -80,6 +80,7 @@ Route::middleware('auth')->group(function () {
         });
 
         Route::get('attendance_header/ajax_get_attendance_info', 'AttendanceHeaderController@ajaxGetAttendanceInfo')->name('attendance_header.ajax_get_attendance_info');
+        Route::post('attendance_header/reapply', 'AttendanceHeaderController@reapply')->name('attendance_header.reapply');
     });
     Route::group(['prefix' => 'user/attendance_daily', 'as' => 'user.attendance_daily.', 'namespace' => 'User'], function () {
         // ロック関連のルート
