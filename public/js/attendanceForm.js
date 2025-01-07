@@ -563,7 +563,10 @@ $(document).on('click', '#reapply-button', function() {
             }
         },
         error: function(xhr) {
-            if (xhr.status === 422) {
+            if (xhr.status === 403) {
+                alert(xhr.responseJSON.message);
+                location.reload();
+            } else if (xhr.status === 422) {
                 const errors = xhr.responseJSON.errors;
                 alert(Object.values(errors).flat().join('\n'));
             } else {
