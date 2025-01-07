@@ -1,5 +1,9 @@
 @extends('layouts.app')
 
+@section('addCss')
+<link rel="stylesheet" href="{{ asset('/css/admin/request.css') }}">
+@endsection
+
 @section('content')
 <div class="container">
     <h1 class="h2 mb-4">有給休暇申請一覧</h1>
@@ -16,7 +20,10 @@
             </thead>
             <tbody>
                 @foreach($requests as $request)
-                <tr>
+                <tr @if($request->status !== $statuses['STATUS_APPROVED'] && 
+                        \Carbon\Carbon::parse($request->created_at)->addDays(7)->isPast())
+                    class="bg-danger-light"
+                    @endif>
                     <td>{{ $request->paidLeaveDefault->user->last_name }} {{ $request->paidLeaveDefault->user->first_name }}</td>
                     <td>{{ $request->attendanceDaily->work_date }}</td>
                     <td>{{ $request->request_reason }}</td>
@@ -27,18 +34,18 @@
                                 data-return-reason="{{ $request->return_reason }}"
                                 data-toggle="modal"
                                 data-target="#approveModal">
-                                <span class="badge badge-warning">申請中</span>
+                                <span class="badge">申請中</span>
                             </a>
                         @else
                             @switch($request->status)
                                 @case($statuses['STATUS_APPROVED'])
-                                    <span class="badge badge-success">承認済み</span>
+                                    <span class="badge">承認済み</span>
                                     @break
                                 @case($statuses['STATUS_RETURNED'])
-                                    <span class="badge badge-danger">差し戻し</span>
+                                    <span class="badge">差し戻し</span>
                                     @break
                                 @default
-                                    <span class="badge badge-secondary">不明</span>
+                                    <span class="badge">不明</span>
                             @endswitch
                         @endif
                     </td>
