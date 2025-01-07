@@ -309,22 +309,12 @@ class AttendanceHeaderController extends Controller
     public function getRequest(Request $request)
     {
         try {
-            \Log::info('Request params:', [
-                'work_date' => $request->work_date,
-                'user_id' => $request->user_id
-            ]);
-
             // AttendanceDailyを取得
             $attendanceDaily = AttendanceDaily::whereHas('attendanceHeader', function($query) use ($request) {
                 $query->where('user_id', $request->user_id);
             })
             ->where('work_date', $request->work_date)
             ->first();
-
-            \Log::info('AttendanceDaily:', [
-                'found' => $attendanceDaily ? 'yes' : 'no',
-                'id' => $attendanceDaily ? $attendanceDaily->id : null
-            ]);
 
             if (!$attendanceDaily) {
                 return response()->json([
@@ -337,13 +327,6 @@ class AttendanceHeaderController extends Controller
             // PaidLeaveRequestを取得
             $paidLeave = PaidLeaveRequest::where('attendance_daily_id', $attendanceDaily->id)
                 ->first();
-
-            \Log::info('PaidLeaveRequest:', [
-                'found' => $paidLeave ? 'yes' : 'no',
-                'status' => $paidLeave ? $paidLeave->status : null,
-                'reason' => $paidLeave ? $paidLeave->request_reason : null,
-                'return_reason' => $paidLeave ? $paidLeave->return_reason : null
-            ]);
 
             if (!$paidLeave) {
                 return response()->json([
@@ -360,7 +343,6 @@ class AttendanceHeaderController extends Controller
             ]);
 
         } catch (\Exception $e) {
-            \Log::error('有給休暇申請情報の取得に失敗: ' . $e->getMessage());
             return response()->json([
                 'error' => true,
                 'message' => '有給休暇申請情報の取得に失敗しました'
@@ -401,7 +383,6 @@ class AttendanceHeaderController extends Controller
             ]);
 
         } catch (\Exception $e) {
-            \Log::error('有給休暇再申請処理でエラー発生: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
                 'message' => '再申請処理に失敗しました。'
