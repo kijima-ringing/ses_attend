@@ -466,12 +466,15 @@ class AttendanceHeaderController extends Controller
                 ]);
             });
 
+            session()->flash('flash_message', '有給休暇を再申請しました。');
+
             return response()->json([
                 'success' => true,
                 'message' => '有給休暇を再申請しました。'
             ]);
 
         } catch (\Exception $e) {
+            session()->flash('error_message', '再申請処理に失敗しました。');
             return response()->json([
                 'success' => false,
                 'message' => '再申請処理に失敗しました。'

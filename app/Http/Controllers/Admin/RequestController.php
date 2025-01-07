@@ -47,8 +47,11 @@ class RequestController extends Controller
                 $paidLeaveDefault->decrement('remaining_days');
             });
 
+            session()->flash('flash_message', '申請を承認しました。');
+
             return response()->json(['success' => true, 'message' => '申請を承認しました。']);
         } catch (\Exception $e) {
+            session()->flash('error_message', '承認処理に失敗しました。');
             return response()->json(['success' => false, 'message' => '承認処理に失敗しました。'], 500);
         }
     }
@@ -66,8 +69,11 @@ class RequestController extends Controller
                 'return_reason' => $validated['return_reason']
             ]);
 
+            session()->flash('flash_message', '申請を差し戻しました。');
+
             return response()->json(['success' => true, 'message' => '申請を差し戻しました。']);
         } catch (\Exception $e) {
+            session()->flash('error_message', '差し戻し処理に失敗しました。');
             return response()->json(['success' => false, 'message' => '差し戻し処理に失敗しました。'], 500);
         }
     }
