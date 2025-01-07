@@ -67,6 +67,7 @@ class AttendanceHeaderController extends Controller
 
             // 勤怠が確定済みかを確認
             if ($attendanceHeader && $attendanceHeader->confirm_flag === 1) {
+                session()->flash('error_message', 'すでに勤怠は確定されています。');
                 return response()->json(['success' => false, 'message' => 'すでに勤怠は確定されています。'],403);
             }
 
