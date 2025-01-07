@@ -224,20 +224,14 @@
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5>有給申請詳細</h5>
+                <h5 class="modal-title" id="paid-leave-date"></>
                 <button type="button" class="close" data-dismiss="modal" aria-label="閉じる">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
                 <div class="form-group row">
-                    <label class="col-md-4 col-form-label text-right">申請日</label>
-                    <div class="col-md-8">
-                        <p class="form-control-plaintext" id="paid-leave-date"></p>
-                    </div>
-                </div>
-                <div class="form-group row">
-                    <label class="col-md-4 col-form-label text-right">ステータス</label>
+                    <label class="col-md-4 col-form-label text-right">区分</label>
                     <div class="col-md-8">
                         <p class="form-control-plaintext" id="paid-leave-status"></p>
                     </div>

@@ -479,7 +479,7 @@ $(document).on('click', '.paid-leave-dialog', function(event) {
                     statusText = '申請中';
                     break;
                 case 1:
-                    statusText = '承認済';
+                    statusText = '承認済み';
                     break;
                 case 2:
                     statusText = '差し戻し';
