@@ -440,6 +440,10 @@ $(document).on('click', '#paid-leave-submit', function(e) {
             if (xhr.status === 422) {
                 const errors = xhr.responseJSON.errors;
                 displayErrors(errors);
+            } else if (xhr.status === 403) {
+                alert(xhr.responseJSON.message || 'この操作は許可されていません。');
+                $('#attendance-modal').modal('hide');
+                location.reload();
             } else {
                 alert('申請処理中にエラーが発生しました。');
             }
