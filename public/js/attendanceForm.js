@@ -565,6 +565,10 @@ $(document).on('click', '#reapply-button', function() {
             if (xhr.status === 422) {
                 const errors = xhr.responseJSON.errors;
                 alert(Object.values(errors).flat().join('\n'));
+            } else if (xhr.status === 403) {
+                alert(xhr.responseJSON.message || 'この操作は許可されていません。');
+                $('#paid-leave-modal').modal('hide');
+                location.reload();
             } else {
                 alert('再申請処理中にエラーが発生しました。');
             }

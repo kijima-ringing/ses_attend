@@ -383,6 +383,23 @@ class AttendanceHeaderController extends Controller
                 'paid_leave_reason' => 'required|string|max:1000',
             ]);
 
+            // 勤怠ヘッダーを取得して確定状態をチェック
+            $getDateService = new GetDateService();
+            $date = $getDateService->createYearMonthFormat(date('Y-m', strtotime($validated['work_date'])));
+            
+            $attendanceHeader = AttendanceHeader::where([
+                'user_id' => $validated['user_id'],
+                'year_month' => $date
+            ])->first();
+
+            // 勤怠が確定済みかを確認
+            if ($attendanceHeader && $attendanceHeader->confirm_flag === 1) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'すでに勤怠は確定されています。'
+                ], 403);
+            }
+
             DB::transaction(function () use ($validated) {
                 // AttendanceDailyを取得
                 $attendanceDaily = AttendanceDaily::whereHas('attendanceHeader', function($query) use ($validated) {
