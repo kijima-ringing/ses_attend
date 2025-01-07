@@ -122,6 +122,30 @@ class AttendanceHeaderController extends Controller
                 return response()->json(['success' => false, 'message' => 'すでに勤怠は確定されています。'],403);
             }
 
+            // 有給休暇申請の場合、残日数のバリデーションを行う
+            if ($request->attendance_class == '1') {
+                // ユーザーの有給休暇デフォルト情報を取得
+                $paidLeaveDefault = PaidLeaveDefault::where('user_id', $request->user_id)->first();
+
+                if ($paidLeaveDefault) {
+                    // 申請中の有給休暇数を取得
+                    $pendingRequests = PaidLeaveRequest::whereHas('paidLeaveDefault', function($query) use ($request) {
+                        $query->where('user_id', $request->user_id);
+                    })
+                    ->where('status', PaidLeaveRequest::STATUS_PENDING)
+                    ->count();
+
+                    // 残日数が申請中の数を超えていないかチェック
+                    if ($paidLeaveDefault->remaining_days <= $pendingRequests) {
+                        return response()->json([
+                            'success' => false,
+                            'message' => '有給休暇の残日数が不足しています。',
+                            'errors' => ['paid_leave' => ['有給休暇の残日数が不足しています。申請中の有給休暇申請をご確認ください。']]
+                        ], 422);
+                    }
+                }
+            }
+
             DB::transaction(function () use ($request, $attendanceService, $date, $attendanceHeader) {
                 if (!$attendanceHeader) {
                     $attendanceHeader = AttendanceHeader::firstOrCreate([
