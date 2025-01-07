@@ -119,7 +119,6 @@ class AttendanceHeaderController extends Controller
 
             // 勤怠が確定済みかを確認
             if ($attendanceHeader && $attendanceHeader->confirm_flag === 1) {
-                session()->flash('error_message', 'すでに勤怠は確定されています。');
                 return response()->json(['success' => false, 'message' => 'すでに勤怠は確定されています。'],403);
             }
 
@@ -472,21 +471,6 @@ class AttendanceHeaderController extends Controller
                 'user_id' => 'required|exists:users,id',
                 'paid_leave_reason' => 'required|string|max:1000',
             ]);
-
-            // 勤怠ヘッダーを取得
-            $getDateService = new GetDateService();
-            $date = $getDateService->createYearMonthFormat(date('Y-m', strtotime($validated['work_date'])));
-            
-            $attendanceHeader = AttendanceHeader::where([
-                'user_id' => $validated['user_id'],
-                'year_month' => $date
-            ])->first();
-
-            // 勤怠が確定済みかを確認
-            if ($attendanceHeader && $attendanceHeader->confirm_flag === 1) {
-                session()->flash('error_message', 'すでに勤怠は確定されています。');
-                return response()->json(['success' => false, 'message' => 'すでに勤怠は確定されています。'], 403);
-            }
 
             DB::transaction(function () use ($validated) {
                 // AttendanceDailyを取得

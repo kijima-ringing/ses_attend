@@ -82,29 +82,27 @@ $('#modal-form').on('submit', function (e) {
     const formData = form.serialize();
 
     $.ajax({
+        type: 'POST',
         url: url,
-        method: 'POST',
         data: formData,
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        },
-        success: function(response) {
+        success: function (response) {
             if (response.success) {
                 alert(response.message);
-                location.reload();
-            } else {
-                alert(response.message);
+                location.reload(); // 必要に応じてリロード
             }
         },
-        error: function(xhr) {
-            if (xhr.status === 403) {
-                alert(xhr.responseJSON.message);
-                location.reload();
-            } else if (xhr.status === 422) {
+        error: function (xhr) {
+            if (xhr.status === 422) {
                 const errors = xhr.responseJSON.errors;
-                alert(Object.values(errors).flat().join('\n'));
+                displayErrors(errors);
+            } else if (xhr.status === 403) {
+                // 403エラーの場合に、サーバーからのメッセージを表示
+                alert(xhr.responseJSON.message || 'この操作は許可されていません。');
+                setTimeout(() => {
+                    location.reload(); // ページリロードを遅らせて実行
+                }, 100); // 100ミリ秒後にリロード
             } else {
-                alert('申請処理中にエラーが発生しました。');
+                alert('サーバーエラーが発生しました。もう一度お試しください。');
             }
         }
     });
@@ -439,10 +437,7 @@ $(document).on('click', '#paid-leave-submit', function(e) {
             }
         },
         error: function(xhr) {
-            if (xhr.status === 403) {
-                alert(xhr.responseJSON.message);
-                location.reload();
-            } else if (xhr.status === 422) {
+            if (xhr.status === 422) {
                 const errors = xhr.responseJSON.errors;
                 displayErrors(errors);
             } else {
@@ -563,51 +558,11 @@ $(document).on('click', '#reapply-button', function() {
             }
         },
         error: function(xhr) {
-            if (xhr.status === 403) {
-                alert(xhr.responseJSON.message);
-                location.reload();
-            } else if (xhr.status === 422) {
+            if (xhr.status === 422) {
                 const errors = xhr.responseJSON.errors;
                 alert(Object.values(errors).flat().join('\n'));
             } else {
                 alert('再申請処理中にエラーが発生しました。');
-            }
-        }
-    });
-});
-
-// 有給休暇申請用のサブミットハンドラ
-$('#paid-leave-submit').on('click', function(e) {
-    e.preventDefault();
-
-    const form = $('#modal-form');
-    const url = form.attr('action');
-    const formData = form.serialize();
-
-    $.ajax({
-        url: url,
-        method: 'POST',
-        data: formData,
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        },
-        success: function(response) {
-            if (response.success) {
-                alert(response.message);
-                location.reload();
-            } else {
-                alert(response.message);
-            }
-        },
-        error: function(xhr) {
-            if (xhr.status === 403) {
-                alert(xhr.responseJSON.message);
-                location.reload();
-            } else if (xhr.status === 422) {
-                const errors = xhr.responseJSON.errors;
-                alert(Object.values(errors).flat().join('\n'));
-            } else {
-                alert('申請処理中にエラーが発生しました。');
             }
         }
     });
