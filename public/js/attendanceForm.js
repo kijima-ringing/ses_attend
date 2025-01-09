@@ -457,6 +457,13 @@ $(document).on('click', '.paid-leave-dialog', function(event) {
     
     const dateInfo = $(this).data('date_info');
     const workDate = $(this).data('work_date');
+    const attendanceClass = $(this).closest('tr').find('.attendance_class').text().trim();
+    const id = $(this).closest('tr').find('.attendance_class').data('id');
+    
+    // 勤務区分が有給休暇でない場合は処理を中止
+    if (attendanceClass !== '有給休暇') {
+        return;
+    }
     
     // URLから user_id を取得
     const pathSegments = window.location.pathname.split('/');
@@ -476,43 +483,31 @@ $(document).on('click', '.paid-leave-dialog', function(event) {
             user_id: userId
         },
         success: function(response) {
-            // ステータスを日本語に変換
-            let statusText = '';
-            switch(response.status) {
-                case 0:
-                    statusText = '申請中';
-                    break;
-                case 1:
-                    statusText = '承認済み';
-                    break;
-                case 2:
-                    statusText = '差し戻し';
-                    break;
-                default:
-                    statusText = '未申請';
+            // statusが2（差し戻し）の場合は勤怠編集モーダルを表示
+            if (response.status === 2) {
+                // 勤怠編集モーダルを表示する処理を呼び出し
+                showModalWithData(id, workDate, dateInfo);
+                return;
             }
 
-            // モーダルの内容を設定
-            $('#paid-leave-date').text(dateInfo);
-            $('#paid-leave-status').text(statusText);
-            $('#paid-leave-reason-display').text(response.reason || '');
+            // statusが0（申請中）または1（承認済み）の場合は申請詳細モーダルを表示
+            if (response.status === 0 || response.status === 1) {
+                let statusText = response.status === 0 ? '申請中' : '承認済み';
 
-            // 差し戻しの場合の特別処理
-            if (response.status === 2) {
-                $('.return-reason-section').show();
-                $('#paid-leave-return-reason').text(response.return_reason || '理由が記録されていません');
-                $('#paid-leave-reason-display').hide();
-                $('#paid-leave-reason-edit').show().val(response.reason);
-                $('#reapply-button').show();
-            } else {
+                // モーダルの内容を設定
+                $('#paid-leave-date').text(dateInfo);
+                $('#paid-leave-status').text(statusText);
+                $('#paid-leave-reason-display').text(response.reason || '');
+
+                // 差し戻し関連の要素を非表示
                 $('.return-reason-section').hide();
                 $('#paid-leave-reason-display').show();
                 $('#paid-leave-reason-edit').hide();
                 $('#reapply-button').hide();
+                
+                // モーダルを表示
+                $('#paid-leave-modal').modal('show');
             }
-            
-            // モーダルを表示
-            $('#paid-leave-modal').modal('show');
         },
         error: function(xhr, status, error) {
             console.error('Error details:', {
@@ -524,6 +519,74 @@ $(document).on('click', '.paid-leave-dialog', function(event) {
         }
     });
 });
+
+// 勤怠編集モーダルを表示する関数
+function showModalWithData(id, work_date, dateInfo) {
+    // 勤怠IDがある場合、AJAXで勤怠データを取得
+    if (id) {
+        $.ajax({
+            type: 'GET',
+            url: getAttendanceInfoUrl,
+            dataType: 'json',
+            data: { id: id }
+        }).done(function (res) {
+            let data = res.data;
+
+            // 勤怠データを取得またはデフォルト値を設定
+            var attendance_class = data.attendance_class || NORMAL_WORKING;
+            var working_time = formatTimeToHHMM(data.working_time) || companyBaseTimeFrom;
+            var leave_time = formatTimeToHHMM(data.leave_time) || companyBaseTimeTo;
+            var memo = data.memo || '';
+
+            // モーダル内の各フィールドに値をセット
+            $('#attendance_class').val(attendance_class);
+            $('#working_time').val(working_time);
+            $('#leave_time').val(leave_time);
+            $('#memo').val(memo);
+
+            // 休憩時間の表示処理
+            $('#break-times-container').empty();
+            if (data.break_times && data.break_times.length > 0) {
+                data.break_times.forEach(function (breakTime, index) {
+                    var breakTimeFrom = formatTimeToHHMM(breakTime.break_time_from);
+                    var breakTimeTo = formatTimeToHHMM(breakTime.break_time_to);
+                    $('#break-times-container').append(`
+                        <div class="form-inline mb-2 break-time-entry">
+                            <input type="time" name="break_times[${index}][break_time_from]" value="${breakTimeFrom}" class="form-control">
+                            <span class="mx-2">〜</span>
+                            <input type="time" name="break_times[${index}][break_time_to]" value="${breakTimeTo}" class="form-control">
+                            <button type="button" class="btn btn-danger btn-sm ml-2 remove-break-time">削除</button>
+                        </div>
+                    `);
+                });
+            } else {
+                $('#break-times-container').append(`
+                    <div class="form-inline mb-2 break-time-entry">
+                        <input type="time" name="break_times[0][break_time_from]" value="${BASE_BREAK_TIME_FROM}" class="form-control">
+                        <span class="mx-2">〜</span>
+                        <input type="time" name="break_times[0][break_time_to]" value="${BASE_BREAK_TIME_TO}" class="form-control">
+                        <button type="button" class="btn btn-danger btn-sm ml-2 remove-break-time">削除</button>
+                    </div>
+                `);
+            }
+
+            // エラー表示エリアを非表示
+            $('#error-messages').addClass('d-none');
+            $('#error-list').empty();
+
+            // モーダルを表示
+            let replace = $('#delete-url').data("url").replace('work_date', work_date);
+            $('#work_date').val(work_date);
+            $('#delete-url').attr("href", replace);
+            $('.modal-title').text(dateInfo);
+            $(".modal").modal("show");
+            setTimeout(enableModalFields, 0);
+
+        }).fail(function () {
+            alert('AJAX通信に失敗しました');
+        });
+    }
+}
 
 // 再申請ボタンのクリックイベント
 $(document).on('click', '#reapply-button', function() {
