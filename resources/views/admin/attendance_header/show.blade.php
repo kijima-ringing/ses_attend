@@ -165,13 +165,6 @@
                     <div id="error-messages" class="alert alert-danger d-none">
                         <ul id="error-list"></ul>
                     </div>
-                    <!-- 差し戻し理由（差し戻し時のみ表示） -->
-                    <div class="form-group row return-reason-section" style="display: none;">
-                        <label class="col-md-4 col-form-label text-right">差し戻し理由</label>
-                        <div class="col-md-8">
-                            <p class="form-control-plaintext" id="paid-leave-return-reason"></p>
-                        </div>
-                    </div>
 
                     <!-- 勤務区分 -->
                     <div class="form-group row">
