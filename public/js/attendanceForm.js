@@ -248,13 +248,14 @@ $(function () {
                     let data = res.data;
 
                     // 勤怠データを取得またはデフォルト値を設定
-                    var attendance_class = data.attendance_class || NORMAL_WORKING;
+                    // 有給休暇で差し戻しの場合は通常勤務にセット
+                    var attendance_class = NORMAL_WORKING;
                     var working_time = formatTimeToHHMM(data.working_time) || companyBaseTimeFrom;
                     var leave_time = formatTimeToHHMM(data.leave_time) || companyBaseTimeTo;
                     var memo = data.memo || '';
 
                     // 有給休暇で差し戻しの場合、差し戻し理由を表示
-                    if (attendance_class == PAID_HOLIDAYS && 
+                    if (data.attendance_class == PAID_HOLIDAYS && 
                         data.paid_leave_request && 
                         data.paid_leave_request.status == 2) { // 2は差し戻しステータス
                         $('#return-reason-section').show();
@@ -543,13 +544,14 @@ function showModalWithData(id, work_date, dateInfo) {
             let data = res.data;
 
             // 勤怠データを取得またはデフォルト値を設定
-            var attendance_class = data.attendance_class || NORMAL_WORKING;
+            // 有給休暇で差し戻しの場合は通常勤務にセット
+            var attendance_class = NORMAL_WORKING;
             var working_time = formatTimeToHHMM(data.working_time) || companyBaseTimeFrom;
             var leave_time = formatTimeToHHMM(data.leave_time) || companyBaseTimeTo;
             var memo = data.memo || '';
 
             // 有給休暇で差し戻しの場合、差し戻し理由を表示
-            if (attendance_class == PAID_HOLIDAYS && 
+            if (data.attendance_class == PAID_HOLIDAYS && 
                 data.paid_leave_request && 
                 data.paid_leave_request.status == 2) { // 2は差し戻しステータス
                 $('#return-reason-section').show();
