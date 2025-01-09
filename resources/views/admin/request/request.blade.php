@@ -20,7 +20,7 @@
             </thead>
             <tbody>
                 @foreach($requests as $request)
-                <tr @if($request->status !== $statuses['STATUS_APPROVED'] && 
+                <tr @if($request->status === $statuses['STATUS_PENDING'] && 
                         \Carbon\Carbon::parse($request->created_at)->addDays(7)->isPast())
                     class="bg-danger-light"
                     @endif>
