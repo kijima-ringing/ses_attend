@@ -258,26 +258,6 @@ $(function () {
                     $('#leave_time').val(leave_time);
                     $('#memo').val(memo);
 
-                    // 有給休暇の差し戻し理由を表示
-                    const requestUrl = $('#attendance-info-url').data('request-url');
-                    $.ajax({
-                        type: 'GET',
-                        url: requestUrl,
-                        data: {
-                            work_date: work_date,
-                            user_id: $('meta[name="user-id"]').attr('content')
-                        },
-                        success: function(response) {
-                            if (response.status === 2) {  // 差し戻しの場合
-                                // 差し戻し理由セクションを表示
-                                $('.return-reason-section').show();
-                                $('#paid-leave-return-reason').text(response.return_reason || '理由が記録されていません');
-                            } else {
-                                $('.return-reason-section').hide();
-                            }
-                        }
-                    });
-
                     // 休憩時間の表示処理
                     $('#break-times-container').empty();
                     if (data.break_times && data.break_times.length > 0) {
@@ -303,7 +283,6 @@ $(function () {
                             </div>
                         `);
                     }
-
                     // エラー表示エリアを非表示
                     $('#error-messages').addClass('d-none');
                     $('#error-list').empty();
@@ -564,26 +543,6 @@ function showModalWithData(id, work_date, dateInfo) {
             $('#working_time').val(working_time);
             $('#leave_time').val(leave_time);
             $('#memo').val(memo);
-
-            // 有給休暇の差し戻し理由を表示
-            const requestUrl = $('#attendance-info-url').data('request-url');
-            $.ajax({
-                type: 'GET',
-                url: requestUrl,
-                data: {
-                    work_date: work_date,
-                    user_id: $('meta[name="user-id"]').attr('content')
-                },
-                success: function(response) {
-                    if (response.status === 2) {  // 差し戻しの場合
-                        // 差し戻し理由セクションを表示
-                        $('.return-reason-section').show();
-                        $('#paid-leave-return-reason').text(response.return_reason || '理由が記録されていません');
-                    } else {
-                        $('.return-reason-section').hide();
-                    }
-                }
-            });
 
             // 休憩時間の表示処理
             $('#break-times-container').empty();
