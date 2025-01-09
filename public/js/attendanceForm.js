@@ -63,6 +63,7 @@ function resetModalFields() {
     $('#leave_time').val(companyBaseTimeTo);             // 勤務終了時間をリセット
     $('#memo').val('');                                  // メモを空にリセット
     $('#break-times-container').empty();                // 休憩時間をクリア
+    $('#return-reason-section').hide();                 // 差し戻し理由セクションを非表示
     $('#break-times-container').append(`
         <div class="form-inline mb-2 break-time-entry">
             <input type="time" name="break_times[0][break_time_from]" value="${BASE_BREAK_TIME_FROM}" class="form-control">
