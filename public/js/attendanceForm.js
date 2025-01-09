@@ -252,6 +252,16 @@ $(function () {
                     var leave_time = formatTimeToHHMM(data.leave_time) || companyBaseTimeTo;
                     var memo = data.memo || '';
 
+                    // 有給休暇で差し戻しの場合、差し戻し理由を表示
+                    if (attendance_class == PAID_HOLIDAYS && 
+                        data.paid_leave_request && 
+                        data.paid_leave_request.status == 2) { // 2は差し戻しステータス
+                        $('#return-reason-section').show();
+                        $('#attendance-return-reason').text(data.paid_leave_request.return_reason || '');
+                    } else {
+                        $('#return-reason-section').hide();
+                    }
+
                     // モーダル内の各フィールドに値をセット
                     $('#attendance_class').val(attendance_class);
                     $('#working_time').val(working_time);
@@ -522,7 +532,6 @@ $(document).on('click', '.paid-leave-dialog', function(event) {
 
 // 勤怠編集モーダルを表示する関数
 function showModalWithData(id, work_date, dateInfo) {
-    // 勤怠IDがある場合、AJAXで勤怠データを取得
     if (id) {
         $.ajax({
             type: 'GET',
@@ -537,6 +546,16 @@ function showModalWithData(id, work_date, dateInfo) {
             var working_time = formatTimeToHHMM(data.working_time) || companyBaseTimeFrom;
             var leave_time = formatTimeToHHMM(data.leave_time) || companyBaseTimeTo;
             var memo = data.memo || '';
+
+            // 有給休暇で差し戻しの場合、差し戻し理由を表示
+            if (attendance_class == PAID_HOLIDAYS && 
+                data.paid_leave_request && 
+                data.paid_leave_request.status == 2) { // 2は差し戻しステータス
+                $('#return-reason-section').show();
+                $('#attendance-return-reason').text(data.paid_leave_request.return_reason || '');
+            } else {
+                $('#return-reason-section').hide();
+            }
 
             // モーダル内の各フィールドに値をセット
             $('#attendance_class').val(attendance_class);

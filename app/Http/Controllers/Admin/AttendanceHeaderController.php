@@ -285,7 +285,7 @@ class AttendanceHeaderController extends Controller
     public function ajaxGetAttendanceInfo(Request $request)
     {
         // 指定された ID の日次勤怠データを取得または新規作成
-        $attendanceDaily = AttendanceDaily::with('breakTimes')->findOrNew($request->id);
+        $attendanceDaily = AttendanceDaily::with(['breakTimes', 'paidLeaveRequest'])->findOrNew($request->id);
 
         // 勤怠データと休憩時間を JSON で返却
         return response()->json([
@@ -300,6 +300,10 @@ class AttendanceHeaderController extends Controller
                         'break_time_to' => $breakTime->break_time_to,
                     ];
                 }),
+                'paid_leave_request' => $attendanceDaily->paidLeaveRequest ? [
+                    'status' => $attendanceDaily->paidLeaveRequest->status,
+                    'return_reason' => $attendanceDaily->paidLeaveRequest->return_reason
+                ] : null
             ]
         ]);
     }
