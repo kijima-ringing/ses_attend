@@ -19,22 +19,33 @@
                 <thead class="bg-info">
                     <tr>
                         <th width="30%">社員名</th>
-                        <th>日付</th>
+                        <th>最終メッセージ日付</th>
                         <th width="15%"></th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($chat_rooms as $room)
+                    @foreach($users as $user)
                         <tr>
-                            <td>{{ $room->user->last_name }} {{ $room->user->first_name }}</td>
+                            <td>{{ $user->last_name }} {{ $user->first_name }}</td>
                             <td>
-                                @if($room->latestMessage)
+                                @php
+                                    $room = $chat_rooms->where('user_id', $user->id)->first();
+                                @endphp
+                                @if($room && $room->latestMessage)
                                     {{ \Carbon\Carbon::parse($room->latestMessage->created_at)->format('Y-n-j') }}
                                 @endif
                             </td>
                             <td class="text-center">
-                                <a href="{{ route('admin.chat.room', ['room_id' => $room->id]) }}" 
-                                   class="btn btn-primary chat-button">チャット画面</a>
+                                @if($room)
+                                    <a href="{{ route('admin.chat.room', ['room_id' => $room->id]) }}" 
+                                       class="btn btn-primary chat-button">チャット画面</a>
+                                @else
+                                    <form method="POST">
+                                        @csrf
+                                        <input type="hidden" name="user_id" value="{{ $user->id }}">
+                                        <button type="submit" class="btn btn-success chat-button">チャット開始</button>
+                                    </form>
+                                @endif
                             </td>
                         </tr>
                     @endforeach
