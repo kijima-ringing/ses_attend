@@ -65,6 +65,7 @@ Route::middleware('auth')->group(function () {
 
             // チャット機能用のルート
             Route::get('chat', 'ChatListController@index')->name('chat.list');
+            Route::post('chat/create', 'ChatListController@createRoom')->name('chat.create');
             Route::get('chat/{room_id}', 'ChatRoomController@show')->name('chat.room');
             Route::post('chat/{room_id}/send', 'ChatRoomController@sendMessage')->name('chat.send');
         });
