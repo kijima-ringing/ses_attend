@@ -64,9 +64,9 @@ Route::middleware('auth')->group(function () {
             Route::post('request/{id}/return', 'RequestController@return')->name('request.return');
 
             // チャット機能用のルート
-            Route::get('chat', 'Admin\ChatListController@index')->name('chat.list');
-            Route::get('chat/{room_id}', 'Admin\ChatRoomController@show')->name('chat.room');
-            Route::post('chat/{room_id}/send', 'Admin\ChatRoomController@sendMessage')->name('chat.send');
+            Route::get('chat', 'ChatListController@index')->name('chat.list');
+            Route::get('chat/{room_id}', 'ChatRoomController@show')->name('chat.room');
+            Route::post('chat/{room_id}/send', 'ChatRoomController@sendMessage')->name('chat.send');
         });
         Route::group(['prefix' => 'admin/attendance_daily', 'as' => 'attendance_daily.'], function () {
             Route::get('check-lock', 'Admin\AttendanceHeaderController@checkLock');
