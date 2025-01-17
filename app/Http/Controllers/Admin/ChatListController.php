@@ -35,20 +35,23 @@ class ChatListController extends Controller
             // 最後のIDを取得して+1する
             $lastId = ChatRoom::max('id') ?? 0;
             
+            // UTCの現在時刻を取得し、Asia/Tokyoに変換
+            $now = \Carbon\Carbon::now()->timezone('Asia/Tokyo');
+            
             // チャットルームを作成
             $chatRoom = ChatRoom::create([
                 'id' => $lastId + 1,
                 'admin_id' => Auth::id(),
                 'user_id' => $request->user_id,
                 'created_by' => Auth::id(),
-                'updated_by' => Auth::id()
+                'updated_by' => Auth::id(),
+                'created_at' => $now->setTimezone('UTC'), // UTCに戻して保存
+                'updated_at' => $now->setTimezone('UTC')  // UTCに戻して保存
             ]);
 
-            // 作成したチャットルームのIDを使用
             return redirect()->route('admin.chat.room', ['room_id' => $chatRoom->id]);
         }
 
-        // 既存のチャットルームがある場合はそのルームに遷移
         return redirect()->route('admin.chat.room', ['room_id' => $existingRoom->id]);
     }
 }

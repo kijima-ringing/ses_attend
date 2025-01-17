@@ -19,7 +19,7 @@
                             {{ $message->message }}
                         </div>
                         <div class="message-time">
-                            {{ \Carbon\Carbon::parse($message->created_at)->format('Y-n-j H:i') }}
+                            {{ \Carbon\Carbon::parse($message->created_at)->timezone('Asia/Tokyo')->format('Y-n-j H:i') }}
                         </div>
                     </div>
                 @endforeach

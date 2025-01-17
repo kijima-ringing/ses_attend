@@ -32,7 +32,7 @@
                                     $room = $chat_rooms->where('user_id', $user->id)->first();
                                 @endphp
                                 @if($room && $room->latestMessage)
-                                    {{ \Carbon\Carbon::parse($room->latestMessage->created_at)->format('Y-n-j') }}
+                                    {{ \Carbon\Carbon::parse($room->latestMessage->created_at)->timezone('Asia/Tokyo')->format('Y-n-j H:i:s') }}
                                 @endif
                             </td>
                             <td class="text-center">

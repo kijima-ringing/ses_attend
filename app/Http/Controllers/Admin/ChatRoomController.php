@@ -30,8 +30,10 @@ class ChatRoomController extends Controller
             ->where('admin_id', Auth::id())
             ->firstOrFail();
 
-        // 最後のIDを取得して+1する
         $lastId = ChatMessage::max('id') ?? 0;
+
+        // UTCの現在時刻を取得し、Asia/Tokyoに変換
+        $now = \Carbon\Carbon::now()->timezone('Asia/Tokyo');
 
         ChatMessage::create([
             'id' => $lastId + 1,
@@ -40,7 +42,9 @@ class ChatRoomController extends Controller
             'message' => $request->message,
             'read_flag' => 0,
             'created_by' => Auth::id(),
-            'updated_by' => Auth::id()
+            'updated_by' => Auth::id(),
+            'created_at' => $now->setTimezone('UTC'), // UTCに戻して保存
+            'updated_at' => $now->setTimezone('UTC')  // UTCに戻して保存
         ]);
 
         return redirect()->route('admin.chat.room', ['room_id' => $room_id]);
