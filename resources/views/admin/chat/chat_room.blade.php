@@ -68,10 +68,10 @@
                     </div>
                 @endforeach
             </div>
-            <form action="{{ route('admin.chat.send', ['room_id' => $chat_room->id]) }}" method="POST">
+            <form id="message-form" action="{{ route('admin.chat.send', ['room_id' => $chat_room->id]) }}" method="POST">
                 @csrf
                 <div class="input-group">
-                    <input type="text" name="message" class="chat-input" placeholder="メッセージを入力">
+                    <input type="text" id="message-input" name="message" class="chat-input" placeholder="メッセージを入力">
                     <div class="input-group-append">
                         <button type="submit" class="btn btn-primary">送信</button>
                     </div>
@@ -83,5 +83,5 @@
 @endsection
 
 @section('addJs')
-
+<script src="{{ asset('js/chat.js') }}"></script>
 @endsection

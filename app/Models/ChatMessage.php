@@ -9,6 +9,7 @@ class ChatMessage extends Model
     protected $table = 'chat_messages';
 
     protected $fillable = [
+        'id',
         'user_id',
         'chat_room_id',
         'message',
