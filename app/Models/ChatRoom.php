@@ -25,4 +25,19 @@ class ChatRoom extends Model
     public $incrementing = false;
 
     protected $keyType = 'integer';
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function latestMessage()
+    {
+        return $this->hasOne(ChatMessage::class)->latest();
+    }
+
+    public function messages()
+    {
+        return $this->hasMany(ChatMessage::class);
+    }
 }
