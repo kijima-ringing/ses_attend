@@ -32,7 +32,7 @@
                                 ->where('read_flag', 0)
                                 ->exists() : false;
                         @endphp
-                        <tr class="{{ $hasUnread ? 'table-danger' : '' }}">
+                        <tr style="{{ $hasUnread ? 'background-color: #f9d6d5;' : '' }}">
                             <td>{{ $user->last_name }} {{ $user->first_name }}</td>
                             <td>
                                 @if($room && $room->latestMessage)

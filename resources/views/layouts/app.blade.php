@@ -30,7 +30,6 @@
     <div id="app">
         <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
             <div class="container">
-
                 Adseed勤怠システム
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
                     <span class="navbar-toggler-icon"></span>
@@ -72,6 +71,26 @@
                 </div>
             </div>
         </nav>
+        @auth
+                @if(!Auth::user()->admin_flag)
+                    @php
+                        $hasUnreadMessages = \App\Models\ChatMessage::whereIn(
+                            'chat_room_id',
+                            \App\Models\ChatRoom::where('user_id', Auth::id())->pluck('id')
+                        )
+                        ->where('user_id', '!=', Auth::id())
+                        ->where('read_flag', 0)
+                        ->exists();
+                    @endphp
+                    @if($hasUnreadMessages)
+                        <div class="col-md-12 alert alert-danger">
+                            <div class="container text-center">
+                                未読のメッセージがあります。
+                            </div>
+                        </div>
+                    @endif
+                @endif
+            @endauth
         @can('admin')
             @include('layouts.sidebar')
         @else
