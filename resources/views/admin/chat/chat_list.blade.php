@@ -47,7 +47,7 @@
                                     <form action="{{ route('admin.chat.create') }}" method="POST">
                                         @csrf
                                         <input type="hidden" name="user_id" value="{{ $user->id }}">
-                                        <button type="submit" class="btn btn-success chat-button">チャット開始</button>
+                                        <button type="submit" class="btn btn-primary chat-button">チャット画面</button>
                                     </form>
                                 @endif
                             </td>
