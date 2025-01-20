@@ -13,6 +13,16 @@
 
 @section('content')
 <div class="container">
+    <div class="row pb-3">
+        <div class="col-md-12">
+            <div class="d-flex justify-content-end">
+                <a href="{{ route('user.attendance_header.show', ['user_id' => Auth::id(), 'year_month' => now()->format('Y-m')]) }}" class="nav-link">
+                    <i class="fas fa-calendar-alt mr-1"></i><span class="text-nowrap">勤怠一覧</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
     <div class="row">
         <div class="col-md-12">
             <table class="table table-bordered chat-list-table">
