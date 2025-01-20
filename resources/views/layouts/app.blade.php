@@ -83,7 +83,7 @@
                         ->exists();
                     @endphp
                     @if($hasUnreadMessages)
-                        <div class="col-md-12 alert alert-danger">
+                        <div class="col-md-12 alert alert-danger" style="max-width: 1140px; margin: auto; margin-top: 30px;">
                             <div class="container text-center">
                                 未読のメッセージがあります。
                             </div>
