@@ -21,4 +21,10 @@ $(document).ready(function() {
             return false;
         }
     });
+
+    // チャットコンテナを最下部にスクロール
+    const chatContainer = $('.chat-container');
+    if (chatContainer.length) {
+        chatContainer.scrollTop(chatContainer[0].scrollHeight);
+    }
 });
