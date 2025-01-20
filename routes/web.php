@@ -111,4 +111,6 @@ Route::middleware('auth')->group(function () {
         Route::post('/api/break/end', 'User\AttendanceStampController@endBreak');
     });
 
+    Route::post('/user/chat/create', [App\Http\Controllers\User\ChatListController::class, 'createRoom'])->name('user.chat.create');
+
 });
