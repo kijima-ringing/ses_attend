@@ -10,8 +10,9 @@ class CreateChatMessagesTable extends Migration
     {
         Schema::create('chat_messages', function (Blueprint $table) {
             $table->integer('id')->primary();
-            $table->integer('user_id')->notNullable();
             $table->integer('chat_room_id')->notNullable();
+            $table->integer('user_id')->notNullable();
+            $table->foreign('chat_room_id')->references('id')->on('chat_rooms')->onDelete('cascade');
             $table->text('message')->notNullable();
             $table->unsignedTinyInteger('read_flag')->default(0)->notNullable();
             $table->datetime('created_at')->notNullable();
