@@ -17,6 +17,12 @@ class ChatRoomController extends Controller
             ->where('admin_id', Auth::id())
             ->firstOrFail();
 
+        // 未読メッセージを既読に更新
+        ChatMessage::where('chat_room_id', $room_id)
+            ->where('user_id', '!=', Auth::id())
+            ->where('read_flag', 0)
+            ->update(['read_flag' => 1]);
+
         return view('admin.chat.chat_room', compact('chat_room'));
     }
 
@@ -56,21 +62,30 @@ class ChatRoomController extends Controller
             ->where('admin_id', Auth::id())
             ->firstOrFail();
 
+        // 新しいメッセージを取得すると同時に既読に更新
         $newMessages = ChatMessage::where('chat_room_id', $room_id)
             ->where('id', '>', $lastMessageId)
             ->orderBy('id', 'asc')
-            ->get()
-            ->map(function ($message) {
+            ->get();
+
+        // 他のユーザーからのメッセージを既読に更新
+        ChatMessage::where('chat_room_id', $room_id)
+            ->where('user_id', '!=', Auth::id())
+            ->where('read_flag', 0)
+            ->update(['read_flag' => 1]);
+
+        return response()->json([
+            'messages' => $newMessages->map(function ($message) {
                 return [
                     'id' => $message->id,
                     'message' => $message->message,
                     'is_current_user' => $message->user_id == Auth::id(),
                     'created_at' => \Carbon\Carbon::parse($message->created_at)
                         ->timezone('Asia/Tokyo')
-                        ->format('Y-n-j H:i')
+                        ->format('Y-n-j H:i'),
+                    'read_flag' => $message->read_flag
                 ];
-            });
-
-        return response()->json(['messages' => $newMessages]);
+            })
+        ]);
     }
 }

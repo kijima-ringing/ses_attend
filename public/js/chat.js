@@ -87,8 +87,10 @@ $(document).ready(function() {
                 <div class="message-content">
                     ${message.message}
                 </div>
-                <div class="message-time">
-                    ${message.created_at}
+                <div class="message-info">
+                    <span class="message-time">
+                        ${message.created_at}
+                    </span>
                 </div>
             </div>
         `;
