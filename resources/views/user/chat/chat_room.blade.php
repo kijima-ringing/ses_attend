@@ -14,7 +14,7 @@
             </div>
             <div class="chat-container">
                 @foreach($chat_room->messages as $message)
-                    <div class="message {{ $message->user_id == Auth::id() ? 'message-admin' : 'message-user' }}">
+                    <div class="message {{ $message->user_id == Auth::id() ? 'message-admin' : 'message-user' }}" data-message-id="{{ $message->id }}">
                         <div class="message-content">
                             {{ $message->message }}
                         </div>
@@ -24,7 +24,7 @@
                     </div>
                 @endforeach
             </div>
-            <form id="message-form" action="{{ route('user.chat.send', ['room_id' => $chat_room->id]) }}" method="POST">
+            <form id="message-form" action="{{ route('user.chat.send', ['room_id' => $chat_room->id]) }}" method="POST" data-room-id="{{ $chat_room->id }}">
                 @csrf
                 <div class="input-group">
                     <input type="text" id="message-input" name="message" class="chat-input" placeholder="メッセージを入力">

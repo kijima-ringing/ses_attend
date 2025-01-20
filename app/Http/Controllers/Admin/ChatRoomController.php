@@ -31,11 +31,9 @@ class ChatRoomController extends Controller
             ->firstOrFail();
 
         $lastId = ChatMessage::max('id') ?? 0;
-
-        // UTCの現在時刻を取得し、Asia/Tokyoに変換
         $now = \Carbon\Carbon::now()->timezone('Asia/Tokyo');
 
-        ChatMessage::create([
+        $message = ChatMessage::create([
             'id' => $lastId + 1,
             'chat_room_id' => $room_id,
             'user_id' => Auth::id(),
@@ -43,10 +41,36 @@ class ChatRoomController extends Controller
             'read_flag' => 0,
             'created_by' => Auth::id(),
             'updated_by' => Auth::id(),
-            'created_at' => $now->setTimezone('UTC'), // UTCに戻して保存
-            'updated_at' => $now->setTimezone('UTC')  // UTCに戻して保存
+            'created_at' => $now->setTimezone('UTC'),
+            'updated_at' => $now->setTimezone('UTC')
         ]);
 
-        return redirect()->route('admin.chat.room', ['room_id' => $room_id]);
+        return response()->json(['success' => true]);
+    }
+
+    public function checkNewMessages(Request $request, $room_id)
+    {
+        $lastMessageId = $request->input('last_message_id');
+
+        $chat_room = ChatRoom::where('id', $room_id)
+            ->where('admin_id', Auth::id())
+            ->firstOrFail();
+
+        $newMessages = ChatMessage::where('chat_room_id', $room_id)
+            ->where('id', '>', $lastMessageId)
+            ->orderBy('id', 'asc')
+            ->get()
+            ->map(function ($message) {
+                return [
+                    'id' => $message->id,
+                    'message' => $message->message,
+                    'is_current_user' => $message->user_id == Auth::id(),
+                    'created_at' => \Carbon\Carbon::parse($message->created_at)
+                        ->timezone('Asia/Tokyo')
+                        ->format('Y-n-j H:i')
+                ];
+            });
+
+        return response()->json(['messages' => $newMessages]);
     }
 }

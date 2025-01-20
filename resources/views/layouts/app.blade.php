@@ -22,6 +22,11 @@
 </head>
 <body>
 <meta name="user-id" content="{{ Auth::id() }}">
+@auth
+    <meta name="is-admin" content="{{ Auth::user()->admin_flag }}">
+@else
+    <meta name="is-admin" content="0">
+@endauth
     <div id="app">
         <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
             <div class="container">

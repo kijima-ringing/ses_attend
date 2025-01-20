@@ -68,6 +68,7 @@ Route::middleware('auth')->group(function () {
             Route::post('chat/create', 'ChatListController@createRoom')->name('chat.create');
             Route::get('chat/{room_id}', 'ChatRoomController@show')->name('chat.room');
             Route::post('chat/{room_id}/send', 'ChatRoomController@sendMessage')->name('chat.send');
+            Route::get('chat/{room_id}/check-new-messages', 'ChatRoomController@checkNewMessages')->name('chat.check_new_messages');
         });
         Route::group(['prefix' => 'admin/attendance_daily', 'as' => 'attendance_daily.'], function () {
             Route::get('check-lock', 'Admin\AttendanceHeaderController@checkLock');
@@ -92,6 +93,7 @@ Route::middleware('auth')->group(function () {
         Route::get('chat', 'ChatListController@index')->name('chat.list');
         Route::get('chat/{room_id}', 'ChatRoomController@show')->name('chat.room');
         Route::post('chat/{room_id}/send', 'ChatRoomController@sendMessage')->name('chat.send');
+        Route::get('chat/{room_id}/check-new-messages', 'ChatRoomController@checkNewMessages')->name('chat.check_new_messages');
     });
     Route::group(['prefix' => 'user/attendance_daily', 'as' => 'user.attendance_daily.', 'namespace' => 'User'], function () {
         // ロック関連のルート
