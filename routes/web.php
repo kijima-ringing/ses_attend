@@ -76,7 +76,7 @@ Route::middleware('auth')->group(function () {
         });
     });
 
-    Route::group(['prefix' => 'user', 'as' => 'user.', 'namespace' => 'User'], function () {
+    Route::group(['middleware' => ['auth'], 'prefix' => 'user', 'as' => 'user.', 'namespace' => 'User'], function () {
         Route::group(['middleware' => ['loginUserCheck']], function () {
             // Attendance Header Routes for Users
             Route::get('attendance_header/{user_id}/{year_month}', 'AttendanceHeaderController@show')->name('attendance_header.show');
@@ -87,6 +87,11 @@ Route::middleware('auth')->group(function () {
 
         Route::get('attendance_header/ajax_get_attendance_info', 'AttendanceHeaderController@ajaxGetAttendanceInfo')->name('attendance_header.ajax_get_attendance_info');
         Route::post('attendance_header/reapply', 'AttendanceHeaderController@reapply')->name('attendance_header.reapply');
+
+        // チャット機能用のルート
+        Route::get('chat', 'ChatListController@index')->name('chat.list');
+        Route::get('chat/{room_id}', 'ChatRoomController@show')->name('chat.room');
+        Route::post('chat/{room_id}/send', 'ChatRoomController@sendMessage')->name('chat.send');
     });
     Route::group(['prefix' => 'user/attendance_daily', 'as' => 'user.attendance_daily.', 'namespace' => 'User'], function () {
         // ロック関連のルート

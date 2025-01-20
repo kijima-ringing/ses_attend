@@ -29,6 +29,11 @@ class ChatRoom extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
+    public function admin()
+    {
+        return $this->belongsTo(User::class, 'admin_id');
+    }
+
     public function latestMessage()
     {
         return $this->hasOne(ChatMessage::class)->latest();

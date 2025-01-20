@@ -29,6 +29,11 @@
                 <i class="fas fa-clock mr-1"></i>打刻画面
             </a>
         </div>
+        <div class="col-2">
+            <a href="{{ route('user.chat.list') }}" class="nav-link text-right">
+                <i class="fas fa-comments mr-1"></i>チャット
+            </a>
+        </div>
     </div>
 
     <table class="table table-bordered">
