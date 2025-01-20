@@ -25,12 +25,16 @@
                 </thead>
                 <tbody>
                     @foreach($users as $user)
-                        <tr>
+                        @php
+                            $room = $chat_rooms->where('user_id', $user->id)->first();
+                            $hasUnread = $room ? \App\Models\ChatMessage::where('chat_room_id', $room->id)
+                                ->where('user_id', '!=', Auth::id())
+                                ->where('read_flag', 0)
+                                ->exists() : false;
+                        @endphp
+                        <tr class="{{ $hasUnread ? 'table-danger' : '' }}">
                             <td>{{ $user->last_name }} {{ $user->first_name }}</td>
                             <td>
-                                @php
-                                    $room = $chat_rooms->where('user_id', $user->id)->first();
-                                @endphp
                                 @if($room && $room->latestMessage)
                                     {{ \Carbon\Carbon::parse($room->latestMessage->created_at)->timezone('Asia/Tokyo')->format('Y-n-j H:i:s') }}
                                 @endif

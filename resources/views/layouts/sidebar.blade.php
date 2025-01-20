@@ -32,7 +32,7 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('admin.chat.list') }}">
+                        <a class="nav-link {{ \App\Models\ChatMessage::whereIn('chat_room_id', Auth::user()->adminChatRooms->pluck('id'))->where('user_id', '!=', Auth::id())->where('read_flag', 0)->exists() ? 'bg-danger text-white' : '' }}" href="{{ route('admin.chat.list') }}">
                             チャット一覧
                         </a>
                     </li>

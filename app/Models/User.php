@@ -92,4 +92,9 @@ class User extends Authenticatable
 
         return self::updateOrCreate(['id' => $request->id], $data);
     }
+
+    public function adminChatRooms()
+    {
+        return $this->hasMany(ChatRoom::class, 'admin_id');
+    }
 }
