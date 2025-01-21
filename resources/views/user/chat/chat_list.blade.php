@@ -46,7 +46,7 @@
                             <td>{{ $admin->last_name }} {{ $admin->first_name }}</td>
                             <td>
                                 @if($room && $room->latestMessage)
-                                    {{ \Carbon\Carbon::parse($room->latestMessage->created_at)->timezone('Asia/Tokyo')->format('Y-n-j H:i:s') }}
+                                    {{ \Carbon\Carbon::parse($room->latestMessage->created_at)->timezone('Asia/Tokyo')->format('Y-n-j H:i') }}
                                 @endif
                             </td>
                             <td class="text-center">
