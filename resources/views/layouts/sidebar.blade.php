@@ -33,7 +33,7 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {{ \App\Models\ChatMessage::whereIn('chat_room_id', Auth::user()->adminChatRooms->pluck('id'))->where('user_id', '!=', Auth::id())->where('read_flag', 0)->exists() ? 'bg-light-danger' : '' }}" href="{{ route('admin.chat.list') }}" style="{{ \App\Models\ChatMessage::whereIn('chat_room_id', Auth::user()->adminChatRooms->pluck('id'))->where('user_id', '!=', Auth::id())->where('read_flag', 0)->exists() ? 'background-color: #f9d6d5;' : '' }}">
-                            チャット一覧
+                            メッセージ
                         </a>
                     </li>
                 </ul>

@@ -27,7 +27,7 @@
         <div class="col-2 ml-auto">
             <div class="d-flex justify-content-end flex-nowrap">
                 <a href="{{ route('user.chat.list') }}" class="nav-link px-2">
-                    <i class="fas fa-comments mr-1"></i><span class="text-nowrap">チャット一覧</span>
+                    <i class="fas fa-comments mr-1"></i><span class="text-nowrap">メッセージ</span>
                 </a>
                 <a href="{{ route('stamp.index', ['user_id' => $attendance->user_id, 'year_month' => now()->format('Y-m')]) }}" class="nav-link px-2">
                     <i class="fas fa-clock mr-1"></i><span class="text-nowrap">打刻画面</span>
