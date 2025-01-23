@@ -113,4 +113,5 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/user/chat/create', [App\Http\Controllers\User\ChatListController::class, 'createRoom'])->name('user.chat.create');
 
+    Route::get('/api/check-admin-flag', 'Api\AdminFlagController@check');
 });

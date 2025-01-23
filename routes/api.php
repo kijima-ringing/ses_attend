@@ -16,3 +16,7 @@ use Illuminate\Http\Request;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+Route::middleware('auth')->group(function () {
+    Route::get('/check-admin-flag', 'Api\AdminFlagController@check');
+});

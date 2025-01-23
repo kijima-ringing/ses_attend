@@ -6,6 +6,7 @@
 
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="is-admin" content="{{ Auth::check() ? Auth::user()->admin_flag : '0' }}">
 
     <title>Adseed勤怠システム</title>
 
@@ -130,6 +131,7 @@
         <script src="{{ asset('vendor/jquery-ui/jquery-ui.js') }}"></script>
         <script src="{{ asset('vendor/jquery-ui/jquery.mtz.monthpicker.js') }}"></script>
         <script src="{{ asset('js/common.js') }}"></script>
+        <script src="{{ asset('js/checkAdminFlag.js') }}"></script>
         @yield('addJs')
     </div>
 </body>
