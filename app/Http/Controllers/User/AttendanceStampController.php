@@ -319,6 +319,11 @@ class AttendanceStampController extends Controller
                 ->where('work_date', $now->format('Y-m-d'))
                 ->first();
 
+            if (!$daily) {
+                session()->flash('error_message', '出勤時間が記録されていないため、休憩を終了できません。');
+                return response()->json(['success' => false, 'message' => '出勤時間が記録されていないため、休憩を終了できません。'], 400);
+            }
+
             if ($daily && $daily->locked_at && $daily->locked_by !== $user->id) {
                 $lockedAt = Carbon::parse($daily->locked_at);
                 if ($lockedAt->diffInMinutes($now) < 5) {
