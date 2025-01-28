@@ -143,20 +143,29 @@ $(function() {
             url: form.attr('action'),
             data: form.serialize(),
             success: function(response) {
+                // モーダルを閉じる
+                $('#InputForm').modal('hide');
+                
+                // 即座にページをリロード（メッセージはセッションから表示される）
                 location.reload();
             },
             error: function(xhr) {
+                // モーダル内のエラーメッセージ表示エリアをクリア
+                $('.alert-danger ul').empty();
+                
                 if (xhr.responseJSON && xhr.responseJSON.errors) {
                     var errors = xhr.responseJSON.errors;
                     $.each(errors, function(key, value) {
                         $('.alert-danger').removeClass('d-none').find('ul').append('<li>' + value + '</li>');
                     });
+                } else if (xhr.responseJSON && xhr.responseJSON.message) {
+                    $('.alert-danger').removeClass('d-none').find('ul').append('<li>' + xhr.responseJSON.message + '</li>');
                 } else {
                     $('.alert-danger').removeClass('d-none').find('ul').append('<li>予期せぬエラーが発生しました</li>');
                 }
             },
             complete: function() {
-                isSubmitting = false;  // リクエストが完了したらフラグをリセット
+                isSubmitting = false;
                 submitButton.prop('disabled', false);
             }
         });

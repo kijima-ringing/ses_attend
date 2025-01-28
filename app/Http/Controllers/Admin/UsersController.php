@@ -58,12 +58,22 @@ class UsersController extends Controller
                 }
             });
 
+            // セッションフラッシュメッセージを設定
             session()->flash('flash_message', '社員リストを更新しました。');
-        } catch (\Exception $e) {
-            session()->flash('error_message', $e->getMessage());
-        }
 
-        return redirect(route('admin.users.index'));
+            return response()->json([
+                'success' => true,
+                'message' => '社員リストを更新しました。'
+            ]);
+        } catch (\Exception $e) {
+            // エラーメッセージをセッションに設定
+            session()->flash('error_message', $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }
 
     public function destroy(Request $request) {
