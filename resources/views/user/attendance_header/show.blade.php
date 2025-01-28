@@ -100,7 +100,13 @@
                 </th>
                 <th class="text-center break_times">
                     @if (isset($attendanceDaily[$day['work_date']]))
-                        @foreach ($attendanceDaily[$day['work_date']]['break_times'] ?? [] as $breakTime)
+                        @php
+                            $breakTimes = collect($attendanceDaily[$day['work_date']]['break_times'] ?? [])
+                                ->sortBy('break_time_from')
+                                ->values()
+                                ->all();
+                        @endphp
+                        @foreach ($breakTimes as $breakTime)
                             {{ AttendanceHelper::timeFormat($breakTime['break_time_from']) }} ~ {{ AttendanceHelper::timeFormat($breakTime['break_time_to']) }}<br>
                         @endforeach
                     @endif
